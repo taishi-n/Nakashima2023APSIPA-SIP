@@ -1,0 +1,75 @@
+% BSS notations
+% Author: Taishi Nakashima
+% Last modified: 2021/11/16
+\DeclareMathOperator{\sinc}{sinc}
+
+\newcommand{\myterm}[1]{\textgt{#1}}
+
+\newcommand{\logdet}[1]{\log \lvert \det #1 \rvert}
+
+% Set of complex numbers
+\newcommand{\C}{\mathbb{C}}
+
+% Complex Gaussian distribution
+\newcommand{\cGauss}{\mathcal{N}_{\text{C}}}
+
+% Hermite転置
+\newcommand{\hermite}{\mathsf{H}}
+\renewcommand{\top}{\mathsf{T}}
+
+% エルミート転置ありの場合に suffix がずれないようにするための空白
+\newcommand{\nohermite}{\vphantom{\hermite}}
+
+% 周波数インデクス
+\newcommand{\freq}{f}
+\newcommand{\Freq}{F}
+\newcommand{\freqPhys}{\nu}
+\newcommand{\freqSamp}{\freq _{\mathrm{s}}}
+\newcommand{\SubFreq}{\tilde{\Freq}}
+\newcommand{\nfft}{L}
+
+% 時間フレームインデクス
+\newcommand{\tframe}{t}
+\newcommand{\Tframe}{T}
+
+% 音源インデクス
+\newcommand{\src}{k}
+\newcommand{\Src}{K}
+
+% マイクインデクス
+\newcommand{\mic}{m}
+\newcommand{\Mic}{M}
+\newcommand{\dMic}{L}  % 音場補間の一時変数L
+
+% % NMF基底インデクス
+% \newcommand{\basis}{\ell}
+% \newcommand{\Basis}{L}
+
+% 時間周波数
+\newcommand{\ft}{\freq\tframe}
+
+% 分離行列，分離ベクトル
+\newcommand{\demix}{\bm{w}}
+\newcommand{\Demix}{\bm{W}}
+
+% 混合行列，混合ベクトル
+\newcommand{\steer}{\bm{a}}
+\newcommand{\Steer}{\bm{A}}
+
+% signals
+\newcommand{\sig}{s}
+\newcommand{\obs}{\bm{x}}
+\newcommand{\est}{\bm{y}}
+
+% IVA
+\newcommand{\srcvar}{r}
+\newcommand{\cov}{\bm{V}}
+\newcommand{\newcov}{\tilde{\cov}}
+\newcommand{\forget}{\alpha}
+\newcommand{\weight}{\varphi}
+
+% sound field interpolation
+\newcommand{\rotObs}{\hat{\obs}}
+\newcommand{\rotMat}{\bm{U}}
+\newcommand{\rotDeg}{\theta}
+\newcommand{\rotFra}{\hat{\tframe}}
