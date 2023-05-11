@@ -1,6 +1,5 @@
-\documentclass{article}
-\usepackage{waspaa23}
-\usepackage[dvipdfmx]{graphicx}
+\documentclass[twocolumn,9pt,dvipdfmx]{article}
+\usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -9,44 +8,88 @@
 \usepackage{cite}
 % \usepackage{times}
 \usepackage[nolist,nohyperlinks]{acronym}
+\usepackage{mathtools}
 \usepackage{flushend}
 
 \usepackage{bm}
 \usepackage{booktabs}
 \usepackage{siunitx}
 \usepackage{subcaption}
+\usepackage{hyperref}
 \usepackage{cleveref}
+
+\usepackage[margin=15mm]{geometry}
+
+% psuedo codes
+\usepackage[xparse,breakable,hooks,listingsutf8,documentation]{tcolorbox}
+\tcbuselibrary{theorems,skins}
+\usepackage{tabularx}
+\usepackage{pseudo}
+\newtcbtheorem[crefname = {Algorithm}{algorithms}]{algorithm}{Algorithm}{pseudo/booktabs, float=t, theorem hanging indent=0pt}{alg}
+\pseudodefinestyle{fullwidth}{
+    begin-tabular=
+    \tabularx{\textwidth}[t]{@{}
+        r                                          % Labels
+        >{\leavevmode\pseudosetup}                 % Indent, font, ...
+        X                                          % Code (flexible)
+        >{\leavevmode} % Comment styling
+        p{0.20\textwidth}                           % Comments (fixed)
+        @{}},
+    end-tabular=\endtabularx,
+}
+\pseudoset{%
+   fullwidth,
+   kwfont=\sffamily\bfseries,
+   font=\kwfont,
+   prfont=\textsf,
+   hsep=.3em,
+   indent-mark,
+   indent-mark-shift=.5em,
+   indent-length=1em,
+   line-height=1.5,
+   ct-left=\hfill\texttt{//}~,
+   ct-right=,
+   % label=\textcircled{\ttfamily\scriptsize\arabic*},
+   label=,
+   % ref,
+}
+% 擬似コード内の数式を揃える (https://latex.org/forum/viewtopic.php?t=26363)
+\usepackage{xparse}
+\DeclareDocumentCommand{\psm}{m O{$\gets$}}{% pseudocode-math
+  {\hphantom{$W_{k,f,t - 1}$}\llap{#1}~#2}%
+  % {\rlap{#1}\hphantom{$W_{k,f,t}$}#2}%
+}
 
 \usepackage{bsssym}
 
 \title{Rotation Robust Online Independent Vector Analysis with\\Sound Field Interpolation of Circular Microphone Array}
-\name{%
+\author{%
   Taishi Nakashima \textsuperscript{\textdagger},
   Yukoh Wakabayashi \textsuperscript{\textdaggerdbl},
   Nobutaka Ono \textsuperscript{\textdagger}
   \thanks{This work was supported by JST CREST Grant Number \mbox{JPMJCR19A3} and JSPS KAKENHI Grant Number \mbox{JP21J22039}, Japan.}
 }
-\address{%
-  \begin{minipage}{.5\textwidth}
-    \begin{tabular}{@{}c@{}}
-      \textsuperscript{\textdagger}
-      Graduate School of Systems Design,\\
-      Tokyo Metropolitan University\\
-      {\small 6--6, Asahigaoka, Hino-shi, Tokyo 191--0065, Japan}\\
-      {\footnotesize \url{nakashima-taishi@ed.tmu.ac.jp}, \url{onono@tmu.ac.jp}}
-    \end{tabular}
-  \end{minipage}
-  \hfill
-  \begin{minipage}{.5\textwidth}
-    \begin{tabular}{@{}c@{}}
-      \textsuperscript{\textdaggerdbl}
-      Graduate School of Engineering,\\
-      Toyohashi University of Technology\\
-      {\small 1--1 Hibarigaoka, Tempaku-cho, Toyohashi, Aichi, 441--8580}\\
-      {\footnotesize \url{wakayuko@cs.tut.ac.jp}}
-    \end{tabular}
-  \end{minipage}
-}
+% \address{%
+%   \begin{minipage}{.5\textwidth}
+%     \begin{tabular}{@{}c@{}}
+%       \textsuperscript{\textdagger}
+%       Graduate School of Systems Design,\\
+%       Tokyo Metropolitan University\\
+%       {\small 6--6, Asahigaoka, Hino-shi, Tokyo 191--0065, Japan}\\
+%       {\footnotesize \url{nakashima-taishi@ed.tmu.ac.jp}, \url{onono@tmu.ac.jp}}
+%     \end{tabular}
+%   \end{minipage}
+%   \hfill
+%   \begin{minipage}{.5\textwidth}
+%     \begin{tabular}{@{}c@{}}
+%       \textsuperscript{\textdaggerdbl}
+%       Graduate School of Engineering,\\
+%       Toyohashi University of Technology\\
+%       {\small 1--1 Hibarigaoka, Tempaku-cho, Toyohashi, Aichi, 441--8580}\\
+%       {\footnotesize \url{wakayuko@cs.tut.ac.jp}}
+%     \end{tabular}
+%   \end{minipage}
+% }
 
 % % for DeepL
 % \rhead{}
@@ -73,13 +116,13 @@
   Therefore, in this paper, we attempt to employ the sound field interpolation for circular microphone arrays (CMAs) as a pre-processing for OIVA.
   Simulation experiments confirmed that the sound field interpolation improves the source separation performance.
 \end{abstract}
-\begin{keywords}
-  Blind source separation,
-  online source separation,
-  independent vector analysis,
-  circular microphone array,
-  sound field interpolation
-\end{keywords}
+% \begin{keywords}
+%   Blind source separation,
+%   online source separation,
+%   independent vector analysis,
+%   circular microphone array,
+%   sound field interpolation
+% \end{keywords}
 
 \section{Introduction}
 % ブラインド音源分離など多くのアレイ信号処理では，時不変な系を仮定する．
@@ -114,9 +157,9 @@ Furthermore, the source separation performance is evaluated by simulation experi
 % $\sig _{\src\ft} \in \C\; (\src = 1, \dots, \Src)$は$\src$個目の音源信号，
 % $\steer _{\src\ft} \in \C ^{\Mic}\; (\src = 1, \dots, \Mic)$はそのステアリングベクトルである．
 Let $\Src$ and $\Mic$ respectively be the number of sources and microphones.
-We assume that the observed signal $\obs _{\ft}$ is modelled as:
+We assume that the observed signal $\Obs _{\ft}$ is modelled as:
 \begin{equation}
-  \obs _{\ft} = \sum _{\src=1} ^{\Src} \steer _{\src\ft} \sig _{\src\ft},
+  \Obs _{\ft} = \sum _{\src=1} ^{\Src} \steer _{\src\ft} \sig _{\src\ft},
 \end{equation}
 in the short-time Fourier transform (STFT) domain,
 where $\freq = 1, \dots, \Freq$ denotes the frequency bin index,
@@ -133,12 +176,12 @@ $\steer _{\src\ft} \in \C ^{\Mic}\; (\src = 1, \dots, \Mic)$ denotes the steerin
 % ここで，$\Demix _{\ft}$は分離行列，$\est _{\ft}$は分離信号である．
 % 本研究では，ある時間フレーム$\rotFra$においてCMAが角度$\rotDeg$回転した状況下で分離行列を推定することを考える．
 % ただし，$\rotFra$および$\rotDeg$は既知とする．
-Online blind source separation aims to estimate the demixing matrix and estimated signals using only the current and past observed signals $\{\obs _{\freq,i}\} _{i=1} ^{\tframe}$:
+Online blind source separation aims to estimate the demixing matrix and estimated signals using only the current and past observed signals $\{\Obs _{\freq,i}\} _{i=1} ^{\tframe}$:
 \begin{align}
   \Demix _{\ft} &= \begin{bmatrix} \demix _{1\ft} & \dots & \demix _{\Src\ft} \end{bmatrix} ^{\hermite} \in \C ^{\Src \times \Mic}, \\
-  \est _{\ft} &= \Demix _{\ft} \obs _{\ft} \in \C ^{\Src},
+  \Est _{\ft} &= \Demix _{\ft} \Obs _{\ft} \in \C ^{\Src},
 \end{align}
-where $\Demix _{\ft}$ is the demixing matrix and $\est _{\ft}$ is the estimated signal.
+where $\Demix _{\ft}$ is the demixing matrix and $\Est _{\ft}$ is the estimated signal.
 We consider estimating the demixing matrix in a situation where the CMA is rotated by an angle $\rotDeg$ in a certain time frame $\rotFra$.
 In this study, $\rotFra$ and $\rotDeg$ are assumed to be known.
 
@@ -146,39 +189,40 @@ In this study, $\rotFra$ and $\rotDeg$ are assumed to be known.
 {%
   \color{red}\bf
   式迷走中… $\rotObs _{\ft}$は回転後の観測信号とするか，回転を補償した後の観測信号とするかで$\rotMat$のかけ方が変わる．
-  若林先生のASLP論文では$\rotObs _{\ft} = \rotMat (-\rotDeg) \obs _{\ft}$と書いていて，$\obs _{\ft}$は回転後の信号としている？
+  若林先生のASLP論文では，絶対基準位置の観測信号$\refObs _{\ft}$があり，$\refObs _{\ft} = \rotMat (-\rotDeg) \Obs _{\ft}$と書いている．
 }
 
-音場補間は，CMAが回転した後の位置における観測信号$\rotObs _{\ft}\; (\tframe \geq \rotFra)$のみを用いて，
-CMAの回転をキャンセルする行列$\rotMat (\rotDeg) \in \C ^{\Mic\times\Mic}$を推定することを目指す:
+音場補間では，
+CMAが回転した後の位置における観測信号$\rotObs _{\ft}\; (\tframe \geq \rotFra)$と，ある行列$\rotMat (\rotDeg) \in \R ^{\Mic\times\Mic}$を用いて，
+CMAが回転する前の位置における観測信号$\Obs _{\ft}$を推定する．
 \begin{equation}
-  \obs _{\ft} = \rotMat (\rotDeg) \rotObs _{\ft},
+  \Obs _{\ft} = \rotMat (\rotDeg) \rotObs _{\ft},
 \end{equation}
 $\rotMat (\rotDeg)$の計算方法の詳細は文献 \cite{Wakabayashi:2020:ASJ:A} を見よ．
-$\rotMat (\rotDeg)$が推定できれば，CMAが回転する前の位置における観測信号は$\obs _{\ft} = $
-CMAが回転する前の時間フレーム$\tframe < \rotFra$における観測信号$\obs _{\ft}$を用いて分離行列$\Demix _{\ft}$が推定できていたとする．
-音場補間を適用し，回転前の観測信号を推定することで，CMAが回転した後も分離行列を推定し直すことなく分離信号$\est _{\ft}$が得られる．
+$\rotMat (\rotDeg)$が推定できれば，CMAが回転する前の位置における観測信号は$\Obs _{\ft} = $
+CMAが回転する前の時間フレーム$\tframe < \rotFra$における観測信号$\Obs _{\ft}$を用いて分離行列$\Demix _{\ft}$が推定できていたとする．
+音場補間を適用し，回転前の観測信号を推定することで，CMAが回転した後も分離行列を推定し直すことなく分離信号$\Est _{\ft}$が得られる．
 \begin{equation}
-  \est _{\ft} = \Demix _{\ft} \rotObs _{\ft} = \Demix _{\ft} \left(\rotMat (\rotDeg)^{-1} \obs _{\ft}\right).
+  \Est _{\ft} = \Demix _{\ft} \rotObs _{\ft} = \Demix _{\ft} \left(\rotMat (\rotDeg)^{-1} \Obs _{\ft}\right).
 \end{equation}
 
 本論文では，補助関数型独立ベクトル分析 (auxiliary-function-based independent vector analysis; AuxIVA) \cite{Ono:2011:WASPAA}
 およびそのオンライン拡張 (online AuxIVA; OIVA) \cite{Taniguchi:2014:HSCMA} を用いて音源分離を行う．
 AuxIVAでは，各音源$\src = 1, \dots, \Src$に対して次の更新式で時不変な分離行列$\Demix _{\freq}$を推定する．
 \begin{align}
-  \srcvar _{\src\tframe} &\gets \sqrt{\sum _{\freq=1} ^{\Freq} \lvert \demix ^{\hermite} _{\src\freq} \obs ^{\nohermite}_{\ft} \rvert ^2}, \\
-  \cov _{\src\freq} &\gets \frac{1}{\Tframe} \sum _{\tframe=1} ^{\Tframe} \weight (\srcvar_{\src\tframe}) \obs _{\ft} \obs _{\ft}^{\hermite}, \\
+  \var _{\src\tframe} &\gets \sqrt{\sum _{\freq=1} ^{\Freq} \lvert \demix ^{\hermite} _{\src\freq} \Obs ^{\nohermite}_{\ft} \rvert ^2}, \\
+  \cov _{\src\freq} &\gets \frac{1}{\Tframe} \sum _{\tframe=1} ^{\Tframe} \weight (\var_{\src\tframe}) \Obs _{\ft} \Obs _{\ft}^{\hermite}, \\
   \demix _{\src\freq} &\gets (\Demix _{\freq} \cov _{\src\freq}) ^{-1} \bm{e} _{\src} \label{eq:ip:proj}, \\
   \demix _{\src\freq} &\gets {\demix _{\src\freq}} / {\sqrt{\demix _{\src\freq} ^{\hermite} \cov _{\src\freq} \demix _{\src\freq}}} \label{eq:ip:norm}.
 \end{align}
 ここで，$\bm{e}_{\src}$は単位行列の$\src$列目のベクトルである．
 $\cov _{\src\freq}$は{重み付き共分散行列}と呼ばれる．
-$\weight(\srcvar)$は音源モデルによって定まる関数であり，
-本論文では時変Gauss分布$\weight (\srcvar) = \Freq/{\srcvar ^2}$ \cite{Ono:2012:APSIPA}を用いる．
+$\weight(\var)$は音源モデルによって定まる関数であり，
+本論文では時変Gauss分布$\weight (\var) = \Freq/{\var ^2}$ \cite{Ono:2012:APSIPA}を用いる．
 
 一方OIVAでは，各時間フレーム$\tframe$ごと重み付き共分散行列$\cov _{\src\ft}$を更新する~\cite{Taniguchi:2014:HSCMA}．
 \begin{equation}
-  \cov _{\src\ft} \gets \forget \cov _{\src\freq(\tframe-1)} + (1 - \forget) \weight ({\srcvar _{\src\tframe}}) \obs _{\ft} \obs _{\ft}^{\hermite}.
+  \cov _{\src\ft} \gets \forget \cov _{\src\freq(\tframe-1)} + (1 - \forget) \weight ({\var _{\src\tframe}}) \Obs _{\ft} \Obs _{\ft}^{\hermite}.
 \end{equation}
 ここで，$\forget\; (0 \leq \forget < 1)$は忘却係数である．
 分離行列は\cref{eq:ip:proj}, \cref{eq:ip:norm}と同じ更新式を用いて書く時間フレームで更新する．
@@ -202,14 +246,14 @@ $\weight(\srcvar)$は音源モデルによって定まる関数であり，
 TBD
 \begin{itemize}
   \item 音場補間は周波数が高くなるほどモデルとの乖離が大きくなり補間性能が悪くなる \cite{Wakabayashi:2020:ASJ:A}
-  \item 音源分離に用いる音源モデル$\srcvar _{\src\tframe}$を計算するとき，補間がうまくできている周波数帯域だけで計算すれば分離性能が改善されると期待できる
+  \item 音源分離に用いる音源モデル$\var _{\src\tframe}$を計算するとき，補間がうまくできている周波数帯域だけで計算すれば分離性能が改善されると期待できる
   \item サンプリング周波数$\freqSamp~\unit{\hertz}$，FFT点数$\nfft$のとき，STFTの周波数ビンインデクス$\freq$と物理的な周波数$\freqPhys$の対応
     \begin{equation}
       \freqPhys = \frac{(\freq - 1)\times\freqSamp}{\nfft} \quad \left(\freq = 1, \dots, \frac{\nfft}{2} + 1\right),
     \end{equation}
   \item 修正された音源モデルの更新式
     \begin{equation}
-      \srcvar _{\src\tframe} = \sqrt{\sum _{\freq = 1} ^{\SubFreq} \lvert \demix _{\src\ft} \obs _{\ft} \rvert ^2},
+      \var _{\src\tframe} = \sqrt{\sum _{\freq = 1} ^{\SubFreq} \lvert \demix _{\src\ft} \Obs _{\ft} \rvert ^2},
     \end{equation}
     ただし，$\SubFreq$は周波数の上限
 \end{itemize}
@@ -339,59 +383,190 @@ Future work includes combining this method with self-rotation angle estimation \
 \bibliography{IEEEabrv,ref}
 
 \clearpage\newpage
-\onecolumn
-\section*{Results of frequency band limitation}
-\newcommand{\myscale}{.75}
-\begin{figure*}[h]
-  \centering
-  \begin{subfigure}[t]{.3\textwidth}
-    \includegraphics[scale=\myscale]{figures/plots/online/Gauss_2000_97.pdf}
-    \caption{$\SubFreq = 2000$}
-  \end{subfigure}
-  \begin{subfigure}[t]{.3\textwidth}
-    \includegraphics[scale=\myscale]{figures/plots/online/Gauss_4000_97.pdf}
-    \caption{$\SubFreq = 4000$}
-  \end{subfigure}
-  \begin{subfigure}[t]{.3\textwidth}
-    \includegraphics[scale=\myscale]{figures/plots/online/Gauss_8000_97.pdf}
-    \caption{$\SubFreq = 8000$}
-  \end{subfigure}
-  \caption{Frame-wise SI-SDR improvements (dB) with varying $\SubFreq$ where $\forget = 0.97$.}
-  \label{fig:online:97}
-\end{figure*}
-\begin{figure*}[h]
-  \centering
-  \begin{subfigure}[t]{.3\textwidth}
-    \includegraphics[scale=\myscale]{figures/plots/online/Gauss_2000_99.pdf}
-    \caption{$\SubFreq = 2000$}
-  \end{subfigure}
-  \begin{subfigure}[t]{.3\textwidth}
-    \includegraphics[scale=\myscale]{figures/plots/online/Gauss_4000_99.pdf}
-    \caption{$\SubFreq = 4000$}
-  \end{subfigure}
-  \begin{subfigure}[t]{.3\textwidth}
-    \includegraphics[scale=\myscale]{figures/plots/online/Gauss_8000_99.pdf}
-    \caption{$\SubFreq = 8000$}
-  \end{subfigure}
-  \caption{Frame-wise SI-SDR improvements (dB) with varying $\SubFreq$ where $\forget = 0.99$.}
-  \label{fig:online:99}
-\end{figure*}
-\begin{figure*}[h]
-  \centering
-  \begin{subfigure}[t]{.3\textwidth}
-    \includegraphics[scale=\myscale]{figures/plots/online/Gauss_2000_995.pdf}
-    \caption{$\SubFreq = 2000$}
-  \end{subfigure}
-  \begin{subfigure}[t]{.3\textwidth}
-    \includegraphics[scale=\myscale]{figures/plots/online/Gauss_4000_995.pdf}
-    \caption{$\SubFreq = 4000$}
-  \end{subfigure}
-  \begin{subfigure}[t]{.3\textwidth}
-    \includegraphics[scale=\myscale]{figures/plots/online/Gauss_8000_995.pdf}
-    \caption{$\SubFreq = 8000$}
-  \end{subfigure}
-  \caption{Frame-wise SI-SDR improvements (dB) with varying $\SubFreq$ where $\forget = 0.995$.}
-  \label{fig:online:995}
-\end{figure*}
+\section*{音場補間$\times$音源分離の評価方法}
+\subsection*{変数一覧}
+\begin{itemize}
+  \item $\Src, \Mic$: 音源・マイク数
+  \item $\steer _{\src,\ft} \in \C ^{\Mic}\; (\src = 1, \dots, \Src)$: ステアリングベクトル
+  \item $\sig _{\src,\ft} \in \C$: 音源信号
+  \item $\Img _{\src,\ft} = \steer _{\src,\ft} \sig _{\src,\ft} \in \C^{\Mic}$: 参照信号%（参照マイク位置での音源信号）
+  \item $\Obs _{\ft} = \sum _{\src=1} ^{\Src} \Img _{\src,\ft} \in \C^{\Mic}$: 観測信号（\textcolor{red}{\textbf{基準位置}}）
+  \item $\rotObs _{\ft} \coloneqq \rotMat _{\rotDeg} \Obs _{\ft} \; (\tframe \geq \rotFra)$: 観測信号（\textcolor{red}{\textbf{回転後}}）
+  \item $\Est _{\ft} \coloneqq \Demix _{\ft} \Obs _{\ft}$: 分離信号
+  \item $\rotDeg, \rotFra \in \R$: 回転角度・時刻
+  \item $\rotMat _{\rotDeg} \in \R ^{\Mic \times \Mic}$: 回転行列
+  \item $\cov _{\src,\ft} \gets \forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight (\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$: 共分散行列
+\end{itemize}
+
+\subsection*{目的}
+\begin{itemize}
+  \item 音源分離では観測信号を ``混ぜ直して'' 新たに入力としても出力は変わらないはず
+    \begin{itemize}
+      \item 音場補間も一種の ``混ぜ直し''
+        \begin{itemize}
+          \item[$\Rightarrow$] 音場補間があってもなくても分離性能は変わらなさそうに思える
+          \item[$\Rightarrow$] それでも音場補間を行う意義は何か？
+        \end{itemize}
+    \end{itemize}
+  \item マイク回転前までに得られた$\cov _{\src,\ft}$を活用したい
+    \begin{itemize}
+      \item[$\Rightarrow$] 回転時に$\cov _{\src,\ft},\, \Demix _{\ft}$を ``回転後の座標'' へ変換
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{``回転後の座標''への変換}
+\begin{align}
+  \rot{\cov} _{\src,\freq} &\coloneqq \frac{1}{\Tframe} \sum _{\tframe = 1} ^{\Tframe} \weight (\var _{\src,\tframe}) \rotObs _{\ft} \rotObs _{\ft} ^{\hermite} \\
+                           &= \frac{1}{\Tframe} \sum _{\tframe = 1} ^{\Tframe} \weight (\var _{\src,\tframe}) (\rotMat _{\rotDeg} \Obs _{\ft}) (\Obs _{\ft} ^{\hermite} \rotMat _{\rotDeg} ^{\hermite}) \\
+                           &= \rotMat _{\rotDeg} \left(\frac{1}{\Tframe} \sum _{\tframe = 1} ^{\Tframe} \weight (\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}\right) \rotMat _{\rotDeg} ^{\hermite} \\
+                           &= \rotMat _{\rotDeg} \cov _{\src,\freq} \rotMat _{\rotDeg} ^{\hermite}
+% \end{align}
+% \begin{align}
+  \\
+  \Est _{\ft} &= \Demix _{\ft} \Obs _{\ft} \\
+              &= \Demix _{\ft} \underbrace{(\rotMat _{\rotDeg} ^{\hermite} \rotMat _{\rotDeg})}_{=I} \Obs _{\ft} \\
+              &= \underbrace{(\Demix _{\ft} \rotMat _{\rotDeg} ^{\hermite})}_{\coloneqq \rotDemix _{\ft}} (\rotMat _{\rotDeg} \Obs _{\ft}) \\
+              &= \rotDemix _{\ft} \rotObs _{\ft}
+\end{align}
+
+\subsection*{現在の処理の流れ}
+\begin{itemize}
+  \item 入力信号: 観測信号（途中でマイクが回転）
+  \item 評価方法: SI-SDR
+    \begin{itemize}
+      \item SI-SDRの参照信号: 回転なしの観測信号
+    \end{itemize}
+  \item Projection back:
+    \begin{itemize}
+      \item $\ell$: Reference mic.
+    \end{itemize}
+    \begin{align}
+      \Steer _{\ft} &\coloneqq \begin{bmatrix} \steer _{1,\ft} & \dots & \steer _{\Mic,\ft} \end{bmatrix} \gets \Demix _{\ft} ^{-1} \\
+      \Est _{\ft} &\gets
+      \begin{bmatrix}
+        a _{1\ell} & \dots  & 0 \\
+        \vdots     & \ddots & \vdots \\
+        0          & \dots  & a _{\Src\ell}
+      \end{bmatrix}
+        \Demix _{\ft} \Obs _{\ft}
+    \end{align}
+\end{itemize}
+
+\subsection*{TODO}
+\begin{itemize}
+  \item 疑問
+    \begin{itemize}
+      \item SI-SDRの参照信号はマイク回転あり or なし？\\ $\Rightarrow$回転前後でそれぞれ独立に評価する
+      \item 共分散行列をオンラインで更新する場合の ``座標変換'' の関係？\\ バッチの場合と勝手が違う気がする…
+    \end{itemize}
+  \item 比較手法
+    \begin{itemize}
+      % \item マイク回転前後で2個のブロックごと独立にバッチ
+      \item \Cref{alg:naive}: 通常のOnline AuxIVA
+      \item \Cref{alg:reset}: 回転後に$\Demix _{\ft}, \cov _{\src,\ft}$を初期化
+      \item \Cref{alg:sfi}: 回転後に音場補間 $\Obs _{\ft} = \rotMat _{\rotDeg} ^{-1} \rotObs _{\ft}$
+      \item \Cref{alg:coord}: 回転した瞬間に座標変換\\
+        $\rotDemix _{\ft} \gets \Demix _{\ft} \rotMat _{\rotDeg} ^{\hermite}$,\; $\rotCov _{\src,\ft} \gets \rotMat _{\rotDeg} \cov _{\src,\ft} \rotMat _{\rotDeg} ^{\hermite}$
+% 回転前のマイクにPB
+% マイクが回転しない領域で行う？
+    \end{itemize}
+\end{itemize}
+
+\clearpage\newpage\noindent
+\begin{algorithm}{Na\"{i}ve Online AuxIVA}{naive}
+  \begin{pseudo}
+    for $\tframe = 1,\, \dots,\, \Tframe$ \\+
+      {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
+      for $\src = 1,\, \dots,\, \Src$ \\+
+        {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \\
+        {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{$(\forall \freq)$}\\-
+      forall $\src = 1, \dots, \Src$ \\+
+        {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{$(\forall \freq)$}\\
+        {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{$(\forall \freq)$} \\-
+        {$\Est _{\ft}  $} $\gets$ $\Demix _{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$}
+  \end{pseudo}
+\end{algorithm}
+
+\newpage\noindent
+\begin{algorithm}{Online AuxIVA with reset}{reset}
+  \begin{pseudo}
+    for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
+      \pr{Na\"ive Online AuxIVA}(\Obs _{ft}) \\-
+      % \psm{$\Demix _{\ft}$} $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
+      % for $\src = 1,\, \dots,\, \Src$ \\+
+      %   \psm{$\var _{\src,\tframe}$} $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \\
+      %   \psm{$\cov _{\src,\ft}    $} $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{$(\forall \freq)$}\\-
+      % forall $\src = 1, \dots, \Src$ \\+
+      %   \psm{$\demix _{\src,\ft}$} $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{$(\forall \freq)$}\\
+      %   \psm{$\demix _{\src,\ft}$} $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{$(\forall \freq)$} \\-
+      %   \psm{$\Est _{\ft}  $} $\Demix _{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$} \\-
+    % {$\Demix _{\freq,\rotFra - 1}$} $\gets$ $\Eye$ {$(\forall \freq)$} \;\; {$\cov _{\src,\freq,\rotFra - 1}$} $\gets$ $\varepsilon \Eye$ {$(\forall \src,\freq)$} \\
+    {$\Demix _{\freq,\rotFra - 1}$} $\gets$ $\Eye$ \ct{$(\forall \freq)$} \\
+    {$\cov _{\src,\freq,\rotFra - 1}$} $\gets$ $\varepsilon \Eye$ \ct{$(\forall \src,\freq)$} \\
+    for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
+      {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
+      for $\src = 1,\, \dots,\, \Src$ \\+
+        {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \\
+        {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{$(\forall \freq)$}\\-
+      forall $\src = 1, \dots, \Src$ \\+
+        {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{$(\forall \freq)$}\\
+        {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{$(\forall \freq)$} \\-
+        {$\Est _{\ft}  $} $\gets$ $\Demix _{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$}
+  \end{pseudo}
+\end{algorithm}
+
+\clearpage\newpage\noindent
+\begin{algorithm}{Online AuxIVA with SFI}{sfi}
+  \begin{pseudo}
+    for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
+      \pr{Na\"ive Online AuxIVA}(\Obs _{ft}) \\-
+      % $\Demix _{\ft}$ $\gets$ $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
+      % for $\src = 1,\, \dots,\, \Src$ \\+
+      %   $\var _{\src,\tframe}$ $\gets$ $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \\
+      %   $\cov _{\src,\ft}$ $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{$(\forall \freq)$}\\-
+      % forall $\src = 1, \dots, \Src$ \\+
+      %   $\demix _{\src,\ft}$ $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{$(\forall \freq)$}\\
+      %   $\demix _{\src,\ft}$ $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{$(\forall \freq)$} \\-
+      %   $\Est _{\ft}$ $\gets$ $\Demix _{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$} \\-
+    $\rotMat _{\rotDeg}$ $\gets$ \pr{CalcRotationMatrix}(\Mic, \rotDeg) \\
+    for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
+      $\Demix _{\ft}$ $\gets$ $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
+      $\Obs _{\ft} \gets \rotMat _{\rotDeg} ^{-1} \rotObs _{\ft}$ \\
+      for $\src = 1,\, \dots,\, \Src$ \\+
+        $\var _{\src,\tframe}$ $\gets$ $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \\
+        $\cov _{\src,\ft}    $ $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{$(\forall \freq)$}\\-
+      forall $\src = 1, \dots, \Src$ \\+
+        $\demix _{\src,\ft}$ $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{$(\forall \freq)$}\\
+        $\demix _{\src,\ft}$ $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{$(\forall \freq)$} \\-
+        $\Est _{\ft}$ $\gets$ $\Demix _{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$}
+  \end{pseudo}
+\end{algorithm}
+\vfill\par
+\newpage\noindent
+\begin{algorithm}{Online AuxIVA with ``transformation''}{coord}
+  \begin{pseudo}
+    for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
+      \pr{Na\"ive Online AuxIVA}(\Obs _{ft}) \\-
+      % {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
+      % for $\src = 1,\, \dots,\, \Src$ \\+
+      %   {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \\
+      %   {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{$(\forall \freq)$}\\-
+      % forall $\src = 1, \dots, \Src$ \\+
+      %   {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{$(\forall \freq)$}\\
+      %   {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{$(\forall \freq)$} \\-
+      %   {$\Est _{\ft}  $} $\gets$ $\Demix _{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$} \\-
+    {$\rotDemix _{\freq,\rotFra - 1}$} $\gets$ $\Demix _{\freq,\rotFra - 1} \rotMat _{\rotDeg} ^{\hermite}$ \ct{$(\forall \freq)$} \\
+    {$\rotCov _{\src,\freq,\rotFra - 1}$} $\gets$ $\rotMat _{\rotDeg} \cov _{\src,\freq,\rotFra - 1} \rotMat _{\rotDeg} ^{\hermite}$ \ct{$(\forall \src,\freq)$} \\
+    for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
+      {$\rotDemix _{\ft}$} $\gets$ $\rotDemix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
+      for $\src = 1,\, \dots,\, \Src$ \\+
+        {$\rot{\var} _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq} \abs{\rot{\demix} _{\src,\ft} ^{\hermite} \rotObs _{\ft}} ^2}$ \\
+        {$\rot{\cov} _{\src,\ft}    $} $\gets$ $\forget \rot{\cov} _{\src,\ft[-1]} + (1 - \forget) \weight(\rot{\var} _{\src,\tframe}) \rot{\Obs} _{\ft} \rot{\Obs} _{\ft} ^{\hermite}$ \ct{$(\forall \freq)$}\\-
+      forall $\src = 1, \dots, \Src$ \\+
+        {$\rot{\demix} _{\src,\ft}$} $\gets$ $(\rot{\Demix} _{\ft} \rot{\cov} _{\src,\ft}) ^{-1} \eye _{\src}$ \ct{$(\forall \freq)$}\\
+        {$\rot{\demix} _{\src,\ft}$} $\gets$ $\dfrac{\rot{\demix} _{\src,\ft}}{\sqrt{\rot{\demix} _{\src,\ft} ^{\hermite} \rot{\cov} _{\src,\ft} \rot{\demix} _{\src,\ft}}}$ \ct{$(\forall \freq)$} \\-
+        {$\Est _{\ft}  $} $\gets$ $\rot{\Demix} _{\ft} \rot{\Obs} _{\ft}$ \ct{$(\forall \freq)$}
+  \end{pseudo}
+\end{algorithm}
 
 \end{document}

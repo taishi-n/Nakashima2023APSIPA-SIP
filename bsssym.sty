@@ -6,9 +6,11 @@
 \newcommand{\myterm}[1]{\textgt{#1}}
 
 \newcommand{\logdet}[1]{\log \lvert \det #1 \rvert}
+\newcommand{\abs}[1]{\lvert #1 \rvert} % absolute
 
 % Set of complex numbers
 \newcommand{\C}{\mathbb{C}}
+\newcommand{\R}{\mathbb{R}}
 
 % Complex Gaussian distribution
 \newcommand{\cGauss}{\mathcal{N}_{\text{C}}}
@@ -41,12 +43,14 @@
 \newcommand{\Mic}{M}
 \newcommand{\dMic}{L}  % 音場補間の一時変数L
 
-% % NMF基底インデクス
-% \newcommand{\basis}{\ell}
-% \newcommand{\Basis}{L}
-
 % 時間周波数
-\newcommand{\ft}{\freq\tframe}
+\newcommand{\ft}[1][0]{%
+   \ifnum #1=0%
+      \freq,\tframe%
+   \else{%
+      \freq,\tframe#1
+   }\fi%
+}
 
 % 分離行列，分離ベクトル
 \newcommand{\demix}{\bm{w}}
@@ -58,18 +62,29 @@
 
 % signals
 \newcommand{\sig}{s}
-\newcommand{\obs}{\bm{x}}
-\newcommand{\est}{\bm{y}}
+\newcommand{\Obs}{\bm{x}}
+\newcommand{\Est}{\bm{y}}
+\newcommand{\est}{y}
+\newcommand{\Img}{\bm{z}}
 
 % IVA
-\newcommand{\srcvar}{r}
+\newcommand{\var}{r}
 \newcommand{\cov}{\bm{V}}
 \newcommand{\newcov}{\tilde{\cov}}
 \newcommand{\forget}{\alpha}
 \newcommand{\weight}{\varphi}
 
 % sound field interpolation
-\newcommand{\rotObs}{\hat{\obs}}
+\newcommand{\rot}[1]{\hat{#1}}
+\newcommand{\refObs}{\Obs_{\text{ref},}{}}
+\newcommand{\rotObs}{\rot{\Obs}}
+\newcommand{\rotVar}{\rot{\var}}
 \newcommand{\rotMat}{\bm{U}}
 \newcommand{\rotDeg}{\theta}
-\newcommand{\rotFra}{\hat{\tframe}}
+\newcommand{\rotFra}{\tau}
+\newcommand{\rotDemix}{\rot{\Demix}}
+\newcommand{\rotdemix}{\rot{\demix}}
+\newcommand{\rotCov}{\rot{\cov}}
+
+\newcommand{\Eye}{\bm{I}}
+\newcommand{\eye}{\bm{e}}
