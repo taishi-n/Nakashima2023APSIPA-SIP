@@ -383,7 +383,7 @@ Future work includes combining this method with self-rotation angle estimation \
 \bibliography{IEEEabrv,ref}
 
 \clearpage\newpage
-\section*{音場補間$\times$音源分離の評価方法}
+\section*{音場補間BSS}
 \subsection*{変数一覧}
 \begin{itemize}
   \item $\Src, \Mic$: 音源・マイク数
@@ -402,19 +402,20 @@ Future work includes combining this method with self-rotation angle estimation \
 \begin{itemize}
   \item 音源分離では観測信号を ``混ぜ直して'' 新たに入力としても出力は変わらないはず
     \begin{itemize}
-      \item 音場補間も一種の ``混ぜ直し''
+      \item ``混ぜ直し''例: 2chの入力$x_1, x_2$を$x_1+x_2, x_1-x_2$と改めて入力
+      \item 音場補間も一種の``混ぜ直し''
         \begin{itemize}
-          \item[$\Rightarrow$] 音場補間があってもなくても分離性能は変わらなさそうに思える
-          \item[$\Rightarrow$] それでも音場補間を行う意義は何か？
+          \item 音場補間があってもなくても分離性能は変わらなさそうだが，以前の結果はそうではない
+          \item[$\Rightarrow$] わざわざ音場補間を行う意義を明らかにしたい
         \end{itemize}
     \end{itemize}
-  \item マイク回転前までに得られた$\cov _{\src,\ft}$を活用したい
+  \item マイク回転前までに得られた共分散$\cov _{\src,\ft}$を活用したい
     \begin{itemize}
-      \item[$\Rightarrow$] 回転時に$\cov _{\src,\ft},\, \Demix _{\ft}$を ``回転後の座標'' へ変換
+      \item[$\Rightarrow$] 回転時に$\cov _{\src,\ft},\, \Demix _{\ft}$を ``座標変換''
     \end{itemize}
 \end{itemize}
 
-\subsubsection*{``回転後の座標''への変換}
+\subsection*{共分散・分離行列の``座標変換''}
 \begin{align}
   \rot{\cov} _{\src,\freq} &\coloneqq \frac{1}{\Tframe} \sum _{\tframe = 1} ^{\Tframe} \weight (\var _{\src,\tframe}) \rotObs _{\ft} \rotObs _{\ft} ^{\hermite} \\
                            &= \frac{1}{\Tframe} \sum _{\tframe = 1} ^{\Tframe} \weight (\var _{\src,\tframe}) (\rotMat _{\rotDeg} \Obs _{\ft}) (\Obs _{\ft} ^{\hermite} \rotMat _{\rotDeg} ^{\hermite}) \\
@@ -429,50 +430,38 @@ Future work includes combining this method with self-rotation angle estimation \
               &= \rotDemix _{\ft} \rotObs _{\ft}
 \end{align}
 
-\subsection*{現在の処理の流れ}
+\subsection*{予備実験1: バッチ AuxIVA}
+\subsubsection*{目的}
 \begin{itemize}
-  \item 入力信号: 観測信号（途中でマイクが回転）
-  \item 評価方法: SI-SDR
-    \begin{itemize}
-      \item SI-SDRの参照信号: 回転なしの観測信号
-    \end{itemize}
-  \item Projection back:
-    \begin{itemize}
-      \item $\ell$: Reference mic.
-    \end{itemize}
-    \begin{align}
-      \Steer _{\ft} &\coloneqq \begin{bmatrix} \steer _{1,\ft} & \dots & \steer _{\Mic,\ft} \end{bmatrix} \gets \Demix _{\ft} ^{-1} \\
-      \Est _{\ft} &\gets
-      \begin{bmatrix}
-        a _{1\ell} & \dots  & 0 \\
-        \vdots     & \ddots & \vdots \\
-        0          & \dots  & a _{\Src\ell}
-      \end{bmatrix}
-        \Demix _{\ft} \Obs _{\ft}
-    \end{align}
+  \item 座標変換の有効性の確認
+  \item 座標変換と通常の音場補間との性能差を確認
 \end{itemize}
 
-\subsection*{TODO}
+\subsubsection*{条件}
 \begin{itemize}
-  \item 疑問
-    \begin{itemize}
-      \item SI-SDRの参照信号はマイク回転あり or なし？\\ $\Rightarrow$回転前後でそれぞれ独立に評価する
-      \item 共分散行列をオンラインで更新する場合の ``座標変換'' の関係？\\ バッチの場合と勝手が違う気がする…
-    \end{itemize}
+  \item 回転なし (oracle)
+  \item 処理なし (baseline)
+  \item 音場補間なし
+  \item 音場補間あり
+  \item 座標変換
+\end{itemize}
+
+\subsection*{予備実験2: オンラインAuxIVA}
+% - 忘却係数 0.99 -> 回転にあまり追従しないようにしておく
+\begin{itemize}
   \item 比較手法
     \begin{itemize}
-      % \item マイク回転前後で2個のブロックごと独立にバッチ
-      \item \Cref{alg:naive}: 通常のOnline AuxIVA
+      \item \Cref{alg:naive}: 通常のnaiveなOnline AuxIVA
       \item \Cref{alg:reset}: 回転後に$\Demix _{\ft}, \cov _{\src,\ft}$を初期化
-      \item \Cref{alg:sfi}: 回転後に音場補間 $\Obs _{\ft} = \rotMat _{\rotDeg} ^{-1} \rotObs _{\ft}$
-      \item \Cref{alg:coord}: 回転した瞬間に座標変換\\
+      \item \Cref{alg:sfi}: 回転後に観測信号を音場補間\\
+        $\Obs _{\ft} = \rotMat _{\rotDeg} ^{-1} \rotObs _{\ft}$
+      \item \Cref{alg:coord}: 回転後に$\Demix _{\ft}, \cov _{\src,\ft}$を``座標変換''\\
         $\rotDemix _{\ft} \gets \Demix _{\ft} \rotMat _{\rotDeg} ^{\hermite}$,\; $\rotCov _{\src,\ft} \gets \rotMat _{\rotDeg} \cov _{\src,\ft} \rotMat _{\rotDeg} ^{\hermite}$
-% 回転前のマイクにPB
-% マイクが回転しない領域で行う？
+        % Projection back: 回転前のマイク
+        % マイクが回転しない領域で行う？
     \end{itemize}
 \end{itemize}
 
-\clearpage\newpage\noindent
 \begin{algorithm}{Na\"{i}ve Online AuxIVA}{naive}
   \begin{pseudo}
     for $\tframe = 1,\, \dots,\, \Tframe$ \\+
@@ -487,7 +476,6 @@ Future work includes combining this method with self-rotation angle estimation \
   \end{pseudo}
 \end{algorithm}
 
-\newpage\noindent
 \begin{algorithm}{Online AuxIVA with reset}{reset}
   \begin{pseudo}
     for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
@@ -515,7 +503,6 @@ Future work includes combining this method with self-rotation angle estimation \
   \end{pseudo}
 \end{algorithm}
 
-\clearpage\newpage\noindent
 \begin{algorithm}{Online AuxIVA with SFI}{sfi}
   \begin{pseudo}
     for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
@@ -541,8 +528,6 @@ Future work includes combining this method with self-rotation angle estimation \
         $\Est _{\ft}$ $\gets$ $\Demix _{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$}
   \end{pseudo}
 \end{algorithm}
-\vfill\par
-\newpage\noindent
 \begin{algorithm}{Online AuxIVA with ``transformation''}{coord}
   \begin{pseudo}
     for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
@@ -568,5 +553,41 @@ Future work includes combining this method with self-rotation angle estimation \
         {$\Est _{\ft}  $} $\gets$ $\rot{\Demix} _{\ft} \rot{\Obs} _{\ft}$ \ct{$(\forall \freq)$}
   \end{pseudo}
 \end{algorithm}
+
+\begin{algorithm}{Projection back (online)}{pb}
+  \textbf{Input:}
+    \begin{itemize}
+      \item Observed signal $\Obs _{\ft}$
+      \item Demixing matrices $\Demix _{\ft}$
+      \item Reference microphone index $\ell$
+    \end{itemize}
+  \textbf{Output:} Scale-restored output signal $\Est _{\ft}$
+  \begin{pseudo}
+    for $\tframe = 1,\, \dots,\, \Tframe$ \\+
+      for $\freq = 1,\, \dots,\, \Freq$ \\+
+        $\begin{bmatrix} \steer _{1,\ft} & \dots & \steer _{\Mic,\ft} \end{bmatrix} \eqqcolon \Steer _{\ft} \gets \Demix _{\ft} ^{-1}$ \\
+        $\tilde{\Demix} _{\ft} \gets \mathrm{diag}(\steer _{\ell,\ft}) \Demix _{\ft}$ \\
+        \nf{$\phantom{\tilde{\Demix} _{\ft} \gets} = \begin{bmatrix} a _{1,\ell,\ft} & \dots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \dots & a _{\Src,\ell,\ft} \end{bmatrix} \Demix _{\ft}$} \\
+        $\Est _{\ft} \gets \tilde{\Demix} _{\ft} \Obs _{\ft}$ \\--
+  \end{pseudo}
+\end{algorithm}
+
+\subsection*{疑問}
+\begin{itemize}
+  \item オンラインAuxIVAでの共分散行列 ``座標変換'' ？\\ バッチの場合と勝手が違う気がする…\\
+    マイクは $\tframe \leq \rotFra - 1$ で基準位置，
+    $\tframe \geq \rotFra$ で回転後とする．
+    \begin{align*}
+      \rot{\cov} _{\src,\ft} &= \forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \rot{\Obs} _{\ft} \rot{\Obs} _{\ft} ^{\hermite} \\
+                             &= \forget ^{\tframe} \cov _{\src,\freq,0}
+                                + \sum _{i = 1} ^{\rotFra - 1} \forget ^{\tframe - i} (1 - \forget) \weight(\var _{\src,i}) \Obs _{\freq,i} \Obs _{\freq,i} ^{\hermite} \\
+                             &\qquad + \sum _{j = \rotFra} ^{\tframe} \forget ^{\tframe - j} (1 - \forget) \weight(\var _{\src,j}) \rot{\Obs} _{\freq,j} \rot{\Obs} _{\freq,j} ^{\hermite}
+    \end{align*}
+\end{itemize}
+
+\subsection*{疑問}
+\begin{itemize}
+  \item 忘却係数を周波数依存にする？
+\end{itemize}
 
 \end{document}
