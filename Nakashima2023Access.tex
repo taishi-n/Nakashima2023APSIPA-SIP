@@ -62,7 +62,7 @@
 
 \usepackage{bsssym}
 
-\title{Rotation Robust Online Independent Vector Analysis with\\Sound Field Interpolation of Circular Microphone Array}
+\title{Rotation-Robust Online Independent Vector Analysis with\\Sound Field Interpolation on Circular Microphone Array}
 \author{%
   Taishi Nakashima \textsuperscript{\textdagger},
   Yukoh Wakabayashi \textsuperscript{\textdaggerdbl},
@@ -258,68 +258,68 @@ TBD
     ただし，$\SubFreq$は周波数の上限
 \end{itemize}
 
-\section{Simulated experiments}
-\subsection{Setup}
-% CMAが回転する条件下で，ブラインド音源分離の性能を評価した．
-% 音源信号は，SiSECデータベース \cite{Araki:2012:LVAICA}から男性と女性の各1サンプル音源を用いた．
-% 音源信号のサンプリング周波数は\SI{16}{\kilo\hertz}であり，長さ\SI{40}{\second}になるよう加工した．
-% これらの信号を用いて鏡像法 \cite{Allen:1979:JASA} によるシミュレーションを行い音像を生成した．
-% \Cref{fig:room}に鏡像法のためのマイクと音源の配置を示す．
-% 残響時間は約\SI{100}{\milli\second}である．
-% \begin{figure}[t]
-%   \centering
-%   \includegraphics{figures/room_layout.pdf}
-%   \caption{Room layout.}
-%   \label{fig:room}
-% \end{figure}
-% マイクロホンアレイはマイク数$\Mic = 8$，半径\SI{5}{\cm}のCMAを用いた．
-% CMAを\cref{fig:room}中の水平軸から反時計周りに0度，30度，45度回転させた場合の音像を生成し，
-% それぞれ0--10\si{\second}，10--25\si{\second}，25--40\si{\second}の区間でつなぎ合わせることでマイクロホンアレイの回転を擬似的にシミュレートした．
-% 得られた観測信号に対してフレーム長4096点，シフト長1024点，Hamming窓で短時間フーリエ変換を行い音源分離および音場補間を行った．
-% AuxIVAおよびOIVAの分離行列の初期値は単位行列とした．
-% 反復回数はAuxIVAは100，OIVAは2とした．
-% OIVAは忘却係数$\forget$を\num{0.97}，\num{0.99}および\num{0.995}と変化させて音源分離を行った．
-% 音場補間を用いた観測信号と用いない観測信号それぞれについて音源分離を行い，scale-invariant signal-to-distortion ratio (SI-SDR) \cite{LeRoux:2019:ICASSP} とその改善量（以下，SDRi）をチャネルごとに平均した．
-% 本実験では音場補間によってCMAの回転を補償した信号に対して音源分離を行うために，SI-SDRとSDRiの計算に用いる参照信号はCMAが回転していない場合の音像を用いた．
-% また，OIVAにおいては，分離信号を\SI{1}{\second}ごとの区間に分割し，各区間でSDRiを計算した．
+%\section{Simulated experiments}
+%\subsection{Setup}
+%% CMAが回転する条件下で，ブラインド音源分離の性能を評価した．
+%% 音源信号は，SiSECデータベース \cite{Araki:2012:LVAICA}から男性と女性の各1サンプル音源を用いた．
+%% 音源信号のサンプリング周波数は\SI{16}{\kilo\hertz}であり，長さ\SI{40}{\second}になるよう加工した．
+%% これらの信号を用いて鏡像法 \cite{Allen:1979:JASA} によるシミュレーションを行い音像を生成した．
+%% \Cref{fig:room}に鏡像法のためのマイクと音源の配置を示す．
+%% 残響時間は約\SI{100}{\milli\second}である．
+%% \begin{figure}[t]
+%%   \centering
+%%   \includegraphics{figures/room_layout.pdf}
+%%   \caption{Room layout.}
+%%   \label{fig:room}
+%% \end{figure}
+%% マイクロホンアレイはマイク数$\Mic = 8$，半径\SI{5}{\cm}のCMAを用いた．
+%% CMAを\cref{fig:room}中の水平軸から反時計周りに0度，30度，45度回転させた場合の音像を生成し，
+%% それぞれ0--10\si{\second}，10--25\si{\second}，25--40\si{\second}の区間でつなぎ合わせることでマイクロホンアレイの回転を擬似的にシミュレートした．
+%% 得られた観測信号に対してフレーム長4096点，シフト長1024点，Hamming窓で短時間フーリエ変換を行い音源分離および音場補間を行った．
+%% AuxIVAおよびOIVAの分離行列の初期値は単位行列とした．
+%% 反復回数はAuxIVAは100，OIVAは2とした．
+%% OIVAは忘却係数$\forget$を\num{0.97}，\num{0.99}および\num{0.995}と変化させて音源分離を行った．
+%% 音場補間を用いた観測信号と用いない観測信号それぞれについて音源分離を行い，scale-invariant signal-to-distortion ratio (SI-SDR) \cite{LeRoux:2019:ICASSP} とその改善量（以下，SDRi）をチャネルごとに平均した．
+%% 本実験では音場補間によってCMAの回転を補償した信号に対して音源分離を行うために，SI-SDRとSDRiの計算に用いる参照信号はCMAが回転していない場合の音像を用いた．
+%% また，OIVAにおいては，分離信号を\SI{1}{\second}ごとの区間に分割し，各区間でSDRiを計算した．
 
-We evaluate the performance of OIVA under a condition where CMA rotated.
-One male and one female source sample each from the SiSEC database \cite{Araki:2012:LVAICA} were used as the source signals.
-The sampling frequency of the source signals was \SI{16}{\kilo\hertz} and they were processed to a length of \SI{40}{\second}.
-These signals were used to generate a source image by simulation using the image source method \cite{Allen:1979:JASA}.
-\Cref{fig:room} shows the microphone and source layout for the image source method.
-\begin{figure}[t]
-  \centering
-  \includegraphics{figures/room_layout.pdf}
-  \caption{Room layout.}
-  \label{fig:room}
-\end{figure}
-The reverberation time is approximately \SI{100}{\milli\second}.
-The microphone array consists of a CMA with $\Mic = 8$ microphones and a radius of \SI{5}{\centi\metre}.
-The source images were generated when the CMA was rotated by 0°, 30° and 45° counterclockwise from the horizontal axis in \cref{fig:room},
-and were stitched together in the intervals 0-10s, 10-25s and 25-40s, respectively, to simulate the rotation of the microphone array.
-The rotation of the microphone array was simulated by joining the images at intervals of 0-10s, 10-25s and 25-40s, respectively.
-%
-STFT was applied to the observed mixture signals with a FFT length of 4096 points, a shift length of 1024 points and a Hamming window.
-The initial values of the demixing matrices for AuxIVA and OIVA were unit matrices.
-The number of iterations was set to 100 for AuxIVA and 2 for OIVA.
-OIVA was performed by varying the forgetting factor $\forget$ from \num{0.97}, \num{0.99} and \num{0.995}.
-The source separation was carried out on the observed signals with and without sound field interpolation,
-and the scale-invariant signal-to-distortion ratio (SI-SDR) \cite{LeRoux:2019:ICASSP} and its improvement (SDRi) were averaged over the channels.
-In this experiment, the reference signal used to calculate SI-SDR and SDRi was the source image when the CMA was not rotating, in order to perform source separation on the signal compensated for the rotational shift of the CMA by means of sound field interpolation.
-For OIVA, the separated signal was divided into intervals of 1 s and SDRi was calculated for each interval.
+%We evaluate the performance of OIVA under a condition where CMA rotated.
+%One male and one female source sample each from the SiSEC database \cite{Araki:2012:LVAICA} were used as the source signals.
+%The sampling frequency of the source signals was \SI{16}{\kilo\hertz} and they were processed to a length of \SI{40}{\second}.
+%These signals were used to generate a source image by simulation using the image source method \cite{Allen:1979:JASA}.
+%\Cref{fig:room} shows the microphone and source layout for the image source method.
+%\begin{figure}[t]
+%  \centering
+%  \includegraphics{figures/room_layout.pdf}
+%  \caption{Room layout.}
+%  \label{fig:room}
+%\end{figure}
+%The reverberation time is approximately \SI{100}{\milli\second}.
+%The microphone array consists of a CMA with $\Mic = 8$ microphones and a radius of \SI{5}{\centi\metre}.
+%The source images were generated when the CMA was rotated by 0°, 30° and 45° counterclockwise from the horizontal axis in \cref{fig:room},
+%and were stitched together in the intervals 0-10s, 10-25s and 25-40s, respectively, to simulate the rotation of the microphone array.
+%The rotation of the microphone array was simulated by joining the images at intervals of 0-10s, 10-25s and 25-40s, respectively.
+%%
+%STFT was applied to the observed mixture signals with a FFT length of 4096 points, a shift length of 1024 points and a Hamming window.
+%The initial values of the demixing matrices for AuxIVA and OIVA were unit matrices.
+%The number of iterations was set to 100 for AuxIVA and 2 for OIVA.
+%OIVA was performed by varying the forgetting factor $\forget$ from \num{0.97}, \num{0.99} and \num{0.995}.
+%The source separation was carried out on the observed signals with and without sound field interpolation,
+%and the scale-invariant signal-to-distortion ratio (SI-SDR) \cite{LeRoux:2019:ICASSP} and its improvement (SDRi) were averaged over the channels.
+%In this experiment, the reference signal used to calculate SI-SDR and SDRi was the source image when the CMA was not rotating, in order to perform source separation on the signal compensated for the rotational shift of the CMA by means of sound field interpolation.
+%For OIVA, the separated signal was divided into intervals of 1 s and SDRi was calculated for each interval.
 
-\subsection{Results}
-% まず，音場補間を用いない観測信号に対するAuxIVAの分離性能は\SI[round-mode=places,round-precision=3]{-5.104996}{\decibel}であり，十分な分離性能が得られなかった．
-% これは，AuxIVAがバッチ処理であるためCMAの回転に追従できなかったためと考えられる．
-% 次に，音場補間を用いた観測信号に対するAuxIVAの分離性能は\SI[round-mode=places,round-precision=3]{-1.094806}{\decibel}であった．
-% 音場補間を用いない観測信号の結果と比較すると改善しているが，まだ十分な分離性能ではない．
-% これは周波数が高くなるほど音場補間の性能が悪くなる現象によるものと考えられ，先行研究の結果と一貫している．
-First, the separation performance of AuxIVA for the observed signal without sound field interpolation was -5.105 dB, which was insufficient.
-This is considered to be because AuxIVA is a batch process and could not follow the rotation of the CMA.
-The separation performance of AuxIVA for the observed signal with sound field interpolation was -1.095 dB.
-This is an improvement compared to the results for the observed signal without sound field interpolation, but the separation performance is still not sufficient.
-This is considered to be due to the phenomenon that the performance of the sound field interpolation worsens as the frequency increases, which is consistent with the results of previous studies.
+%\subsection{Results}
+%% まず，音場補間を用いない観測信号に対するAuxIVAの分離性能は\SI[round-mode=places,round-precision=3]{-5.104996}{\decibel}であり，十分な分離性能が得られなかった．
+%% これは，AuxIVAがバッチ処理であるためCMAの回転に追従できなかったためと考えられる．
+%% 次に，音場補間を用いた観測信号に対するAuxIVAの分離性能は\SI[round-mode=places,round-precision=3]{-1.094806}{\decibel}であった．
+%% 音場補間を用いない観測信号の結果と比較すると改善しているが，まだ十分な分離性能ではない．
+%% これは周波数が高くなるほど音場補間の性能が悪くなる現象によるものと考えられ，先行研究の結果と一貫している．
+%First, the separation performance of AuxIVA for the observed signal without sound field interpolation was -5.105 dB, which was insufficient.
+%This is considered to be because AuxIVA is a batch process and could not follow the rotation of the CMA.
+%The separation performance of AuxIVA for the observed signal with sound field interpolation was -1.095 dB.
+%This is an improvement compared to the results for the observed signal without sound field interpolation, but the separation performance is still not sufficient.
+%This is considered to be due to the phenomenon that the performance of the sound field interpolation worsens as the frequency increases, which is consistent with the results of previous studies.
 
 % 次に，OIVAの結果を\cref{fig:online}に示す．
 % \begin{figure}[t]
@@ -344,37 +344,37 @@ This is considered to be due to the phenomenon that the performance of the sound
 % 忘却係数$\forget=0.99$のとき，前の結果と比較して全体的に分離性能が大きく改善しており，CMAの回転にも頑健であることが確認できる．
 % 忘却係数$\forget=0.995$のとき，$\alpha = 0.99$の結果と比べて分離性能の増加が遅くなっているものの，CMAの回転後も\SI{10}{\decibel}付近の分離性能を維持できていることがわかる．
 
-\begin{figure}[t]
-  \centering
-  \begin{subfigure}[t]{\linewidth}
-    \includegraphics{figures/plots/online/Gauss_8000_97.pdf}
-    \caption{$\forget = 0.99$}
-  \end{subfigure}
-  \begin{subfigure}[t]{\linewidth}
-    \includegraphics{figures/plots/online/Gauss_8000_99.pdf}
-    \caption{$\forget = 0.99$}
-  \end{subfigure}
-  \begin{subfigure}[t]{\linewidth}
-    \includegraphics{figures/plots/online/Gauss_8000_995.pdf}
-    \caption{$\forget = 0.995$}
-  \end{subfigure}
-  \caption{Frame-wise SI-SDR improvements (dB). Two vertical dotted lines at \SI{10}{\second} and \SI{25}{\second} denote the rotaion of microphone array.}
-  \label{fig:online}
-\end{figure}
-Next, the OIVA results are shown in \cref{fig:online}.
-The vertical dotted line in the figure represents the rotation of the CMA.
-When the forgetting factor $\forget = 0.97$, the signal to which the sound field interpolation was applied showed a separation performance of approximately 5 dB in the interval from 10 s to 25 s.
-However, the separation performance decreased after 25 s. The results are consistent with the results of previous studies.
-When the forgetting factor $\forget = 0.99 $, the overall separation performance improves significantly compared to the previous results, confirming that it is robust to CMA rotation.
-When the forgetting factor $\forget = 0.995$, the separation performance increases more slowly compared to the results with $\forget = 0.99$, but it can be seen that the separation performance remains around 10 dB after the rotation of the CMA.
+% \begin{figure}[t]
+%   \centering
+%   \begin{subfigure}[t]{\linewidth}
+%     \includegraphics{figures/plots/online/Gauss_8000_97.pdf}
+%     \caption{$\forget = 0.99$}
+%   \end{subfigure}
+%   \begin{subfigure}[t]{\linewidth}
+%     \includegraphics{figures/plots/online/Gauss_8000_99.pdf}
+%     \caption{$\forget = 0.99$}
+%   \end{subfigure}
+%   \begin{subfigure}[t]{\linewidth}
+%     \includegraphics{figures/plots/online/Gauss_8000_995.pdf}
+%     \caption{$\forget = 0.995$}
+%   \end{subfigure}
+%   \caption{Frame-wise SI-SDR improvements (dB). Two vertical dotted lines at \SI{10}{\second} and \SI{25}{\second} denote the rotaion of microphone array.}
+%   \label{fig:online}
+% \end{figure}
+% Next, the OIVA results are shown in \cref{fig:online}.
+% The vertical dotted line in the figure represents the rotation of the CMA.
+% When the forgetting factor $\forget = 0.97$, the signal to which the sound field interpolation was applied showed a separation performance of approximately 5 dB in the interval from 10 s to 25 s.
+% However, the separation performance decreased after 25 s. The results are consistent with the results of previous studies.
+% When the forgetting factor $\forget = 0.99 $, the overall separation performance improves significantly compared to the previous results, confirming that it is robust to CMA rotation.
+% When the forgetting factor $\forget = 0.995$, the separation performance increases more slowly compared to the results with $\forget = 0.99$, but it can be seen that the separation performance remains around 10 dB after the rotation of the CMA.
 
-\section{Conclusion}
-% 本研究では，円状等間隔マイクロホンアレイにおける音場補間をブラインド音源分離に応用した．
-% シミュレーション実験により，音場補間が円状等間隔マイクロホンアレイの回転に対するOIVAの頑健性を改善させたことを確認した．
-% 今後は本手法の自己回転角度推定 \cite{Lian:2021:APSIPA} との組み合わせや，実時間処理への拡張などに取り組む．
-In this study, sound field interpolation for an equally spaced circular microphone array (CMA) was applied to online auxiliary-function-based independent vector analysis (OIVA).
-Simulation experiments have confirmed that sound field interpolation improved robustness of OIVA against the rotation of CMA.
-Future work includes combining this method with self-rotation angle estimation \cite{Lian:2021:APSIPA} and extending it to real-time processing.
+% \section{Conclusion}
+% % 本研究では，円状等間隔マイクロホンアレイにおける音場補間をブラインド音源分離に応用した．
+% % シミュレーション実験により，音場補間が円状等間隔マイクロホンアレイの回転に対するOIVAの頑健性を改善させたことを確認した．
+% % 今後は本手法の自己回転角度推定 \cite{Lian:2021:APSIPA} との組み合わせや，実時間処理への拡張などに取り組む．
+% In this study, sound field interpolation for an equally spaced circular microphone array (CMA) was applied to online auxiliary-function-based independent vector analysis (OIVA).
+% Simulation experiments have confirmed that sound field interpolation improved robustness of OIVA against the rotation of CMA.
+% Future work includes combining this method with self-rotation angle estimation \cite{Lian:2021:APSIPA} and extending it to real-time processing.
 
 % \section*{Acknowledgments}
 % This work was supported by JST CREST Grant Number \mbox{JPMJCR19A3} and JSPS KAKENHI Grant Number \mbox{JP21J22039}, Japan.
@@ -430,38 +430,186 @@ Future work includes combining this method with self-rotation angle estimation \
               &= \rotDemix _{\ft} \rotObs _{\ft}
 \end{align}
 
-\subsection*{予備実験1: バッチ AuxIVA}
+\subsection*{予備実験}
 \subsubsection*{目的}
 \begin{itemize}
   \item 座標変換の有効性の確認
   \item 座標変換と通常の音場補間との性能差を確認
+  \item 
 \end{itemize}
 
 \subsubsection*{条件}
+\begin{figure}[t]
+  \centering
+  \includegraphics{figures/room_layout.pdf}
+  \caption{Room layout.}%
+  \label{fig:layout}
+\end{figure}
 \begin{itemize}
-  \item 回転なし (oracle)
-  \item 処理なし (baseline)
-  \item 音場補間なし
-  \item 音場補間あり
-  \item 座標変換
+  \item 音源・マイク配置 (\cref{fig:layout})
+  \item 音源・マイク数: 5
+    \begin{itemize}
+      \item 前は2音源5マイクでやっていたが評価がよくわからなくなった…
+        \begin{itemize}
+          \item 参考：\href{https://github.com/onolab-tmu/overiva/blob/1cb3189112889ebfe2ccbbde0f55b1db6020fc48/overiva_sim.py#L200}{OverIVAの評価}\\
+            分離信号の余ったチャネルをrandnで埋めている
+        \end{itemize}
+      \item 分離音が複数チャネルに分かれる場合の評価方法？
+      \item 分離されているとも言えるが，望ましい結果とは言えない…
+      \item[$\Rightarrow$] 簡単のためにいったん決定条件でやり直した
+    \end{itemize}
+  \item 残響時間: 約\SI{100}{\milli\second}
+  \item マイク間隔: \SI{2}{\centi\metre}
+  \item マイク回転角度: \SI{40}{\degree}
+  \item マイク回転時刻: \SI{15}{\second}
+  \item STFT
+    \begin{itemize}
+      \item FFT長: 4096
+      \item シフト長: 1024 (1/4-shift)
+      \item 窓関数: Hamming
+    \end{itemize}
+  \item Projection back: \cref{alg:pb}, 参照マイク=1
+  \item SI-SDRの参照信号: 観測信号（途中でマイクが回転する）
 \end{itemize}
 
-\subsection*{予備実験2: オンラインAuxIVA}
+\clearpage\newpage
+\subsubsection*{結果1: バッチ AuxIVA}
+\begin{itemize}
+  \item 比較手法
+    \begin{itemize}
+      % \item 回転なし (oracle)
+      % \item 処理なし (baseline)
+      \item 音場補間なし (\textbf{Naive})
+      \item 音場補間 (\textbf{Sound Field Interpolation; SFI})
+      \item 座標変換 (\textbf{Coordinate Transformation; CT})
+    \end{itemize}
+  \item パラメータ
+    \begin{itemize}
+      \item 音源モデル: 球状Laplace, 時変Gauss
+      \item 反復回数: 50
+    \end{itemize}
+\end{itemize}
+
+\begin{figure}[t]
+  \begin{subfigure}[t]{\columnwidth}
+    \centering
+    \includegraphics{figures/plots/batch/Gauss_8000.pdf}
+    \caption{音源モデル: 時変Gauss分布}%
+    \label{fig:plot:batch:gauss}
+  \end{subfigure}%
+
+  \begin{subfigure}[t]{\columnwidth}
+    \centering
+    \includegraphics{figures/plots/batch/Laplace_8000.pdf}
+    \caption{音源モデル: 球状Laplace分布}%
+    \label{fig:plot:batch:laplace}
+  \end{subfigure}%
+  \caption{Segmental SI-SDR improvements (SI-SDRi) every \SI{1}{\second} with $\Src = \Mic = 5$ and $\text{RT}_{60} \approx \SI{100}{\milli\second}$.}
+\end{figure}
+
+\paragraph{雑感}
+\begin{itemize}
+  \item CT: うまく動いていそう
+  \item SFI: 観測を変えてしまうのでSIRはよくてもSARが悪くなり，SDRが出ていない？（未確認）
+  \item Naive: マイク回転後に別の音源にスイッチする，分離されなくなるなどの変化が見られた
+\end{itemize}
+
+\clearpage\newpage
+\subsection*{結果2: オンラインAuxIVA}
 % - 忘却係数 0.99 -> 回転にあまり追従しないようにしておく
 \begin{itemize}
   \item 比較手法
     \begin{itemize}
-      \item \Cref{alg:naive}: 通常のnaiveなOnline AuxIVA
-      \item \Cref{alg:reset}: 回転後に$\Demix _{\ft}, \cov _{\src,\ft}$を初期化
-      \item \Cref{alg:sfi}: 回転後に観測信号を音場補間\\
+      \item \Cref{alg:naive}: 通常のOnline AuxIVA (\textbf{Naive})
+      \item \Cref{alg:reset}: 回転後に$\Demix _{\ft}, \cov _{\src,\ft}$を初期化 (\textbf{Reset})
+      \item \Cref{alg:sfi}: 回転後に観測信号を音場補間 (\textbf{SFI})\\
         $\Obs _{\ft} = \rotMat _{\rotDeg} ^{-1} \rotObs _{\ft}$
-      \item \Cref{alg:coord}: 回転後に$\Demix _{\ft}, \cov _{\src,\ft}$を``座標変換''\\
+      \item \Cref{alg:coord}: 回転後に$\Demix _{\ft}, \cov _{\src,\ft}$を``座標変換'' (\textbf{CT})\\
         $\rotDemix _{\ft} \gets \Demix _{\ft} \rotMat _{\rotDeg} ^{\hermite}$,\; $\rotCov _{\src,\ft} \gets \rotMat _{\rotDeg} \cov _{\src,\ft} \rotMat _{\rotDeg} ^{\hermite}$
         % Projection back: 回転前のマイク
         % マイクが回転しない領域で行う？
     \end{itemize}
+  \item 座標変換（仮）
+    \begin{align*}
+      \rotDemix _{\ft} &\gets \Demix _{\ft} \rotMat _{\rotDeg} ^{\hermite} \\
+      \rotCov _{\src,\ft} &\gets \rotMat _{\rotDeg} \cov _{\src,\ft[-1]} \rotMat _{\rotDeg} ^{\hermite} + (1 - \forget) \weight(\var _{\src,\tframe}) \rot{\Obs} _{\ft} \rot{\Obs} _{\ft} ^{\hermite}
+    \end{align*}
+    \begin{itemize}
+      \item $\cov _{\src,\ft[-1]}$はそれ以前のすべての観測の情報を含んでいるので，それだけに$\rotMat _{\rotDeg}$をかけて，あとは観測をそのまま使って更新すればいいはず…
+    \end{itemize}
+  \item パラメータ
+    \begin{itemize}
+      \item 初期値: $\Demix _{\freq,0} = \bm{I}\; (\forall \freq)$, $\cov _{\src,\freq,0} = 10^{-3}\times\bm{I}\; (\forall \src, \freq)$
+      \item 忘却係数$\forget$: 0.97, 0.99
+      \item 音源モデル: 球状Laplace, 時変Gauss
+      \item フレームごとの反復回数: 5
+    \end{itemize}
 \end{itemize}
 
+\begin{figure}[t]
+  \begin{subfigure}{\columnwidth}
+    \centering
+    \includegraphics{figures/plots/online/Gauss_8000_97.pdf}
+    \caption{$\forget = 0.97$}%
+    \label{fig:plot:batch:gauss:97}
+  \end{subfigure}%
+
+  \begin{subfigure}{\columnwidth}
+    \centering
+    \includegraphics{figures/plots/online/Gauss_8000_99.pdf}
+    \caption{$\forget = 0.99$}%
+    \label{fig:plot:batch:gauss:99}
+  \end{subfigure}%
+  \caption{音源モデル: 時変Gauss分布. Segmental SI-SDR improvements (SI-SDRi) every \SI{1}{\second} with $\Src = \Mic = 5$ and $\text{RT}_{60} \approx \SI{100}{\milli\second}$.}
+\end{figure}
+
+\begin{figure}[t]
+  \begin{subfigure}[t]{\columnwidth}
+    \centering
+    \includegraphics{figures/plots/online/Laplace_8000_97.pdf}
+    \caption{$\forget = 0.97$}%
+    \label{fig:plot:batch:laplace:97}
+  \end{subfigure}%
+
+  \begin{subfigure}[t]{\columnwidth}
+    \centering
+    \includegraphics{figures/plots/online/Laplace_8000_99.pdf}
+    \caption{$\forget = 0.99$}%
+    \label{fig:plot:batch:laplace:99}
+  \end{subfigure}%
+  \caption{音源モデル: 球状Laplace分布. Segmental SI-SDR improvements (SI-SDRi) every \SI{1}{\second} with $\Src = \Mic = 5$ and $\text{RT}_{60} \approx \SI{100}{\milli\second}$.}
+\end{figure}
+
+\paragraph{雑感}
+\begin{itemize}
+  \item 全体:
+    \begin{itemize}
+      \item 時変Gauss: 回転前までは徐々に分離されていく，回転後は処理ごとに様々な結果
+      \item 球状Laplace分布: 全然分離できない…
+    \end{itemize}
+  \item 座標変換(CT): オンラインでもうまく動いていそう
+    \begin{itemize}
+      \item 一部分離できていない音源が残っていた
+      \item $\forget=0.99$では性能が上がり切る前にマイクの回転が起こってしまったように見える
+    \end{itemize}
+  \item 音場補間(SFI): 全体的にあまり良くない
+    \begin{itemize}
+      \item 回転後は分離できていなかった
+      \item ASJ 2022 (秋)の結果では音場補間すれば回転後も性能をキープしていた
+      \item[$\Rightarrow$] SI-SDR計算用の信号が回転なしの信号を使っていたためSFIの性能が低下した？
+    \end{itemize}
+  \item 再初期化 (Reset):
+    \begin{itemize}
+      \item 回転後，音が消えて徐々に分離されていく
+    \end{itemize}
+  \item Naive:
+    \begin{itemize}
+      \item 回転後に音源が入れ替わる
+      \item $\forget=0.97$では結構がんばっている
+    \end{itemize}
+\end{itemize}
+
+\clearpage\newpage
 \begin{algorithm}{Na\"{i}ve Online AuxIVA}{naive}
   \begin{pseudo}
     for $\tframe = 1,\, \dots,\, \Tframe$ \\+
@@ -503,6 +651,7 @@ Future work includes combining this method with self-rotation angle estimation \
   \end{pseudo}
 \end{algorithm}
 
+\newpage
 \begin{algorithm}{Online AuxIVA with SFI}{sfi}
   \begin{pseudo}
     for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
@@ -554,6 +703,7 @@ Future work includes combining this method with self-rotation angle estimation \
   \end{pseudo}
 \end{algorithm}
 
+\clearpage
 \begin{algorithm}{Projection back (online)}{pb}
   \textbf{Input:}
     \begin{itemize}
@@ -585,9 +735,10 @@ Future work includes combining this method with self-rotation angle estimation \
     \end{align*}
 \end{itemize}
 
-\subsection*{疑問}
+\subsection*{TODO}
 \begin{itemize}
-  \item 忘却係数を周波数依存にする？
+  \item 音場補間は高周波数帯では動かない
+  \item[$\Rightarrow$] 忘却係数を周波数依存にして，高い周波数は早く忘れるようにする？
 \end{itemize}
 
 \end{document}
