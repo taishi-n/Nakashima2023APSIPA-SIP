@@ -53,7 +53,6 @@ drop = [
     "bss.n_iter",
     "fft.len",
     "fft.hop",
-    "process",
     "bss.demix_update",
     "SDR_est",
     "SDR_mix",
@@ -62,6 +61,7 @@ df.drop(columns=drop, inplace=True)
 
 by = [
     "frame",
+    "process",
     "channel",
     "bss.source_model",
     "bss.forget",
@@ -81,12 +81,10 @@ new_cols = {
     "SDR_imp": "SI-SDRi (dB)",
 }
 group.rename(columns=new_cols, errors="raise", inplace=True)
-
-# post select
-group.query(f"`{new_cols['bss.f_limit']}` == 8000", inplace=True)
+print(group)
 
 # replace
-group.replace({"int": True, "rot-mix": False}, inplace=True)
+group.replace({"online": "Naive", "online-reset": "Reset", "online-sfi": "SFI", "online-rot": "CT"}, inplace=True)
 
 for model in group[new_cols["bss.source_model"]].unique():
     for freq in group[new_cols["bss.f_limit"]].unique():
@@ -102,10 +100,9 @@ for model in group[new_cols["bss.source_model"]].unique():
                 data=d,
                 x=new_cols["frame"],
                 y=new_cols["SDR_imp"],
-                hue=new_cols["mixdir_name"],
-                hue_order=[True, False],
-                style=new_cols["mixdir_name"],
-                style_order=[True, False],
+                hue="process",
+                hue_order=["CT", "SFI", "Reset", "Naive"],
+                style="process",
                 markers=True,
                 dashes=False,
                 kind="line",
@@ -115,22 +112,21 @@ for model in group[new_cols["bss.source_model"]].unique():
                 facet_kws={
                     "legend_out": False,
                     "despine": False,
-                    "xlim": (0, 40),
-                    "ylim": (-10, 20),
+                    "xlim": (0, 30),
+                    # "ylim": (-10, 30),
                 },
                 **plot_kws,
             )
 
             # adjust
-            grid.fig.axes[0].axvline(x=10, color="k", linewidth=0.75, linestyle="--")
-            grid.fig.axes[0].axvline(x=25, color="k", linewidth=0.75, linestyle="--")
+            grid.fig.axes[0].axvline(x=15, color="k", linewidth=0.75, linestyle="--")
             grid.fig.tight_layout()  # (left, bottom, right, top)
             grid.fig.subplots_adjust(**dict(left=0.18, bottom=0.20, right=0.97, top=0.97))
-            lg = grid.fig.axes[0].legend_
-            lg.set_title(None)
-            lg.texts[0].set_text("w/ SFI")
-            lg.texts[1].set_text("w/o SFI")
+            # lg = grid.fig.axes[0].legend_
+            # lg.set_title(None)
+            # lg.texts[0].set_text("w/ SFI")
+            # lg.texts[1].set_text("w/o SFI")
 
-            grid.fig.savefig(f"{model}_{freq}_{alpha}.pdf")
+            grid.fig.savefig(f"{model}_{freq}_{str(alpha)[2:]}.pdf")
             plt.clf()
             plt.close()
