@@ -263,6 +263,7 @@ OIVAでは，時間フレーム$\tframe$ごと重み付き共分散行列$\cov _
 \subsection{Coordinate transformation of sound field interpolation}
 \subsubsection{Purpose}
 \begin{itemize}
+  \item 究極の目的: マイクの回転に頑健なオンライン音源分離を開発したい
   \item 音源分離では観測信号を ``混ぜ直して'' 新たに入力としても出力は変わらないはず
     \begin{itemize}
       \item ``混ぜ直し''例: 2chの入力$x_1, x_2$を$x_1+x_2, x_1-x_2$と改めて入力
@@ -320,7 +321,7 @@ OIVAでは，時間フレーム$\tframe$ごと重み付き共分散行列$\cov _
   \item 残響時間: 約\SI{100}{\milli\second}
   \item マイク間隔: \SI{2}{\centi\metre}
   \item マイク回転角度: \SI{40}{\degree} at \SI{15}{\second}
-  \item STFT: FFT長4096, 1/4-shift, Hamming窓
+  \item STFT: FFT長128, 256, 512, 1024, 2048, 4096, 1/2-shift, Hamming窓
   \item Projection back: \cref{alg:pb}, 参照マイク=1
   \item SI-SDRの参照信号: 観測信号（途中でマイクが回転する）
 \end{itemize}
@@ -412,12 +413,18 @@ OIVAでは，時間フレーム$\tframe$ごと重み付き共分散行列$\cov _
                                 + \sum _{i = 1} ^{\rotFra - 1} \forget ^{\tframe - i} (1 - \forget) \weight(\var _{\src,i}) \Obs _{\freq,i} \Obs _{\freq,i} ^{\hermite} \\
                              &\qquad + \sum _{j = \rotFra} ^{\tframe} \forget ^{\tframe - j} (1 - \forget) \weight(\var _{\src,j}) \rot{\Obs} _{\freq,j} \rot{\Obs} _{\freq,j} ^{\hermite}
     \end{align*}
+  \item 音場補間，座標変換のいい感じの名前？ロボット工学の用語でワールド座標系，ロボット座標系などがあるが，これをもじって簡潔に言い表せないか？
 \end{itemize}
 
 \paragraph*{TODO}
 \begin{itemize}
-  \item 音場補間は高周波数帯では動かない
-  \item[$\Rightarrow$] 忘却係数を周波数依存にして，高い周波数は早く忘れるようにする？
+  \item 忘却係数を周波数ごとに設計
+    \begin{itemize}
+      \item 音場補間は高周波数帯では動かないので高い周波数は早く忘れるようにする？
+    \end{itemize}
+  \item 周波数ごとのSDRの計算
+  \item 音場補間あり・なしでそれぞれ計算した分離行列との差分を可視化
+  \item 実際のマイク回転角度と推定した回転角度に誤差をつけた場合の実験
 \end{itemize}
 
 \begin{algorithm}{Na\"{i}ve Online AuxIVA}{naive}
