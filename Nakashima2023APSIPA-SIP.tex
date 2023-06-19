@@ -319,10 +319,10 @@ OIVAでは，時間フレーム$\tframe$ごと重み付き共分散行列$\cov _
     % \end{itemize}
   \item 残響時間: 約\SI{100}{\milli\second}
   \item マイク間隔: \SI{2}{\centi\metre}
-  \item マイク回転角度: \SI{40}{\degree} at \SI{15}{\second}
-  \item STFT: FFT長128, 256, 512, 1024, 2048, 4096, 1/2-shift, Hamming窓
+  \item マイク回転角度: \SI{40}{\degree} at \SI{30}{\second}
+  \item STFT: FFT長 4096, 1/2-shift, Hamming窓
   \item Projection back: \cref{alg:pb}, 参照マイク=1
-  \item SI-SDRの参照信号: 観測信号（途中でマイクが回転する）
+  \item SI-SDRの参照信号: 各音源の音像（途中でマイクが回転する）
 \end{itemize}
 
 \subsection{結果}
@@ -332,72 +332,77 @@ OIVAでは，時間フレーム$\tframe$ごと重み付き共分散行列$\cov _
     \begin{itemize}
       \item \Cref{alg:naive}: 通常のOnline AuxIVA (\textbf{Naive})
       \item \Cref{alg:reset}: 回転後に$\Demix _{\ft}, \cov _{\src,\ft}$を初期化 (\textbf{Reset})
-      \item \Cref{alg:sfi}: 回転後に観測信号を音場補間 (\textbf{SFI})\\
+      \item \Cref{alg:sfi}: 回転後に観測信号の回転を補償 (\textbf{RT-obs})\\
         $\Obs _{\ft} = \rotMat _{\rotDeg} ^{-1} \rotObs _{\ft}$
-      \item \Cref{alg:coord}: 回転後に$\Demix _{\ft}, \cov _{\src,\ft}$を``座標変換'' (\textbf{CT})\\
+      \item \Cref{alg:coord}: 回転後に$\Demix _{\ft}, \cov _{\src,\ft}$を``座標変換'' (\textbf{RT-cov})\\
         $\rotDemix _{\ft} \gets \Demix _{\ft} \rotMat _{\rotDeg} ^{\hermite}$,\; $\rotCov _{\src,\ft} \gets \rotMat _{\rotDeg} \cov _{\src,\ft} \rotMat _{\rotDeg} ^{\hermite}$
-        % Projection back: 回転前のマイク
-        % マイクが回転しない領域で行う？
     \end{itemize}
-  \item 座標変換（仮）
+  \item 座標変換
     \begin{align*}
       \rotDemix _{\ft} &\gets \Demix _{\ft} \rotMat _{\rotDeg} ^{\hermite} \\
       \rotCov _{\src,\ft} &\gets \rotMat _{\rotDeg} \cov _{\src,\ft[-1]} \rotMat _{\rotDeg} ^{\hermite} + (1 - \forget) \weight(\var _{\src,\tframe}) \rot{\Obs} _{\ft} \rot{\Obs} _{\ft} ^{\hermite}
     \end{align*}
-    \begin{itemize}
-      \item $\cov _{\src,\ft[-1]}$はそれ以前のすべての観測の情報を含んでいるので，それだけに$\rotMat _{\rotDeg}$をかけて，あとは観測をそのまま使って更新すればいいはず…
-    \end{itemize}
+    % \begin{itemize}
+    %   \item $\cov _{\src,\ft[-1]}$はそれ以前のすべての観測の情報を含んでいるので，それだけに$\rotMat _{\rotDeg}$をかけて，あとは観測をそのまま使って更新すればいいはず…
+    % \end{itemize}
   \item パラメータ
     \begin{itemize}
       \item 初期値: $\Demix _{\freq,0} = \bm{I}\; (\forall \freq)$, $\cov _{\src,\freq,0} = 10^{-3}\times\bm{I}\; (\forall \src, \freq)$
-      \item 忘却係数$\forget$: 0.97, 0.99
+      \item 忘却係数$\forget$: 0.90, 0.91, ..., 0.99
       \item 音源モデル: 時変Gauss
       \item フレームごとの反復回数: 5
+      \item 正則化: $\cov _{\src,\ft} \gets \cov _{\src,\ft} + 10 ^{-3} \bm{I}$
     \end{itemize}
 \end{itemize}
 
 \begin{figure}[t]
-  \begin{subfigure}{\columnwidth}
-    \centering
-    \includegraphics{figures/plots/online/Gauss_8000_97.pdf}
-    \caption{$\forget = 0.97$}%
-    \label{fig:plot:batch:gauss:97}
-  \end{subfigure}%
-
-  \begin{subfigure}{\columnwidth}
-    \centering
-    \includegraphics{figures/plots/online/Gauss_8000_99.pdf}
-    \caption{$\forget = 0.99$}%
-    \label{fig:plot:batch:gauss:99}
-  \end{subfigure}%
-  \caption{音源モデル: 時変Gauss分布. Segmental SI-SDR improvements (SI-SDRi) every \SI{1}{\second} with $\Src = \Mic = 5$ and $\text{RT}_{60} \approx \SI{100}{\milli\second}$.}
+  \begin{minipage}[t]{.5\linewidth}
+    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_90.pdf}\subcaption{$\forget = 0.90$}\label{fig:plot:gauss:90}
+    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_91.pdf}\subcaption{$\forget = 0.91$}\label{fig:plot:gauss:91}
+    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_92.pdf}\subcaption{$\forget = 0.92$}\label{fig:plot:gauss:92}
+    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_93.pdf}\subcaption{$\forget = 0.93$}\label{fig:plot:gauss:93}
+    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_94.pdf}\subcaption{$\forget = 0.94$}\label{fig:plot:gauss:94}
+  \end{minipage}%
+  \begin{minipage}[t]{.5\linewidth}
+    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_95.pdf}\subcaption{$\forget = 0.95$}\label{fig:plot:gauss:95}
+    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_96.pdf}\subcaption{$\forget = 0.96$}\label{fig:plot:gauss:96}
+    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_97.pdf}\subcaption{$\forget = 0.97$}\label{fig:plot:gauss:97}
+    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_98.pdf}\subcaption{$\forget = 0.98$}\label{fig:plot:gauss:98}
+    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_99.pdf}\subcaption{$\forget = 0.99$}\label{fig:plot:gauss:99}
+  \end{minipage}
+  \caption{Segmental SI-SDR improvements (SI-SDRi) every \SI{1}{\second} with $\Src = \Mic = 5$ and $\text{RT}_{60} \approx \SI{100}{\milli\second}$.}
 \end{figure}
 
-\paragraph{雑感}
+\paragraph{雑感・メモ}
 \begin{itemize}
-  \item 全体:
+  \item 実験結果
     \begin{itemize}
-      \item 回転前までは徐々に分離されていく，回転後は処理ごとに様々な結果
+      \item RT-cov
+        \begin{itemize}
+          \item マイク回転後も分離性能の低下がほとんどない
+        \end{itemize}
+      \item RT-obs
+        \begin{itemize}
+          \item RT-covとほとんど同じ
+          \item 最終的な分離性能はRT-covにわずかに劣る
+            \begin{itemize}
+              \item 音源分離はマイク回転を補償した観測信号，\\性能評価はマイク回転ありの音像を用いているため？
+            \end{itemize}
+        \end{itemize}
+      \item Reset
+        \begin{itemize}
+          \item 回転後に大きく性能が低下
+          \item 回転後は徐々に収束
+          \item 忘却係数$\forget$が1に近づくほど回転前後の性能差が大きくなる
+        \end{itemize}
+      \item Naive
+        \begin{itemize}
+          \item 回転後に大きく性能が低下，低下の幅はResetよりも小さく，ほとんどすべての忘却係数について同じくらい
+        \end{itemize}
     \end{itemize}
-  \item 座標変換(CT): オンラインでもうまく動いていそう
+  \item その他
     \begin{itemize}
-      \item 一部分離できていない音源が残っていた
-      \item $\forget=0.99$では性能が上がり切る前にマイクの回転が起こってしまったように見える
-    \end{itemize}
-  \item 音場補間(SFI): 全体的にあまり良くない
-    \begin{itemize}
-      \item 回転後は分離できていなかった
-      \item ASJ 2022 (秋)の結果では音場補間すれば回転後も性能をキープしていた
-      \item[$\Rightarrow$] SI-SDR計算用の信号が回転なしの信号を使っていたためSFIの性能が低下した？
-    \end{itemize}
-  \item 再初期化 (Reset):
-    \begin{itemize}
-      \item 回転後，音が消えて徐々に分離されていく
-    \end{itemize}
-  \item Naive:
-    \begin{itemize}
-      \item 回転後に音源が入れ替わる
-      \item $\forget=0.97$では結構がんばっている
+      \item FFT長2048以下，忘却係数0.95以下で$\cov _{\src,\ft} ^{-1}$が発散する
     \end{itemize}
 \end{itemize}
 
