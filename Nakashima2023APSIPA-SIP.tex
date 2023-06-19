@@ -1,6 +1,7 @@
 \PassOptionsToPackage{dvipdfmx}{graphicx}% NOTE: only for Japanese
 \PassOptionsToPackage{dvipdfmx}{xcolor}% NOTE: only for Japanese
 \documentclass[sip,biber]{now-journal}
+\addbibresource{IEEEabrv.bib}
 \addbibresource{ref.bib}
 
 \usepackage[nolist,nohyperlinks]{acronym}
@@ -131,7 +132,7 @@
 % さらに，シミュレーション実験により音源分離性能を評価する．
 Most array signal processing methods, such as blind source separation (BSS), assume a time-invariant system.
 However, for practical applications, it is necessary to consider time variations of the system, such as movements of the microphone or source.
-Sound field interpolation for circular microphone array (CMA) \cite{Wakabayashi:2021:ICASSP} has been proposed to address the rotation of a CMA as one of the time variations of the system.
+Sound field interpolation for circular microphone array (CMA) \cite{Wakabayashi:2023:ASLP} has been proposed to address the rotation of a CMA as one of the time variations of the system.
 This method exploits the symmetry of the CMA to estimate the sound field before the rotation of the CMA by a simple linear operation.
 Applications to beamforming \cite{Wakabayashi:2021:ICASSP} and steering vector estimation \cite{Wakabayashi:2021:ASJ:A} have also been proposed,
 as well as a method for self-estimating the rotation angle of a CMA \cite{Lian:2021:APSIPA}.
