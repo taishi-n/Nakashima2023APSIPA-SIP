@@ -214,10 +214,10 @@ AuxIVAでは，各音源$\src = 1, \dots, \Src$に対して次の更新式で時
 \begin{align}
   \var _{\src\tframe} &\gets \sqrt{\sum _{\freq=1} ^{\Freq} \lvert \demix ^{\hermite} _{\src\freq} \Obs ^{\nohermite}_{\ft} \rvert ^2}, \\
   \cov _{\src\freq} &\gets \frac{1}{\Tframe} \sum _{\tframe=1} ^{\Tframe} \weight (\var_{\src\tframe}) \Obs _{\ft} \Obs _{\ft}^{\hermite}, \\
-  \demix _{\src\freq} &\gets (\Demix _{\freq} \cov _{\src\freq}) ^{-1} \bm{e} _{\src} \label{eq:ip:proj}, \\
+  \demix _{\src\freq} &\gets (\Demix _{\freq} \cov _{\src\freq}) ^{-1} \eye _{\src} \label{eq:ip:proj}, \\
   \demix _{\src\freq} &\gets {\demix _{\src\freq}} / {\sqrt{\demix _{\src\freq} ^{\hermite} \cov _{\src\freq} \demix _{\src\freq}}} \label{eq:ip:norm}.
 \end{align}
-ここで，$\bm{e}_{\src}$は単位行列の$\src$列目のベクトルである．
+ここで，$\eye _{\src}$は単位行列の$\src$列目のベクトルである．
 $\cov _{\src\freq}$は{重み付き共分散行列}と呼ばれる．
 $\weight(\var)$は音源モデルによって定まる関数であり，
 本論文では時変Gauss分布を仮定した場合に対応する，$\weight (\var) = \Freq/{\var ^2}$ \cite{Ono:2012:APSIPA}を用いる．
@@ -336,22 +336,17 @@ OIVAでは，時間フレーム$\tframe$ごと重み付き共分散行列$\cov _
         $\Obs _{\ft} = \rotMat _{\rotDeg} ^{-1} \rotObs _{\ft}$
       \item \Cref{alg:coord}: 回転後に$\Demix _{\ft}, \cov _{\src,\ft}$を``座標変換'' (\textbf{RT-cov})\\
         $\rotDemix _{\ft} \gets \Demix _{\ft} \rotMat _{\rotDeg} ^{\hermite}$,\; $\rotCov _{\src,\ft} \gets \rotMat _{\rotDeg} \cov _{\src,\ft} \rotMat _{\rotDeg} ^{\hermite}$
-    \end{itemize}
-  \item 座標変換
-    \begin{align*}
-      \rotDemix _{\ft} &\gets \Demix _{\ft} \rotMat _{\rotDeg} ^{\hermite} \\
-      \rotCov _{\src,\ft} &\gets \rotMat _{\rotDeg} \cov _{\src,\ft[-1]} \rotMat _{\rotDeg} ^{\hermite} + (1 - \forget) \weight(\var _{\src,\tframe}) \rot{\Obs} _{\ft} \rot{\Obs} _{\ft} ^{\hermite}
-    \end{align*}
     % \begin{itemize}
-    %   \item $\cov _{\src,\ft[-1]}$はそれ以前のすべての観測の情報を含んでいるので，それだけに$\rotMat _{\rotDeg}$をかけて，あとは観測をそのまま使って更新すればいいはず…
+    %   \item $\cov _{\src,\ft[-1]}$はそれ以前のすべての観測の情報を含んでいるので，それだけに$\rotMat _{\rotDeg}$をかけて，あとは観測をそのまま使って更新すればいいはず
     % \end{itemize}
+    \end{itemize}
   \item パラメータ
     \begin{itemize}
-      \item 初期値: $\Demix _{\freq,0} = \bm{I}\; (\forall \freq)$, $\cov _{\src,\freq,0} = 10^{-3}\times\bm{I}\; (\forall \src, \freq)$
+      \item 初期値: $\Demix _{\freq,0} = \Eye\; (\forall \freq)$, $\cov _{\src,\freq,0} = 10^{-3}\times\Eye\; (\forall \src, \freq)$
       \item 忘却係数$\forget$: 0.90, 0.91, ..., 0.99
       \item 音源モデル: 時変Gauss
-      \item フレームごとの反復回数: 5
-      \item 正則化: $\cov _{\src,\ft} \gets \cov _{\src,\ft} + 10 ^{-3} \bm{I}$
+      \item フレームごとの反復回数$\Itr$: 5
+      \item 正則化: $\cov _{\src,\ft} \gets \cov _{\src,\ft} + 10 ^{-3} \Eye$
     \end{itemize}
 \end{itemize}
 
@@ -431,87 +426,65 @@ OIVAでは，時間フレーム$\tframe$ごと重み付き共分散行列$\cov _
   \item 実際のマイク回転角度と推定した回転角度に誤差をつけた場合の実験
 \end{itemize}
 
-\begin{algorithm}{Na\"{i}ve Online AuxIVA}{naive}
+\begin{algorithm}{Online AuxIVA (OIVA)}{naive}
+  \textbf{Input:} $\{\Obs _{\ft}\} _{\freq},\, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\}_{\src,\freq}$\\
+  % \textbf{Output:} $\Est _{\ft},\, \Demix _{\ft},\, \cov _{\src,\ft}\; (\forall \src,\freq)$
+  \textbf{Output:} $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\}_{\src,\freq}$
   \begin{pseudo}
-    for $\tframe = 1,\, \dots,\, \Tframe$ \\+
-      {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
+    {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
+    for $\itr = 1,\, \dots,\, \Itr$ \\+
       for $\src = 1,\, \dots,\, \Src$ \\+
         {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \\
         {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{$(\forall \freq)$}\\-
       forall $\src = 1, \dots, \Src$ \\+
         {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{$(\forall \freq)$}\\
-        {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{$(\forall \freq)$} \\-
-        {$\Est _{\ft}  $} $\gets$ $\Demix _{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$}
+        {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{$(\forall \freq)$}
+        % {$\Est _{\ft}  $} $\gets$ $\Demix _{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$}
   \end{pseudo}
 \end{algorithm}
-\begin{algorithm}{Online AuxIVA with reset}{reset}
+\begin{algorithm}{Online AuxIVA with reset (\textbf{Reset})}{reset}
   \begin{pseudo}
     for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
-      \pr{Na\"ive Online AuxIVA}(\Obs _{ft}) \\-
+      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq}) \\-
     {$\Demix _{\freq,\rotFra - 1}$} $\gets$ $\Eye$ \ct{$(\forall \freq)$} \\
     {$\cov _{\src,\freq,\rotFra - 1}$} $\gets$ $\varepsilon \Eye$ \ct{$(\forall \src,\freq)$} \\
     for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
-      {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
-      for $\src = 1,\, \dots,\, \Src$ \\+
-        {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \\
-        {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{$(\forall \freq)$}\\-
-      forall $\src = 1, \dots, \Src$ \\+
-        {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{$(\forall \freq)$}\\
-        {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{$(\forall \freq)$} \\-
-        {$\Est _{\ft}  $} $\gets$ $\Demix _{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$}
+      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq})
   \end{pseudo}
 \end{algorithm}
 
-\begin{algorithm}{Online AuxIVA with SFI}{sfi}
+\begin{algorithm}{Online AuxIVA with sound field interpolation for observed signal (RT-obs)}{sfi}
   \begin{pseudo}
     for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
-      \pr{Na\"ive Online AuxIVA}(\Obs _{ft}) \\-
+      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq}) \\-
     $\rotMat _{\rotDeg}$ $\gets$ \pr{CalcRotationMatrix}(\Mic, \rotDeg) \\
     for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
-      $\Demix _{\ft}$ $\gets$ $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
-      $\Obs _{\ft} \gets \rotMat _{\rotDeg} ^{-1} \rotObs _{\ft}$ \\
-      for $\src = 1,\, \dots,\, \Src$ \\+
-        $\var _{\src,\tframe}$ $\gets$ $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \\
-        $\cov _{\src,\ft}    $ $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{$(\forall \freq)$}\\-
-      forall $\src = 1, \dots, \Src$ \\+
-        $\demix _{\src,\ft}$ $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{$(\forall \freq)$}\\
-        $\demix _{\src,\ft}$ $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{$(\forall \freq)$} \\-
-        $\Est _{\ft}$ $\gets$ $\Demix _{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$}
+      $\refObs _{\ft} \gets \rotMat _{\rotDeg} ^{-1} \Obs _{\ft}$ \ct{$(\forall \freq)$} \\
+      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\refObs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq})
   \end{pseudo}
 \end{algorithm}
 \begin{algorithm}{Online AuxIVA with ``transformation''}{coord}
   \begin{pseudo}
     for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
-      \pr{Na\"ive Online AuxIVA}(\Obs _{ft}) \\-
+      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq}) \\-
+    $\rotMat _{\rotDeg}$ $\gets$ \pr{CalcRotationMatrix}(\Mic, \rotDeg) \\
     {$\rotDemix _{\freq,\rotFra - 1}$} $\gets$ $\Demix _{\freq,\rotFra - 1} \rotMat _{\rotDeg} ^{\hermite}$ \ct{$(\forall \freq)$} \\
     {$\rotCov _{\src,\freq,\rotFra - 1}$} $\gets$ $\rotMat _{\rotDeg} \cov _{\src,\freq,\rotFra - 1} \rotMat _{\rotDeg} ^{\hermite}$ \ct{$(\forall \src,\freq)$} \\
     for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
-      {$\rotDemix _{\ft}$} $\gets$ $\rotDemix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
-      for $\src = 1,\, \dots,\, \Src$ \\+
-        {$\rot{\var} _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq} \abs{\rot{\demix} _{\src,\ft} ^{\hermite} \rotObs _{\ft}} ^2}$ \\
-        {$\rot{\cov} _{\src,\ft}    $} $\gets$ $\forget \rot{\cov} _{\src,\ft[-1]} + (1 - \forget) \weight(\rot{\var} _{\src,\tframe}) \rot{\Obs} _{\ft} \rot{\Obs} _{\ft} ^{\hermite}$ \ct{$(\forall \freq)$}\\-
-      forall $\src = 1, \dots, \Src$ \\+
-        {$\rot{\demix} _{\src,\ft}$} $\gets$ $(\rot{\Demix} _{\ft} \rot{\cov} _{\src,\ft}) ^{-1} \eye _{\src}$ \ct{$(\forall \freq)$}\\
-        {$\rot{\demix} _{\src,\ft}$} $\gets$ $\dfrac{\rot{\demix} _{\src,\ft}}{\sqrt{\rot{\demix} _{\src,\ft} ^{\hermite} \rot{\cov} _{\src,\ft} \rot{\demix} _{\src,\ft}}}$ \ct{$(\forall \freq)$} \\-
-        {$\Est _{\ft}  $} $\gets$ $\rot{\Demix} _{\ft} \rot{\Obs} _{\ft}$ \ct{$(\forall \freq)$}
+      $\{\rotDemix _{\ft}\}_{\freq},\, \{\rotCov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\rotDemix _{\ft[-1]}\}_{\freq},\, \{\rotCov _{\src,\ft[-1]}\} _{\src,\freq})
   \end{pseudo}
 \end{algorithm}
 
 \begin{algorithm}{Projection back (online)}{pb}
-  \textbf{Input:}
-    \begin{itemize}
-      \item Observed signal $\Obs _{\ft}$
-      \item Demixing matrices $\Demix _{\ft}$
-      \item Reference microphone index $\ell$
-    \end{itemize}
+  \textbf{Input:} $\Obs _{\ft}$, $\Demix _{\ft}$, reference microphone index $\ell$\\
   \textbf{Output:} Scale-restored output signal $\Est _{\ft}$
   \begin{pseudo}
     for $\tframe = 1,\, \dots,\, \Tframe$ \\+
       for $\freq = 1,\, \dots,\, \Freq$ \\+
         $\begin{bmatrix} \steer _{1,\ft} & \dots & \steer _{\Mic,\ft} \end{bmatrix} \eqqcolon \Steer _{\ft} \gets \Demix _{\ft} ^{-1}$ \\
-        $\tilde{\Demix} _{\ft} \gets \mathrm{diag}(\steer _{\ell,\ft}) \Demix _{\ft}$ \\
-        \nf{$\phantom{\tilde{\Demix} _{\ft} \gets} = \begin{bmatrix} a _{1,\ell,\ft} & \dots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \dots & a _{\Src,\ell,\ft} \end{bmatrix} \Demix _{\ft}$} \\
-        $\Est _{\ft} \gets \tilde{\Demix} _{\ft} \Obs _{\ft}$ \\--
+        % $\tilde{\Demix} _{\ft} \gets \mathrm{diag}(\steer _{\ell,\ft}) \Demix _{\ft}$ \\
+        % \nf{$\phantom{\tilde{\Demix} _{\ft} \gets} = \begin{bmatrix} a _{1,\ell,\ft} & \dots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \dots & a _{\Src,\ell,\ft} \end{bmatrix} \Demix _{\ft}$} \\
+        $\Est _{\ft} \gets \mathrm{diag}(\steer _{\ell,\ft}) \Demix _{\ft} \Obs _{\ft}$
   \end{pseudo}
 \end{algorithm}
 
