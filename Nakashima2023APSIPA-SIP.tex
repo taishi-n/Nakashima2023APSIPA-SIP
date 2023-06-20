@@ -245,21 +245,6 @@ OIVAでは，時間フレーム$\tframe$ごと重み付き共分散行列$\cov _
 % where α (0 ≤ α < 1) is the forgetting factor. The separation matrix is updated in the time frame in which it is written using the same update formula as in eq. (8), eq. (9).
 % For both methods, the signal is input again after applying the sound field interpolation to the observed signal including the CMA rotation.
 
-\subsection{Frequency band limitation (\textcolor{red}{\textbf{WiP}})}
-\begin{itemize}
-  \item 音場補間は周波数が高くなるほどモデルとの乖離が大きくなり補間性能が悪くなる \cite{Wakabayashi:2020:ASJ:A}
-  \item 音源分離に用いる音源モデル$\var _{\src\tframe}$を計算するとき，補間がうまくできている周波数帯域だけで計算すれば分離性能が改善されると期待できる
-  \item サンプリング周波数$\freqSamp~\unit{\hertz}$，FFT点数$\nfft$のとき，STFTの周波数ビンインデクス$\freq$と物理的な周波数$\freqPhys$の対応
-    \begin{equation}
-      \freqPhys = \frac{(\freq - 1)\times\freqSamp}{\nfft} \quad \left(\freq = 1, \dots, \frac{\nfft}{2} + 1\right),
-    \end{equation}
-  \item 修正された音源モデルの更新式
-    \begin{equation}
-      \var _{\src\tframe} = \sqrt{\sum _{\freq = 1} ^{\SubFreq} \lvert \demix _{\src\ft} \Obs _{\ft} \rvert ^2},
-    \end{equation}
-    ただし，$\SubFreq$は周波数の上限
-\end{itemize}
-
 \subsection{Coordinate transformation of sound field interpolation}
 \subsubsection{Purpose}
 \begin{itemize}
