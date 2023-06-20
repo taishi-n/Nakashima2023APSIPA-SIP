@@ -120,27 +120,57 @@
   Simulation experiments confirmed that SFI improves the robustness of the OIVA in situations where the microphone is rotating.
 \end{abstract}
 
-\section{Introduction}
-% ブラインド音源分離など多くのアレイ信号処理では，時不変な系を仮定する．
-% しかし，実応用のためにはマイクロホンや音源の移動など系の時間変化を考慮する必要がある．
-% そこで，系の時間変化のひとつとして，円状等間隔マイクロホンアレイ(circular microphone array; CMA)の回転を考え，音場の補間により対応する手法 \cite{Wakabayashi:2020:ASJ:A} が提案された．
+\section{Introduction}\label{sec:intro}
+% ブラインド音源分離は混合信号から目的の信号を分離する技術である．
+% BSSの手法はIVAやその拡張などが有名である．
+% これらの手法はすべて時不変な系を仮定している．
+% それに対して，実応用のためにはマイクロホンや音源の移動など系の時間変化を考慮する必要がある．
+% 系の時間変化を考慮するためには，信号を短いブロックに分割し，各ブロックに対してIVAを適用するやり方が考えられる．
+% ブロックバッチの手法やオンラインの手法が考えられる．
+%
+% オンライン独立ベクトル分析は実時間で動作し，高い性能を示した．
+% オンラインAuxIVA は補聴器への応用，残響除去との組み合わせ，高速なステアリングベクトル更新など最近活発に研究されている．
+% オンラインAuxIVA ではフレームごとに分離行列を推定し，音響伝達系のゆるやかな時間変化に対応できる．
+% しかし，新たな音源の出現やマイクの移動など，音響伝達系の突発的な変化が起こった場合には推定が難しくなり性能が著しく低下する．
+%
+% 音響伝達系の突発的な変化に対応するための音響信号処理手法がいくつか提案されている．
+% 円状等間隔マイクロホンアレイ(circular microphone array; CMA)の回転を考え，音場の補間により対応する手法が提案されている．
 % この手法はCMAの対称性を利用することで，CMAが回転する前の音場を簡単な線形演算により推定する．
 % また，ビームフォーミング \cite{Wakabayashi:2021:ICASSP} やステアリングベクトル推定 \cite{Wakabayashi:2021:ASJ:A} への応用や，
 % CMAの回転角度を自己推定する手法 \cite{Lian:2021:APSIPA} も提案されている．
-% 本稿では，CMAが回転する状況下のブラインド音源分離に取り組む．
-% 音場補間によりCMAの回転の影響を打ち消し，後段にブラインド音源分離を適用する．
-% さらに，シミュレーション実験により音源分離性能を評価する．
-Most array signal processing methods, such as blind source separation (BSS), assume a time-invariant system.
-However, for practical applications, it is necessary to consider time variations of the system, such as movements of the microphone or source.
-Sound field interpolation for circular microphone array (CMA) \cite{Wakabayashi:2023:ASLP} has been proposed to address the rotation of a CMA as one of the time variations of the system.
+% そこで，本稿では，CMAが回転する状況下のブラインド音源分離に取り組む．
+% 音場補間によりCMAの回転の影響を打ち消しながらオンラインでブラインド音源分離処理を行う．
+Blind source separation (BSS) \cite{Makino:2018:ASS} is a technique to extract the source signals from their observed mixture.
+Popular approaches for BSS include independent vector analysis (IVA) \cite{Kim:2006:ASLP,Hiroe:2006:ICA} and its extensions \cite{Kitamura:2016:ASLP,Nugraha:2020:SPL,Brendel:2020:SP}.
+These methods assume a time-invariant acoustic transfer system (ATS).
+On the other hand, for practical applications, it is necessary to consider time variations of the system, such as movements of the microphone or source.
+Meny methods have been proposed based on block batch processing \cite{Koldovsky:2019:ICASSP,Koldovsky:2021:SP,Jansky:2022:ASMP} or online processing \cite{Kim:2010:CASI,Taniguchi:2014:HSCMA}.
+
+Online AuxIVA shows high separation performance in real-time situation \cite{Taniguchi:2014:HSCMA}.
+It also has been actively researched recently for applications in hearing aids \cite{Sunohara:2017:ICASSP}, joint optimization with dereverberation \cite{Ueda:2021:ICASSP}, and fast steering vector updates \cite{Nakashima:2023:ICASSP}.
+Online AuxIVA estimates demixing matrices frame-by-frame manner and can track smooth environmental changes in ATS such as slow movement of sources.
+However, sudden changes in ATS such as emergence of new sources or microphone movement makes online BSS difficult and thus degrade separation performance.
+
+Several methods have been proposed to cope with such sudden changes in ATS.
+Sound field interpolation for circular microphone array (CMA) has been proposed to address the rotation of a CMA \cite{Wakabayashi:2023:ASLP}.
 This method exploits the symmetry of the CMA to estimate the sound field before the rotation of the CMA by a simple linear operation.
 Applications to beamforming \cite{Wakabayashi:2021:ICASSP} and steering vector estimation \cite{Wakabayashi:2021:ASJ:A} have also been proposed,
 as well as a method for self-estimating the rotation angle of a CMA \cite{Lian:2021:APSIPA}.
-In this paper, we address blind source separation in situations where the CMA rotates.
-The effect of the rotational movement of the CMA is counteracted by interpolating the sound field, and blind source separation is applied in the latter stage.
-Furthermore, the source separation performance is evaluated by simulation experiments.
 
-\section{Problem Formulation}
+In this paper, we address blind source separation in situations where a CMA rotates.
+The effect of the rotation is canceled out by the sound field interpolation, and BSS is applied in the latter stage.
+As described in \cref{sec:proposed}, simply applying sound field interpolation to online BSS is computationally expensive, since sound field interpolation is required for the observed signal in every time frame.
+In contrast, this study introduces a simpler method than that, and demonstrates its effectiveness through experiments.
+Experiments show that our proposed scheme have significantly better than the conventional online AuxIVA for the source separation task.
+
+The rest of this paper is organized as follows.
+We formulate our motivation in \cref{sec:problem}.
+\Cref{sec:problem} describes sound field interpolation and how to apply it to online BSS.
+In \cref{sec:proposed}, we propose an efficient online BSS that utilize the information before and after the rotation of CMA.
+We conduct some experiments to show the efficacy of the sound field interpolationefficacy  for online BSS in \cref{sec:experiment}.
+Finally, \cref{sec:conclusion} concludes this paper.
+
+\section{Problem Formulation}\label{sec:problem}
 \begin{table}[t]
   \centering
   \caption{Symbols}
@@ -189,7 +219,7 @@ Online blind source separation aims to estimate the demixing matrix and estimate
 where $\Demix _{\ft}$ is the demixing matrix and $\Est _{\ft}$ is the estimated signal.
 Note that $\rotFra$ and $\rotDeg$ are assumed to be known or estimated in this paper.% because we focus only on the efficacy of sound field interpolation.
 
-\section{Conventional Methods}
+\section{Conventional Methods}\label{sec:conventional}
 
 \subsection{Online Auxxiliary-Function-Based Independent Vector Analysis}
 
@@ -242,7 +272,7 @@ CMAが回転する前の時間フレーム$\tframe < \rotFra$における観測�
 % where α (0 ≤ α < 1) is the forgetting factor. The separation matrix is updated in the time frame in which it is written using the same update formula as in eq. (8), eq. (9).
 % For both methods, the signal is input again after applying the sound field interpolation to the observed signal including the CMA rotation.
 
-\section{Proposed method}
+\section{Proposed method}\label{sec:proposed}
 \subsection{Coordinate transformation of sound field interpolation}
 \begin{itemize}
   \item 究極の目的: マイクの回転に頑健なオンライン音源分離を開発したい
@@ -272,7 +302,7 @@ CMAが回転する前の時間フレーム$\tframe < \rotFra$における観測�
               &= \Demix _{\ft} \Obs _{\ft}
 \end{align}
 
-\section{実験}
+\section{Experimental Validation}\label{sec:experiment}
 \subsection*{目的}
 \begin{itemize}
   \item 座標変換の有効性の確認
@@ -469,7 +499,7 @@ CMAが回転する前の時間フレーム$\tframe < \rotFra$における観測�
   \end{pseudo}
 \end{algorithm}
 
-\section{Conclusion}
+\section{Conclusion}\label{sec:conclusion}
 % 本研究では，円状等間隔マイクロホンアレイにおける音場補間をブラインド音源分離に応用した．
 % シミュレーション実験により，音場補間が円状等間隔マイクロホンアレイの回転に対するOIVAの頑健性を改善させたことを確認した．
 % 今後は本手法の自己回転角度推定 \cite{Lian:2021:APSIPA} との組み合わせや，実時間処理への拡張などに取り組む．
