@@ -225,26 +225,23 @@ Note that $\rotFra$ and $\rotDeg$ are assumed to be known or estimated in this p
 
 \subsection{Online Auxxiliary-Function-Based Independent Vector Analysis}
 
-本論文では，補助関数型独立ベクトル分析 (auxiliary-function-based independent vector analysis; AuxIVA) \cite{Ono:2011:WASPAA}
-およびそのオンライン拡張 (online AuxIVA; OIVA) \cite{Taniguchi:2014:HSCMA} を用いて音源分離を行う．
-AuxIVAでは，各音源$\src = 1, \dots, \Src$に対して次の更新式で時不変な分離行列$\Demix _{\freq}$を推定する．
+Online AuxIVA \cite{Taniguchi:2014:HSCMA} is an online extension of AuxIVA \cite{Ono:2011:WASPAA} and estimates demixing matrices $\{\Demix _{\ft}\} _{\freq}$ at time frame $\tframe$ by minimizing the following objective function:
 \begin{align}
-  \var _{\src,\tframe} &\gets \sqrt{\sum _{\freq=1} ^{\Freq} \lvert \demix ^{\hermite} _{\src\freq} \Obs ^{\nohermite}_{\ft} \rvert ^2}, \\
-  \cov _{\src,\freq} &\gets \frac{1}{\Tframe} \sum _{\tframe=1} ^{\Tframe} \weight (\var_{\src\tframe}) \Obs _{\ft} \Obs _{\ft}^{\hermite}, \\
-  \demix _{\src,\freq} &\gets (\Demix _{\freq} \cov _{\src\freq}) ^{-1} \eye _{\src} \label{eq:ip:proj}, \\
-  \demix _{\src,\freq} &\gets {\demix _{\src\freq}} / {\sqrt{\demix _{\src\freq} ^{\hermite} \cov _{\src\freq} \demix _{\src\freq}}} \label{eq:ip:norm}.
+  J _{\tframe}(\Demix _{\ft}) &= \sum _{\src = 1} ^{\Src} \demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft} ^{\nohermite} - \logdet{\Demix _{\ft}} ^2, \label{eq:obj} \\
+  \cov _{\src,\ft} &= \forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} ^{\nohermite} \Obs _{\ft} ^{\hermite}, \label{eq:cov} \\
+  \var _{\src,\tframe} &= \sqrt{\sum _{\freq=1} ^{\Freq} \lvert \demix ^{\hermite} _{\src,\ft} \Obs ^{\nohermite}_{\ft} \rvert ^2},
 \end{align}
-ここで，$\eye _{\src}$は単位行列の$\src$列目のベクトルである．
-$\cov _{\src\freq}$は{重み付き共分散行列}と呼ばれる．
-$\weight(\var)$は音源モデルによって定まる関数であり，
-本論文では時変Gauss分布を仮定した場合に対応する，$\weight (\var) = \Freq/{\var ^2}$ \cite{Ono:2012:APSIPA}を用いる．
-
-OIVAでは，時間フレーム$\tframe$ごと重み付き共分散行列$\cov _{\src,\ft}$を更新する~\cite{Taniguchi:2014:HSCMA}．
-\begin{equation}
-  \cov _{\src,\ft} \gets \forget \cov _{\src\freq(\tframe-1)} + (1 - \forget) \weight ({\var _{\src\tframe}}) \Obs _{\ft} \Obs _{\ft}^{\hermite}.
-\end{equation}
-ここで，$\forget\; (0 \leq \forget < 1)$は忘却係数である．
-分離行列は\cref{eq:ip:proj}, \cref{eq:ip:norm}と同じ更新式を用いて各時間フレームで更新する．
+where $\weight\colon \R _{>0} \to \R _{>0}$ is defined as $\weight(\var) = \cont ' (\var) / 2 \var$ ($\cont '(\var)$ denotes the first derivative of $\cont (\var)$ with respect to $\var$),
+$\cont(\var)$ is called a contrast function and derived by probability density function of source signals,
+and $\forget\; (0 \leq \forget < 1)$ is called a forgetting factor.
+In this paper, we assume that $\weight (\var) = \Freq/{\var ^2}$ which represents the time-varying Gaussian distribution \cite{Ono:2012:APSIPA}.
+By using the recursive update for covariance matrix \eqref{eq:cov}, we can apply efficient update methods proposed for batch AuxIVA algorithms such as \emph{iterative projection (IP)} \cite{Ono:2011:WASPAA} to minimize the objective function \eqref{eq:obj}.
+IP cyclically update each \emph{demixing vector} $\demix _{\src,\ft} ^{\hermite}\; (\src = 1, \dots, \Src)$ (row of the demixing matrix $\Demix _{\ft}$) using the following update rule:
+\begin{align}
+  \demix _{\src,\ft} &\gets (\Demix _{\ft} \cov _{\src\ft}) ^{-1} \eye _{\src} \label{eq:ip:proj}, \\
+  \demix _{\src,\ft} &\gets \frac{{\demix _{\src,\ft}}}{{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}} \label{eq:ip:norm},
+\end{align}
+where $\eye _{\src} \in \R ^{\Src}$ is the canonical basis vector with the $\src$th element unity.
 
 \subsection{Sound Field Interpolation on Circular Microphone Array}
 CMAが回転した後の位置における観測信号$\Obs _{\ft}\; (\tframe \geq \rotFra)$と，ある行列$\rotMat _{\rotDeg} \in \R ^{\Mic\times\Mic}$を用いて，
