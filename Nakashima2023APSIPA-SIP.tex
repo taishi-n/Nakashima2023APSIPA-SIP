@@ -251,15 +251,20 @@ We assume that the observed signal \emph{after} CMA was rotated $\Obs _{\ft} (\t
 \begin{equation}
   \irot{\Obs} _{\ft} = \rotMat _{-\rotDeg} \Obs _{\ft},
 \end{equation}
-where $\rotMat _{\rotDeg} \in \R ^{\Mic\times\Mic}$ is called \emph{rotation matrix}.
+where $\rotMat _{\rotDeg} \in \C ^{\Mic\times\Mic}$ is called \emph{rotation matrix}.
 $\rotMat _{\rotDeg}$ is calculated as:
-\begin{equation}
-    \rotmat _{k,l}(\rotDeg) =
+\begin{align}
+  \rotmat _{k,l}(\rotDeg) &=
     \begin{cases}
       \displaystyle\frac{\twid ^{- \Rot (\frac{\Mic}{2} - 1) }}{\Mic} \frac{1 - \twid ^{\Rot \Mic}}{1 - \twid ^{\Rot}} & (\text{$\Mic$ is even}),\\[1em]
       \displaystyle\frac{\twid ^{- \Rot \frac{(\Src - 1)}{2}}}{\Mic} \frac{1 - \twid ^{\Rot \Mic}}{1 - \twid ^{\Rot}} & (\text{$\Mic$ is odd}),
-    \end{cases}\label{eq_rotcompo}
-\end{equation}
+    \end{cases}\label{eq:rot:twid} \\
+  &=
+    \begin{cases}
+      \displaystyle \frac{\sinc{(\Rot)}}{\sinc{\left(\frac{\Rot}{\Mic}\right)}} \twid ^{\frac{\Rot}{2}} & (\text{$\Mic$ is even}),\\[1em]
+      \displaystyle \frac{\sinc{(\Rot)}}{\sinc{\left(\frac{\Rot}{\Mic}\right)}} & (\text{$\Mic$ is odd}),
+    \end{cases}\label{eq:rot:sinc}
+\end{align}
 where $\twid \coloneqq \exp (j \frac{2\pi}{\Mic})$ is a twiddle factor in $\Mic$-points FFT, $\rotmat _{k,l} (\rotDeg)$ is the $(k,l)$ element of $\rotMat _{\rotDeg}$, and $\Rot = l - k - \rotDeg$ \cite{Wakabayashi:2023:ASLP}.
 See Section II of \cite{Wakabayashi:2023:ASLP} for the detailed derivation.
 
