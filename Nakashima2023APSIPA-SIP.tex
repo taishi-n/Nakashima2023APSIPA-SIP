@@ -171,29 +171,7 @@ We conduct some experiments to show the efficacy of the sound field interpolatio
 Finally, \cref{sec:conclusion} concludes this paper.
 
 \section{Problem Formulation}\label{sec:problem}
-\begin{table}[t]
-  \centering
-  \caption{Symbols}
-  \begin{tabular}{lll}
-    \toprule
-      Symbol & Domain & Description \\
-    \midrule
-      $\Mic$               & $\Z$                     & Number of microphones \\
-      $\Src$               & $\Z$                     & Number of sources \\
-      $\steer _{\src,\ft}$ & $\C ^{\Mic}$             & Steering vector \\
-      $\sig _{\src,\ft}$   & $\C$                     & Source signal \\
-      $\Obs _{\ft}$        & $\C^{\Mic}$              & Observed signal \\
-      $\Demix _{\ft}$      & $\C^{\Src \times \Mic}$  & Demixing matrix \\
-      $\Est _{\ft}$        & $\C^{\Mic}$              & Estimated signal \\
-      $\cov _{\src,\ft}$   & $\C^{\Mic \times \Mic}$  & Covariance matrix \\
-      $\rotDeg$            & $\R$                     & Rotation angle \\
-      $\rotFra$            & $\R$                     & Rotation time \\
-      $\rotMat _{\rotDeg}$ & $\R ^{\Mic \times \Mic}$ & Rotation matrix \\
-      $\irot{\Obs} _{\ft}$ & $\C^{\Mic}$              & Observes signal at \textcolor{red}{\textbf{reference position}} \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
+% TODO: マイクが回転する状況での音源分離の図
 Let $\Src$ and $\Mic$ respectively be the number of sources and microphones.
 We assume that the observed signal $\Obs _{\ft}$ is modelled as:
 \begin{equation}
@@ -217,7 +195,31 @@ Online blind source separation aims to estimate the demixing matrix and estimate
   \Est _{\ft} &= \Demix _{\ft} \Obs _{\ft} \in \C ^{\Src},
 \end{align}
 where $\Demix _{\ft}$ is the demixing matrix and $\Est _{\ft}$ is the estimated signal.
-Note that $\rotFra$ and $\rotDeg$ are assumed to be known or estimated in this paper.% because we focus only on the efficacy of sound field interpolation.
+Note that $\rotFra$ and $\rotDeg$ are assumed to be known or estimated in this paper.
+\Cref{tab:notations} summarises the notations used in this paper.
+\begin{table}[t]
+  \centering
+  \caption{Notations}\label{tab:notations}
+  \begin{tabular}{lll}
+    \toprule
+      Symbol & Domain & Description \\
+    \midrule
+      % $\Mic$               & $\Z$                     & Number of microphones \\
+      $\Src$               & $\Z$                     & Number of sources \\
+      $\steer _{\src,\ft}$ & $\C ^{\Mic}$             & Steering vector \\
+      $\sig _{\src,\ft}$   & $\C$                     & Source signal \\
+      $\Obs _{\ft}$        & $\C^{\Mic}$              & Observed signal \\
+      $\Demix _{\ft}$      & $\C^{\Src \times \Mic}$  & Demixing matrix \\
+      $\Est _{\ft}$        & $\C^{\Mic}$              & Estimated signal \\
+      $\cov _{\src,\ft}$   & $\C^{\Mic \times \Mic}$  & Covariance matrix \\
+      $\forget$            & $\{\forget \in \R \mid 0 \leq \forget < 1\}$   & Forgetting factor \\
+      $\rotDeg$            & $\R$                     & Rotation angle \\
+      $\rotFra$            & $\R$                     & Rotation time \\
+      $\rotMat _{\rotDeg}$ & $\R ^{\Mic \times \Mic}$ & Rotation matrix \\
+      $\irot{\Obs} _{\ft}$ & $\C^{\Mic}$              & Observes signal at \textcolor{red}{\textbf{reference position}} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 \section{Conventional Methods}\label{sec:conventional}
 
@@ -245,7 +247,6 @@ OIVAでは，時間フレーム$\tframe$ごと重み付き共分散行列$\cov _
 分離行列は\cref{eq:ip:proj}, \cref{eq:ip:norm}と同じ更新式を用いて各時間フレームで更新する．
 
 \subsection{Sound Field Interpolation on Circular Microphone Array}
-
 CMAが回転した後の位置における観測信号$\Obs _{\ft}\; (\tframe \geq \rotFra)$と，ある行列$\rotMat _{\rotDeg} \in \R ^{\Mic\times\Mic}$を用いて，
 CMAが回転する前の位置における観測信号$\irot{\Obs} _{\ft}$を推定することを考える．
 \begin{equation}
