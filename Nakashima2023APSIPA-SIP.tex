@@ -144,31 +144,33 @@
 Blind source separation (BSS) \cite{Makino:2018:ASS} is a technique to extract the source signals from their observed mixture.
 Popular approaches for BSS include independent vector analysis (IVA) \cite{Kim:2006:ASLP,Hiroe:2006:ICA} and its extensions \cite{Kitamura:2016:ASLP,Nugraha:2020:SPL,Brendel:2020:SP}.
 These methods assume a time-invariant acoustic transfer system (ATS).
-On the other hand, for practical applications, it is necessary to consider time variations of the system, such as movements of the microphone or source.
-Meny methods have been proposed based on block batch processing \cite{Koldovsky:2019:ICASSP,Koldovsky:2021:SP,Jansky:2022:ASMP} or online processing \cite{Kim:2010:CASI,Taniguchi:2014:HSCMA}.
+On the other hand, for practical applications, it is necessary to consider time variations of the ATS, such as movements of the microphone or source.
+Many methods have been proposed based on block batch \cite{Koldovsky:2019:ICASSP,Koldovsky:2021:SP,Jansky:2022:ASMP} or online processing \cite{Kim:2010:CASI,Taniguchi:2014:HSCMA}.
 
 Online AuxIVA shows high separation performance in real-time situation \cite{Taniguchi:2014:HSCMA}.
-It also has been actively researched recently for applications in hearing aids \cite{Sunohara:2017:ICASSP}, joint optimization with dereverberation \cite{Ueda:2021:ICASSP}, and fast steering vector updates \cite{Nakashima:2023:ICASSP}.
+It also has been actively researched recently for applications in hearing aids \cite{Sunohara:2017:ICASSP}, joint optimization with dereverberation \cite{Ueda:2021:ICASSP}, and computationally efficient optimization \cite{Nakashima:2023:ICASSP}.
 Online AuxIVA estimates demixing matrices frame-by-frame manner and can track smooth environmental changes in ATS such as slow movement of sources.
 However, sudden changes in ATS such as emergence of new sources or microphone movement makes online BSS difficult and thus degrade separation performance.
 
+\todo{AR, VR関連のサーベイ追加}
+
 Several methods have been proposed to cope with such sudden changes in ATS.
-Sound field interpolation for circular microphone array (CMA) has been proposed to address the rotation of a CMA \cite{Wakabayashi:2023:ASLP}.
+Sound field interpolation (SFI) for circular microphone array (CMA) has been proposed to address the rotation of a CMA \cite{Wakabayashi:2023:ASLP}.
 This method exploits the symmetry of the CMA to estimate the sound field before the rotation of the CMA by a simple linear operation.
 Applications to beamforming \cite{Wakabayashi:2021:ICASSP} and steering vector estimation \cite{Wakabayashi:2021:ASJ:A} have also been proposed,
 as well as a method for self-estimating the rotation angle of a CMA \cite{Lian:2021:APSIPA}.
 
 In this paper, we address blind source separation in situations where a CMA rotates.
-The effect of the rotation is canceled out by the sound field interpolation, and BSS is applied in the latter stage.
-As described in \cref{sec:proposed}, simply applying sound field interpolation to online BSS is computationally expensive, since sound field interpolation is required for the observed signal in every time frame.
+The effect of the rotation is canceled out by the SFI, and BSS is applied in the latter stage.
+As described in \cref{sec:proposed}, simply applying SFI to online BSS is computationally expensive, since SFI is required for the observed signal in every time frame.
 In contrast, this study introduces a simpler method than that, and demonstrates its effectiveness through experiments.
 Experiments show that our proposed scheme have significantly better than the conventional online AuxIVA for the source separation task.
 
 The rest of this paper is organized as follows.
 We formulate our motivation in \cref{sec:problem}.
-\Cref{sec:problem} describes sound field interpolation and how to apply it to online BSS.
+\Cref{sec:conventional} describes SFI and how to apply it to online BSS.
 In \cref{sec:proposed}, we propose an efficient online BSS that utilize the information before and after the rotation of CMA.
-We conduct some experiments to show the efficacy of the sound field interpolationefficacy  for online BSS in \cref{sec:experiment}.
+We conduct some experiments to show the efficacy of the SFI for online BSS in \cref{sec:experiment}.
 Finally, \cref{sec:conclusion} concludes this paper.
 
 \section{Problem Formulation}\label{sec:problem}
