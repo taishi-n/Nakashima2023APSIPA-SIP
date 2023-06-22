@@ -9,7 +9,7 @@
 \usepackage{bm}
 \usepackage{mathtools}
 \usepackage{siunitx}
-\usepackage{subcaption}
+\usepackage[skip=1pt]{subcaption}
 
 % reload hyperref
 \usepackage[colorlinks=true, allcolors=blue, plainpages=false, pdfpagelabels=true]{hyperref}
@@ -385,7 +385,10 @@ CMAが回転する前の時間フレーム$\tframe < \rotFra$における観測�
   \item パラメータ
     \begin{itemize}
       \item 初期値: $\Demix _{\freq,0} = \Eye\; (\forall \freq)$, $\cov _{\src,\freq,0} = 10^{-3}\times\Eye\; (\forall \src, \freq)$
-      \item 忘却係数$\forget$: 0.90, 0.91, ..., 0.99
+      \item 忘却係数$\forget$: 0.9, 0.95, 0.98, 0.99
+        \begin{itemize}
+          \item 有効データ長 $\frac{1}{1 - \forget} = 10, 20, 50, 100$ となるよう選んだ
+        \end{itemize}
       \item 音源モデル: 時変Gauss
       \item フレームごとの反復回数$\Itr$: 5
       \item 正則化: $\cov _{\src,\ft} \gets \cov _{\src,\ft} + 10 ^{-3} \Eye$
@@ -393,19 +396,12 @@ CMAが回転する前の時間フレーム$\tframe < \rotFra$における観測�
 \end{itemize}
 
 \begin{figure}[t]
-  \begin{minipage}[t]{.5\linewidth}
-    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_90.pdf}\subcaption{$\forget = 0.90$}\label{fig:plot:gauss:90}
-    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_91.pdf}\subcaption{$\forget = 0.91$}\label{fig:plot:gauss:91}
-    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_92.pdf}\subcaption{$\forget = 0.92$}\label{fig:plot:gauss:92}
-    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_93.pdf}\subcaption{$\forget = 0.93$}\label{fig:plot:gauss:93}
-    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_94.pdf}\subcaption{$\forget = 0.94$}\label{fig:plot:gauss:94}
-  \end{minipage}%
-  \begin{minipage}[t]{.5\linewidth}
-    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_95.pdf}\subcaption{$\forget = 0.95$}\label{fig:plot:gauss:95}
-    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_96.pdf}\subcaption{$\forget = 0.96$}\label{fig:plot:gauss:96}
-    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_97.pdf}\subcaption{$\forget = 0.97$}\label{fig:plot:gauss:97}
-    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_98.pdf}\subcaption{$\forget = 0.98$}\label{fig:plot:gauss:98}
-    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_99.pdf}\subcaption{$\forget = 0.99$}\label{fig:plot:gauss:99}
+  \begin{minipage}[t]{\linewidth}
+    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_900.pdf}\subcaption{$\forget = 0.90 $}\label{fig:plot:gauss:900}
+    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:gauss:950}
+    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:gauss:980}
+    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:gauss:990}
+    % \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_995.pdf}\subcaption{$\forget = 0.995$}\label{fig:plot:gauss:995}
   \end{minipage}
   \caption{Segmental SI-SDR improvements (SI-SDRi) every \SI{1}{\second} with $\Src = \Mic = 5$ and $\text{RT}_{60} \approx \SI{100}{\milli\second}$.}
 \end{figure}

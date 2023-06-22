@@ -20,7 +20,7 @@ sns.set(
         "grid.alpha": 0.8,
         "grid.linestyle": "--",
         "grid.linewidth": 0.5,
-        "legend.fontsize": "xx-small",
+        "legend.fontsize": "x-small",
         "legend.frameon": True,
         "legend.framealpha": 0.9,
         "legend.title_fontsize": "x-small",
@@ -46,8 +46,8 @@ plot_kws = {
 
 # figure size
 mm = 1 / 25.4  # inch to mm
-aspect = 1.61
-fig_w = 50 * mm
+aspect = 1.8
+fig_w = 64 * mm
 fig_h = fig_w / aspect
 
 
@@ -137,9 +137,9 @@ for fftlen in group["fft.len"].unique():
                 # adjust
                 grid.fig.axes[0].axvline(x=30, color="k", linewidth=0.75, linestyle="--")
                 grid.fig.tight_layout()  # (left, bottom, right, top)
-                grid.fig.subplots_adjust(**dict(left=0.18, bottom=0.22, right=0.91, top=0.88))
+                grid.fig.subplots_adjust(**dict(left=0.15, bottom=0.20, right=0.85, top=0.85))
 
-                alpha_fmt = f"{alpha:.2f}"[2:]
+                alpha_fmt = f"{alpha:.3f}"[2:]
                 grid.fig.savefig(csvpath.parent / f"{model}_{freq}_fft{fftlen}_{alpha_fmt}.pdf")
                 plt.clf()
                 plt.close()
