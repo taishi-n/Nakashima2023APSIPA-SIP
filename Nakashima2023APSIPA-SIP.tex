@@ -70,6 +70,7 @@
 
 % Original style files
 \usepackage{bsssym}
+\newcommand{\todo}[1]{\textcolor{red}{#1}}
 
 % Document information
 \title{Self-Rotation-Robust Online Independent Vector Analysis with\\Sound Field Interpolation on Circular Microphone Array}
@@ -186,15 +187,20 @@ Unless specified, indices $\freq,\, \tframe,$ and $\src$ always take the ranges 
 We omit the bounds of sets over these indices when they span the ranges.
 ${\{\Obs _{\ft}\}}_{\ft}$ denotes the set of $\Obs _{\ft}$ for all $\freq$ and $\tframe$, for example.
 
-\renewcommand{\Mic}{\Src}%
-We consider online BSS problem in a situation where the CMA is rotated by an angle $\rotDeg$ in a certain time frame $\rotFra$.
+We consider online BSS problem in a situation where the CMA is rotated by an angle $\rotDeg _{\tframe}$.
 We henceforth assume that the number of microphones of CMA is euqal to that of sources; $\Mic = \Src$.
+\renewcommand{\Mic}{\Src}%
 Online blind source separation aims to estimate the demixing matrix and estimated signals using only the current and past observed signals $\{\Obs _{\freq,i}\}_{i=1}^{\tframe}$:
 \begin{align}
   \Demix _{\ft} &= \begin{bmatrix} \demix _{1\ft} & \dots & \demix _{\Src,\ft} \end{bmatrix} ^{\hermite} \in \C ^{\Src \times \Mic}, \\
   \Est _{\ft} &= \Demix _{\ft} \Obs _{\ft} \in \C ^{\Src},
 \end{align}
 where $\Demix _{\ft}$ is the demixing matrix and $\Est _{\ft}$ is the estimated signal.
+\begin{itemize}
+  \item \textcolor{red}{一般性を失わず1個目のマイクをリファレンスとして，sがリファレンス位置でのsource imageとして書く}
+  \item \textcolor{red}{リファレンスマイク位置でのsource imageを求める}
+  \item \textcolor{red}{BSSの説明よりも前に，CMAが回転することを書きたい}
+\end{itemize}
 Note that $\rotFra$ and $\rotDeg$ are assumed to be known or estimated in this paper.
 \Cref{tab:notations} summarises the notations used in this paper.
 \begin{table}[t]
@@ -274,6 +280,15 @@ CMAが回転する前の時間フレーム$\tframe < \rotFra$における観測�
   \Est _{\ft} = \Demix _{\ft} \irot{\Obs} _{\ft} = \Demix _{\ft} \left(\rotMat _{-\rotDeg} \Obs _{\ft}\right).
 \end{equation}
 
+\subsection{Can Direct Combination of Online BSS and SFI Be a Solution of Our Problem?}
+\begin{itemize}
+  \item \todo{音場補間と音源分離を組み合わせただけのものを書く}
+  \item \todo{それではだめだという説明を入れる}
+    \begin{itemize}
+      \item \todo{求めたいのは回転後のリファレンス位置での音像であって，音場補間を行うとマイク位置が変わってしまう}
+    \end{itemize}
+\end{itemize}
+
 % It is shown how to approximate x̂=U(θ)x using a certain matrix U (θ) ∈ CM ×M, with the observed signal x̂ (t ≥ t̂) at the position after the microphone has rotated (see [1] for details).
 % Suppose that the separation matrix W could be estimated using the observed signal x in time frame t<t̂ before the CMA was rotated.
 % By applying sound field interpolation and estimating the observed signal before the rotation as follows, the separation signal y can be obtained after the CMA has rotated without having to re-estimate the separation matrix.
@@ -288,8 +303,8 @@ CMAが回転する前の時間フレーム$\tframe < \rotFra$における観測�
 % where α (0 ≤ α < 1) is the forgetting factor. The separation matrix is updated in the time frame in which it is written using the same update formula as in eq. (8), eq. (9).
 % For both methods, the signal is input again after applying the sound field interpolation to the observed signal including the CMA rotation.
 
-\section{Proposed method}\label{sec:proposed}
-\subsection{Coordinate transformation of sound field interpolation}
+\section{Proposed Method}\label{sec:proposed}
+\subsection{Coordinate Transformation of SFI}
 \begin{itemize}
   \item 究極の目的: マイクの回転に頑健なオンライン音源分離を開発したい
   \item 音源分離では観測信号を ``混ぜ直して'' 新たに入力としても出力は変わらないはず
