@@ -303,7 +303,7 @@ CMAが回転する前の観測信号$\refpos{\Obs} _{\ft}$を用いて分離行�
 もし回転前の観測信号を推定できれば，CMAが回転した後も分離行列を推定し直すことなく分離信号$\Est _{\ft}$を計算できる．
 そこで，CMAの回転後は観測信号に対してSFIを適用し，CMAが回転する前の観測信号を用いて推定した分離行列を利用してオンライン音源分離を行うことを考える：
 \begin{equation}
-  \Est _{\ft} = \refpos{\Demix} _{\ft} \refpos{\Obs} _{\ft} = \refpos{\Demix} _{\ft} \left(\rotMat ^{-1} (\rotSpat _{\tframe}) \Obs _{\ft}\right).
+  \Est _{\ft} = \refpos{\Demix} _{\ft} \refpos{\Obs} _{\ft} = \refpos{\Demix} _{\ft} \left(\rotMat ^{\hermite} (\rotSpat _{\tframe}) \Obs _{\ft}\right).
 \end{equation}
 ただし，この方式では観測信号のマイク位置を変えてしまうため，本論文の目的である，回転した後の位置におけるsource imageが得られない．
 そのため，観測信号ではなく，分離信号を得るためのパラメータの方に何らかの変換を与えることで，マイクの位置は変えずにパラメータの再推定よりも良いonline BSSを考える．
@@ -380,7 +380,7 @@ CMAが回転する前の観測信号$\refpos{\Obs} _{\ft}$を用いて分離行�
       \item \Cref{alg:naive}: 通常のOnline AuxIVA (\textbf{Naive})
       \item \Cref{alg:reset}: 回転後に$\Demix _{\ft}, \cov _{\src,\ft}$を初期化 (\textbf{Reset})
       \item \Cref{alg:sfi}: 回転後に観測信号の回転を補償 (\textbf{RT-obs})\\
-        $\Obs _{\ft} = \rotMat ^{-1} (\rotSpat _{\tframe}) \rot{\Obs} _{\ft}$
+        $\Obs _{\ft} = \rotMat ^{\hermite} (\rotSpat _{\tframe}) \rot{\Obs} _{\ft}$
       \item \Cref{alg:coord}: 回転後に$\Demix _{\ft}, \cov _{\src,\ft}$を``座標変換'' (\textbf{RT-cov})\\
         $\rot{\Demix} _{\ft} \gets \Demix _{\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$,\; $\rot{\cov} _{\src,\ft} \gets \rotMat (\rotSpat _{\tframe}) \cov _{\src,\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$
     % \begin{itemize}
@@ -502,7 +502,7 @@ CMAが回転する前の観測信号$\refpos{\Obs} _{\ft}$を用いて分離行�
       $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq}) \\-
     $\rotMat (\rotSpat _{\tframe})$ $\gets$ \pr{CalcRotationMatrix}(\Mic, \rotSpat _{\tframe}) \\
     for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
-      $\refpos{\Obs} _{\ft} \gets \rotMat ^{-1} (\rotSpat _{\tframe}) \Obs _{\ft}$ \ct{$(\forall \freq)$} \\
+      $\refpos{\Obs} _{\ft} \gets \rotMat ^{\hermite} (\rotSpat _{\tframe}) \Obs _{\ft}$ \ct{$(\forall \freq)$} \\
       $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\refpos{\Obs} _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq})
   \end{pseudo}
 \end{algorithm}
