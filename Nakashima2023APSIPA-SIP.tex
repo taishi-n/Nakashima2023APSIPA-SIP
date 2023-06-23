@@ -176,34 +176,37 @@ Finally, \cref{sec:conclusion} concludes this paper.
 \section{Problem Formulation}\label{sec:problem}
 % TODO: マイクが回転する状況での音源分離の図
 Let $\Src$ and $\Mic$ respectively be the number of sources and microphones.
+Also, we set the \emph{reference microphone} $\refmic = 1$ without loss of generality.
 We assume that the observed signal $\Obs _{\ft}$ is modelled as:
 \begin{equation}
-  \Obs _{\ft} = \sum _{\src=1} ^{\Src} \steer _{\src,\ft} \sig _{\src,\ft},
+  \Obs _{\ft} = \steer _{1,\ft} \sig _{1,\ft} + \dots + \steer _{\Src,\ft} \sig _{\Src,\ft} = \sum _{\src=1} ^{\Src} \steer _{\src,\ft} \sig _{\src,\ft},\label{eq:mix}
 \end{equation}
 in the short-time Fourier transform (STFT) domain,
 where $\freq = 1, \dots, \Freq$ denotes the frequency bin index,
 $\tframe = 1, \dots, \Tframe$ denotes the time frame index,
 $\sig _{\src,\ft} \in \C\; (\src = 1, \dots, \Src)$ denotes the $\src$th source signal, and
-$\steer _{\src,\ft} \in \C ^{\Mic}\; (\src = 1, \dots, \Mic)$ denotes the steering vector of $\src$th source signal to each microphone.
-Unless specified, indices $\freq,\, \tframe,$ and $\src$ always take the ranges from 1 to $\Freq, \Tframe,$ and $\Src$, respectively.
-We omit the bounds of sets over these indices when they span the ranges.
-${\{\Obs _{\ft}\}}_{\ft}$ denotes the set of $\Obs _{\ft}$ for all $\freq$ and $\tframe$, for example.
+\begin{equation*}
+  \steer _{\src,\ft} \coloneqq \begin{bmatrix} 1 & \str _{2\src,\ft} & \dots & \str _{\Mic\src,\ft} \end{bmatrix} ^{\top} \in \C ^{\Mic}\; (\src = 1, \dots, \Src)
+\end{equation*}
+denotes the steering vector of $\src$th source signal to each microphone.
+In other words, $\str _{\mic\src,\ft} \; (\mic = 2, \dots, \Mic,\; \forall \src = 1, \dots, \Src)$ corresponds to the relative transfer function from the $\src$th source to the $\mic$th microphone.
+Our goal is to estimate \emph{source images} at the reference microphone $\sig _{1,\ft},\, \dots,\, \sig _{\Src,\ft}$.
 
-We consider online BSS problem in a situation where the CMA is rotated by an angle $\rotSpat _{\tframe}$.
+Next, we assume that the observed signal $\Obs _{\ft}$ is recorded with a circular microphone array (CMA) and CMA may be rotated of angle $\rotSpat _{\tframe}$ during processing.
+We consider online BSS problem under such situation.
 We henceforth assume that the number of microphones of CMA is euqal to that of sources; $\Mic = \Src$.
 \renewcommand{\Mic}{\Src}%
-Online blind source separation aims to estimate the demixing matrix and estimated signals using only the current and past observed signals $\{\Obs _{\freq,i}\}_{i=1}^{\tframe}$:
+Online blind source separation estimates demixing matrices and estimated signals using only the current and past observed signals $\Obs _{\freq,1},\, \dots,\, \Obs _{\freq,\tframe}$:
 \begin{align}
   \Demix _{\ft} &= \begin{bmatrix} \demix _{1\ft} & \dots & \demix _{\Src,\ft} \end{bmatrix} ^{\hermite} \in \C ^{\Src \times \Mic}, \\
   \Est _{\ft} &= \Demix _{\ft} \Obs _{\ft} \in \C ^{\Src},
 \end{align}
 where $\Demix _{\ft}$ is the demixing matrix and $\Est _{\ft}$ is the estimated signal.
-\begin{itemize}
-  \item \textcolor{red}{一般性を失わず1個目のマイクをリファレンスとして，sがリファレンス位置でのsource imageとして書く}
-  \item \textcolor{red}{リファレンスマイク位置でのsource imageを求める}
-  \item \textcolor{red}{BSSの説明よりも前に，CMAが回転することを書きたい}
-\end{itemize}
-Note that $\rotFra$ and $\rotSpat$ are assumed to be known or estimated in this paper.
+Note that $\rotSpat _{\tframe}$ is assumed to be known or estimated in this paper.
+
+Unless specified, indices $\freq,\, \tframe,$ and $\src$ always take the ranges from 1 to $\Freq, \Tframe,$ and $\Src$, respectively.
+We omit the bounds of sets over these indices when they span the ranges.
+${\{\Obs _{\ft}\}}_{\ft}$ denotes the set of $\Obs _{\ft}$ for all $\freq$ and $\tframe$, for example.
 \Cref{tab:notations} summarises the notations used in this paper.
 \begin{table}[t]
   \centering
