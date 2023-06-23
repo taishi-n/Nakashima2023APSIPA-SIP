@@ -110,14 +110,14 @@
   % そこで本論文では，円状等間隔マイクロホンアレイ(CMA)のための音場補間処理を利用したOIVAを提案する．
   % 音場補間はCMAの回転を打ち消し，パラメータの再推定を必要とせずにBSSを可能にする．
   % シミュレーション実験の結果は音場補間によりマイクが回転する状況における音源分離の頑健性が向上したことを確認した．
-  In this paper, we propose robust online blind source separation (BSS) method against self-rotation of microphone arrays.
+  In this paper, we propose a robust online blind source separation (BSS) method against the self-rotation of microphone arrays.
   Online auxiliary-function-based independent vector analysis (OIVA) is one of the promising methods for real-time BSS.
-  One major issue for real-time BSS is robustness against environmental changes such as movement of source or microphone.
-  In general, parameter re-estimation is necessary if environmental changes occur during real-time processing.
-  OIVA has been shown to be robust against smooth movement of sources and to achieve high separation performance.
+  One major issue for real-time BSS is robustness against environmental changes such as the movement of the source or microphone.
+  Parameter re-estimation is generally necessary if environmental changes occur during real-time processing.
+  OIVA is robust against smooth movement of sources and achieves high separation performance.
   However, OIVA does not perform well against sudden movements of microphones.
-  Therefore, in this paper, we employ the sound field interpolation (SFI) for circular microphone arrays (CMAs) with OIVA.
-  SFI cancels out rotation of the CMA, enabling us to apply BSS without parameter re-estimation.
+  Therefore, we employ sound field interpolation (SFI) for circular microphone arrays (CMAs) with OIVA in this paper.
+  SFI cancels out the rotation of the CMA, enabling us to apply BSS without parameter re-estimation.
   Simulation experiments confirmed that SFI improves the robustness of the OIVA in situations where the microphone is rotating.
 \end{abstract}
 
@@ -142,15 +142,15 @@
 % そこで，本稿では，CMAが回転する状況下のブラインド音源分離に取り組む．
 % 音場補間によりCMAの回転の影響を打ち消しながらオンラインでブラインド音源分離処理を行う．
 Blind source separation (BSS) \cite{Makino:2018:ASS} is a technique to extract the source signals from their observed mixture.
-Popular approaches for BSS include independent vector analysis (IVA) \cite{Kim:2006:ASLP,Hiroe:2006:ICA} and its extensions \cite{Kitamura:2016:ASLP,Nugraha:2020:SPL,Brendel:2020:SP}.
+Popular approaches for BSS include independent vector analysis (IVA) \cite{Kim:2006:ASLP,Hiroe:2006:ICA} and extensions \cite{Kitamura:2016:ASLP,Nugraha:2020:SPL,Brendel:2020:SP}.
 These methods assume a time-invariant acoustic transfer system (ATS).
 On the other hand, for practical applications, it is necessary to consider time variations of the ATS, such as movements of the microphone or source.
 Many methods have been proposed based on block batch \cite{Koldovsky:2019:ICASSP,Koldovsky:2021:SP,Jansky:2022:ASMP} or online processing \cite{Kim:2010:CASI,Taniguchi:2014:HSCMA}.
 
-Online AuxIVA shows high separation performance in real-time situation \cite{Taniguchi:2014:HSCMA}.
+Online AuxIVA shows high separation performance in real-time situations \cite{Taniguchi:2014:HSCMA}.
 It also has been actively researched recently for applications in hearing aids \cite{Sunohara:2017:ICASSP}, joint optimization with dereverberation \cite{Ueda:2021:ICASSP}, and computationally efficient optimization \cite{Nakashima:2023:ICASSP}.
-Online AuxIVA estimates demixing matrices frame-by-frame manner and can track smooth environmental changes in ATS such as slow movement of sources.
-However, sudden changes in ATS such as emergence of new sources or microphone movement makes online BSS difficult and thus degrade separation performance.
+Online AuxIVA estimates demixing matrices frame-by-frame manner and can track smooth environmental changes in ATS, such as slow movement of sources.
+However, sudden changes in ATS, such as the emergence of new sources or microphone movement, makes online BSS difficult and thus degrade separation performance.
 
 \todo{AR, VR関連のサーベイ追加}
 
@@ -161,23 +161,23 @@ Applications to beamforming \cite{Wakabayashi:2021:ICASSP} and steering vector e
 as well as a method for self-estimating the rotation angle of a CMA \cite{Lian:2021:APSIPA}.
 
 In this paper, we address blind source separation in situations where a CMA rotates.
-The effect of the rotation is canceled out by the SFI, and BSS is applied in the latter stage.
-As described in \cref{sec:proposed}, simply applying SFI to online BSS is computationally expensive, since SFI is required for the observed signal in every time frame.
-In contrast, this study introduces a simpler method than that, and demonstrates its effectiveness through experiments.
-Experiments show that our proposed scheme have significantly better than the conventional online AuxIVA for the source separation task.
+SFT cancels out the effect of the rotation, and BSS is applied in the latter stage.
+As described in \cref{sec:proposed}, simply applying SFI to online BSS is computationally expensive since SFI is required for the observed signal every time frame.
+In contrast, this study introduces a more straightforward method than that and demonstrates its effectiveness through experiments.
+Experiments show that our proposed scheme is significantly better than the conventional online AuxIVA for the source separation task.
 
 The rest of this paper is organized as follows.
 We formulate our motivation in \cref{sec:problem}.
 \Cref{sec:conventional} describes SFI and how to apply it to online BSS.
-In \cref{sec:proposed}, we propose an efficient online BSS that utilize the information before and after the rotation of CMA.
+In \cref{sec:proposed}, we propose an efficient online BSS that utilizes the information before and after the rotation of CMA.
 We conduct some experiments to show the efficacy of the SFI for online BSS in \cref{sec:experiment}.
 Finally, \cref{sec:conclusion} concludes this paper.
 
 \section{Problem Formulation}\label{sec:problem}
 % TODO: マイクが回転する状況での音源分離の図
-Let $\Src$ and $\Mic$ respectively be the number of sources and microphones.
+Let $\Src$ and $\Mic$ be the number of sources and microphones, respectively.
 Also, we set the \emph{reference microphone} $\refmic = 1$ without loss of generality.
-We assume that the observed signal $\Obs _{\ft}$ is modelled as:
+We assume that the observed signal $\Obs _{\ft}$ is modeled as
 \begin{equation}
   \Obs _{\ft} = \steer _{1,\ft} \sig _{1,\ft} + \dots + \steer _{\Src,\ft} \sig _{\Src,\ft} = \sum _{\src=1} ^{\Src} \steer _{\src,\ft} \sig _{\src,\ft},\label{eq:mix}
 \end{equation}
@@ -188,23 +188,23 @@ $\sig _{\src,\ft} \in \C\; (\src = 1, \dots, \Src)$ denotes the $\src$th source 
 \begin{equation*}
   \steer _{\src,\ft} \coloneqq \begin{bmatrix} 1 & \str _{2\src,\ft} & \dots & \str _{\Mic\src,\ft} \end{bmatrix} ^{\top} \in \C ^{\Mic}\; (\src = 1, \dots, \Src)
 \end{equation*}
-denotes the steering vector of $\src$th source signal to each microphone.
+denotes the steering vector of the $\src$th source signal to each microphone.
 In other words, $\str _{\mic\src,\ft} \; (\mic = 2, \dots, \Mic,\; \forall \src = 1, \dots, \Src)$ corresponds to the relative transfer function from the $\src$th source to the $\mic$th microphone.
 Our goal is to estimate \emph{source images} at the reference microphone $\sig _{1,\ft},\, \dots,\, \sig _{\Src,\ft}$.
 
-Next, we assume that the observed signal $\Obs _{\ft}$ is recorded with a circular microphone array (CMA) and CMA may be rotated of angle $\rotSpat _{\tframe}$ during processing.
-We consider online BSS problem under such situation.
-We henceforth assume that the number of microphones of CMA is euqal to that of sources; $\Mic = \Src$.
+Next, we assume that the observed signal $\Obs _{\ft}$ is recorded with a circular microphone array (CMA), and CMA may be rotated at angle $\rotSpat _{\tframe}$ during processing.
+We consider an online BSS problem under such a situation.
+We henceforth assume that the number of microphones of CMA is equal to that of sources; $\Mic = \Src$.
 \renewcommand{\Mic}{\Src}%
 Online blind source separation estimates demixing matrices and estimated signals using only the current and past observed signals $\Obs _{\freq,1},\, \dots,\, \Obs _{\freq,\tframe}$:
 \begin{align}
   \Demix _{\ft} &= \begin{bmatrix} \demix _{1\ft} & \dots & \demix _{\Src,\ft} \end{bmatrix} ^{\hermite} \in \C ^{\Src \times \Mic}, \\
   \Est _{\ft} &= \Demix _{\ft} \Obs _{\ft} \in \C ^{\Src},
 \end{align}
-where $\Demix _{\ft}$ is the demixing matrix and $\Est _{\ft}$ is the estimated signal.
+where $\Demix _{\ft}$ is the demixing matrix, and $\Est _{\ft}$ is the estimated signal.
 Note that $\rotSpat _{\tframe}$ is assumed to be known or estimated in this paper.
 
-Unless specified, indices $\freq,\, \tframe,$ and $\src$ always take the ranges from 1 to $\Freq, \Tframe,$ and $\Src$, respectively.
+Unless specified, indices $\freq,\, \tframe,$ and $\src$ always ranges from 1 to $\Freq, \Tframe,$ and $\Src$, respectively.
 We omit the bounds of sets over these indices when they span the ranges.
 ${\{\Obs _{\ft}\}}_{\ft}$ denotes the set of $\Obs _{\ft}$ for all $\freq$ and $\tframe$, for example.
 \Cref{tab:notations} summarises the notations used in this paper.
@@ -235,7 +235,7 @@ ${\{\Obs _{\ft}\}}_{\ft}$ denotes the set of $\Obs _{\ft}$ for all $\freq$ and $
 
 \section{Conventional Methods}\label{sec:conventional}
 
-\subsection{Online Auxxiliary-Function-Based Independent Vector Analysis}
+\subsection{Online Auxiliary-Function-Based Independent Vector Analysis}
 
 Online AuxIVA \cite{Taniguchi:2014:HSCMA} is an online extension of AuxIVA \cite{Ono:2011:WASPAA} and estimates demixing matrices $\{\Demix _{\ft}\} _{\freq}$ at time frame $\tframe$ by minimizing the following objective function:
 \begin{align}
@@ -244,11 +244,11 @@ Online AuxIVA \cite{Taniguchi:2014:HSCMA} is an online extension of AuxIVA \cite
   \var _{\src,\tframe} &= \sqrt{\sum _{\freq=1} ^{\Freq} \lvert \demix ^{\hermite} _{\src,\ft} \Obs ^{\nohermite}_{\ft} \rvert ^2},
 \end{align}
 where $\weight\colon \R _{>0} \to \R _{>0}$ is defined as $\weight(\var) = \cont ' (\var) / 2 \var$ ($\cont '(\var)$ denotes the first derivative of $\cont (\var)$ with respect to $\var$),
-$\cont(\var)$ is called a contrast function and derived by probability density function of source signals,
+$\cont(\var)$ is called a contrast function and derived from the probability density function of source signals,
 and $\forget\; (0 \leq \forget < 1)$ is called a forgetting factor.
-In this paper, we assume that $\weight (\var) = \Freq/{\var ^2}$ which represents the time-varying Gaussian distribution \cite{Ono:2012:APSIPA}.
-By using the recursive update for covariance matrix \eqref{eq:cov}, we can apply efficient update methods proposed for batch AuxIVA algorithms such as \emph{iterative projection (IP)} \cite{Ono:2011:WASPAA} to minimize the objective function \eqref{eq:obj}.
-IP cyclically update each \emph{demixing vector} $\demix _{\src,\ft} ^{\hermite}\; (\src = 1, \dots, \Src)$ (row of the demixing matrix $\Demix _{\ft}$) using the following update rule:
+In this paper, we assume that $\weight (\var) = \Freq/{\var ^2}$, which represents the time-varying Gaussian distribution \cite{Ono:2012:APSIPA}.
+Using the recursive update for covariance matrix \eqref{eq:cov}, we can apply efficient update methods proposed for batch AuxIVA algorithms, such as \emph{iterative projection (IP)} \cite{Ono:2011:WASPAA}, to minimize the objective function \eqref{eq:obj}.
+IP cyclically updates each \emph{demixing vector} $\demix _{\src,\ft} ^{\hermite}\; (\src = 1, \dots, \Src)$ (row of the demixing matrix $\Demix _{\ft}$) using the following update rule:
 \begin{align}
   \demix _{\src,\ft} &\gets (\Demix _{\ft} \cov _{\src\ft}) ^{-1} \eye _{\src} \label{eq:ip:proj}, \\
   \demix _{\src,\ft} &\gets \frac{{\demix _{\src,\ft}}}{{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}} \label{eq:ip:norm},
@@ -259,7 +259,7 @@ where $\eye _{\src} \in \R ^{\Src}$ is the canonical basis vector with the $\src
 \subsection{Sound Field Interpolation on Circular Microphone Array}
 % TODO: 音場補間のイメージ図
 This subsection briefly reviews the sound field interpolation method on circular microphone array (CMA).
-We consider a situation where CMA is rotated of degree $\rotSpat _{\tframe}$ at time frame $\rotFra$ and let $\refpos{\Obs} _{\ft}$ be the observed signal recorded in the position before CMA was rotated (\emph{reference position}).
+We consider a situation where CMA is rotated of degree $\rotSpat _{\tframe}$ at time frame $\rotFra$ and let $\refpos{\Obs} _{\ft}$ be the observed signal recorded before CMA was rotated (\emph{reference position}).
 We assume that the observed signal \emph{after} CMA was rotated $\Obs _{\ft} (\tframe \geq \rotFra)$ is expressed as the following linear approximation:
 \begin{equation}
   \refpos{\Obs} _{\ft} = \rotMat ^{-1} (\rotSpat _{\tframe}) \Obs _{\ft},
