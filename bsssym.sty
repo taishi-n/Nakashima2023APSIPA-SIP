@@ -38,7 +38,6 @@
 % マイクインデクス
 \newcommand{\mic}{m}
 \newcommand{\Mic}{M}
-\newcommand{\dMic}{L}  % 音場補間の一時変数L
 
 % 時間周波数
 \newcommand{\ft}[1][0]{%
@@ -72,11 +71,13 @@
 
 % sound field interpolation
 \newcommand{\rot}[1]{\hat{#1}}
-\newcommand{\irot}[1]{\tilde{#1}}
+\newcommand{\refpos}[1]{\tilde{#1}}
 \newcommand{\rotMat}{\bm{U}}
 \newcommand{\rotmat}{u}
-\newcommand{\rotDeg}{\theta}
+\newcommand{\rotSpat}{\theta}
+\newcommand{\rotSmpl}{\delta}
 \newcommand{\rotFra}{\tau}
+\newcommand{\rotIdx}{L}
 
 \newcommand{\Eye}{\bm{I}}
 \newcommand{\eye}{\bm{e}}
@@ -84,5 +85,4 @@
 \newcommand{\itr}{n _{\mathrm{itr}}}
 \newcommand{\Itr}{N _{\mathrm{itr}}}
 
-\newcommand{\Rot}{L}
 \newcommand{\twid}{z}

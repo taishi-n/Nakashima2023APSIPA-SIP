@@ -189,7 +189,7 @@ Unless specified, indices $\freq,\, \tframe,$ and $\src$ always take the ranges 
 We omit the bounds of sets over these indices when they span the ranges.
 ${\{\Obs _{\ft}\}}_{\ft}$ denotes the set of $\Obs _{\ft}$ for all $\freq$ and $\tframe$, for example.
 
-We consider online BSS problem in a situation where the CMA is rotated by an angle $\rotDeg _{\tframe}$.
+We consider online BSS problem in a situation where the CMA is rotated by an angle $\rotSpat _{\tframe}$.
 We henceforth assume that the number of microphones of CMA is euqal to that of sources; $\Mic = \Src$.
 \renewcommand{\Mic}{\Src}%
 Online blind source separation aims to estimate the demixing matrix and estimated signals using only the current and past observed signals $\{\Obs _{\freq,i}\}_{i=1}^{\tframe}$:
@@ -203,7 +203,7 @@ where $\Demix _{\ft}$ is the demixing matrix and $\Est _{\ft}$ is the estimated 
   \item \textcolor{red}{リファレンスマイク位置でのsource imageを求める}
   \item \textcolor{red}{BSSの説明よりも前に，CMAが回転することを書きたい}
 \end{itemize}
-Note that $\rotFra$ and $\rotDeg$ are assumed to be known or estimated in this paper.
+Note that $\rotFra$ and $\rotSpat$ are assumed to be known or estimated in this paper.
 \Cref{tab:notations} summarises the notations used in this paper.
 \begin{table}[t]
   \centering
@@ -221,10 +221,11 @@ Note that $\rotFra$ and $\rotDeg$ are assumed to be known or estimated in this p
       $\Est _{\ft}$        & $\C^{\Mic}$              & Estimated signal \\
       $\cov _{\src,\ft}$   & $\C^{\Mic \times \Mic}$  & Covariance matrix \\
       $\forget$            & $\{\forget \in \R \mid 0 \leq \forget < 1\}$   & Forgetting factor \\
-      $\rotDeg$            & $\R$                     & Rotation angle \\
+      $\rotSpat$           & $\R$                     & Spatial rotation angle \\
+      $\rotSmpl$           & $\R$                     & Rotation angle coefficient on CMA \\
       $\rotFra$            & $\R$                     & Rotation time \\
-      $\rotMat _{\rotDeg}$ & $\R ^{\Mic \times \Mic}$ & Rotation matrix \\
-      $\irot{\Obs} _{\ft}$ & $\C^{\Mic}$              & Observes signal at \textcolor{red}{\textbf{reference position}} \\
+      $\rotMat _{\rotSpat}$ & $\R ^{\Mic \times \Mic}$ & Rotation matrix \\
+      $\refpos{\Obs} _{\ft}$ & $\C^{\Mic}$              & Observes signal at \textcolor{red}{\textbf{reference position}} \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -250,36 +251,50 @@ IP cyclically update each \emph{demixing vector} $\demix _{\src,\ft} ^{\hermite}
   \demix _{\src,\ft} &\gets \frac{{\demix _{\src,\ft}}}{{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}} \label{eq:ip:norm},
 \end{align}
 where $\eye _{\src} \in \R ^{\Src}$ is the canonical basis vector with the $\src$th element unity.
+\Cref{alg:naive} summarises the Online AuxIVA algorithm.
 
 \subsection{Sound Field Interpolation on Circular Microphone Array}
 % TODO: 音場補間のイメージ図
 This subsection briefly reviews the sound field interpolation method on circular microphone array (CMA).
-We consider a situation where CMA is rotated of degree $\rotDeg$ at time frame $\rotFra$ and let $\irot{\Obs} _{\ft}$ be the observed signal recorded in the position before CMA was rotated (\emph{reference position}).
+We consider a situation where CMA is rotated of degree $\rotSpat$ at time frame $\rotFra$ and let $\refpos{\Obs} _{\ft}$ be the observed signal recorded in the position before CMA was rotated (\emph{reference position}).
 We assume that the observed signal \emph{after} CMA was rotated $\Obs _{\ft} (\tframe \geq \rotFra)$ is expressed as the following linear approximation:
 \begin{equation}
-  \irot{\Obs} _{\ft} = \rotMat _{-\rotDeg} \Obs _{\ft},
+  \refpos{\Obs} _{\ft} = \rotMat _{\rotSpat} ^{-1} \Obs _{\ft},
 \end{equation}
-where $\rotMat _{\rotDeg} \in \C ^{\Mic\times\Mic}$ is called \emph{rotation matrix}.
-$\rotMat _{\rotDeg}$ is calculated as:
+where
+\begin{equation}
+  \rotMat _{\rotSpat} =
+  \begin{bmatrix}
+    \rotmat _{0, 0}(\rotSpat) & \rotmat _{0, 1}(\rotSpat) & \dots & \rotmat _{0, \Mic - 1}(\rotSpat) \\
+    \rotmat _{1, 0}(\rotSpat) & \rotmat _{1, 1}(\rotSpat) & \dots & \rotmat _{1, \Mic - 1}(\rotSpat) \\
+    \vdots & \vdots  & \ddots & \vdots \\
+    \rotmat _{\Mic - 1, 0}(\rotSpat) & \rotmat _{\Mic - 1, 1}(\rotSpat) & \dots & \rotmat _{\Mic - 1, \Mic - 1}(\rotSpat)
+  \end{bmatrix}
+  \in \C ^{\Mic\times\Mic}
+\end{equation}
+is called \emph{rotation matrix}, and its $(k,l)$element is calculated as:
 \begin{align}
-  \rotmat _{k,l}(\rotDeg) &=
+  \rotmat _{k,l}(\rotSpat) &=
     \begin{cases}
-      \displaystyle\frac{\twid ^{- \Rot (\frac{\Mic}{2} - 1) }}{\Mic} \frac{1 - \twid ^{\Rot \Mic}}{1 - \twid ^{\Rot}} & (\text{$\Mic$ is even}),\\[1em]
-      \displaystyle\frac{\twid ^{- \Rot \frac{(\Src - 1)}{2}}}{\Mic} \frac{1 - \twid ^{\Rot \Mic}}{1 - \twid ^{\Rot}} & (\text{$\Mic$ is odd}),
+      \displaystyle\frac{\twid ^{- \rotIdx (\frac{\Mic}{2} - 1) }}{\Mic} \frac{1 - \twid ^{\rotIdx \Mic}}{1 - \twid ^{\rotIdx}} & (\text{$\Mic$ is even}),\\[1em]
+      \displaystyle\frac{\twid ^{- \rotIdx \frac{(\Src - 1)}{2}}}{\Mic} \frac{1 - \twid ^{\rotIdx \Mic}}{1 - \twid ^{\rotIdx}} & (\text{$\Mic$ is odd}),
     \end{cases}\label{eq:rot:twid} \\
   &=
     \begin{cases}
-      \displaystyle \frac{\sinc{(\Rot)}}{\sinc{\left(\frac{\Rot}{\Mic}\right)}} \twid ^{\frac{\Rot}{2}} & (\text{$\Mic$ is even}),\\[1em]
-      \displaystyle \frac{\sinc{(\Rot)}}{\sinc{\left(\frac{\Rot}{\Mic}\right)}} & (\text{$\Mic$ is odd}),
+      \displaystyle \frac{\sinc{(\rotIdx)}}{\sinc{\left(\rotIdx / \Mic\right)}} \twid ^{\frac{\rotIdx}{2}} & (\text{$\Mic$ is even}),\\[1em]
+      \displaystyle \frac{\sinc{(\rotIdx)}}{\sinc{\left(\rotIdx / \Mic\right)}} & (\text{$\Mic$ is odd}),
     \end{cases}\label{eq:rot:sinc}
 \end{align}
-where $\twid \coloneqq \exp (j \frac{2\pi}{\Mic})$ is a twiddle factor in $\Mic$-points FFT, $\rotmat _{k,l} (\rotDeg)$ is the $(k,l)$ element of $\rotMat _{\rotDeg}$, and $\Rot = l - k - \rotDeg$ \cite{Wakabayashi:2023:ASLP}.
+where $\twid \coloneqq \exp (j \frac{2\pi}{\Mic})$ is a twiddle factor in $\Mic$-points FFT,
+$\rotSmpl \coloneqq \frac{2\pi}{\Mic} \rotSpat$ is a non-integer shift on CMA,
+and $\rotIdx = l - k - \rotSmpl\; (k, l = 0, \dots, \Mic - 1)$ \cite{Wakabayashi:2023:ASLP}.
+This equation is an alternative expression for (3) in \cite{Wakabayashi:2023:ASLP}.
 See Section II of \cite{Wakabayashi:2023:ASLP} for the detailed derivation.
 
 CMAが回転する前の時間フレーム$\tframe < \rotFra$における観測信号$\Obs _{\ft}$を用いて分離行列$\Demix _{\ft}$が推定できていたとする．
 音場補間を適用し，回転前の観測信号を推定することで，CMAが回転した後も分離行列を推定し直すことなく分離信号$\Est _{\ft}$が得られる．
 \begin{equation}
-  \Est _{\ft} = \Demix _{\ft} \irot{\Obs} _{\ft} = \Demix _{\ft} \left(\rotMat _{-\rotDeg} \Obs _{\ft}\right).
+  \Est _{\ft} = \refpos{\Demix} _{\ft} \refpos{\Obs} _{\ft} = \refpos{\Demix} _{\ft} \left(\rotMat _{\rotSpat} ^{-1} \Obs _{\ft}\right).
 \end{equation}
 
 \subsection{Can Direct Combination of Online BSS and SFI Be a Solution of Our Problem?}
@@ -318,20 +333,20 @@ CMAが回転する前の時間フレーム$\tframe < \rotFra$における観測�
           \item[$\Rightarrow$] わざわざ音場補間を行う意義を明らかにしたい
         \end{itemize}
     \end{itemize}
-  \item マイク回転前までに推定した$\irot{\Demix} _{\ft},\, \irot{\cov} _{\src,\ft}$を活用したい
+  \item マイク回転前までに推定した$\refpos{\Demix} _{\ft},\, \refpos{\cov} _{\src,\ft}$を活用したい
     \begin{itemize}
       \item[$\Rightarrow$] 回転時に$\cov _{\src,\ft},\, \Demix _{\ft}$を ``座標変換''
     \end{itemize}
 \end{itemize}
 \begin{align}
   {\cov} _{\src,\freq} &\coloneqq \frac{1}{\Tframe} \sum _{\tframe = 1} ^{\Tframe} \weight (\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite} \\
-                       &= \frac{1}{\Tframe} \sum _{\tframe = 1} ^{\Tframe} \weight (\var _{\src,\tframe}) (\rotMat _{\rotDeg} \irot{\Obs} _{\ft}) (\irot{\Obs} _{\ft} ^{\hermite} \rotMat _{\rotDeg} ^{\hermite}) \\
-                       &= \rotMat _{\rotDeg} \left(\frac{1}{\Tframe} \sum _{\tframe = 1} ^{\Tframe} \weight (\var _{\src,\tframe}) \irot{\Obs} _{\ft} \irot{\Obs} _{\ft} ^{\hermite}\right) \rotMat _{\rotDeg} ^{\hermite} \\
-                       &= \rotMat _{\rotDeg} \irot{\cov} _{\src,\freq} \rotMat _{\rotDeg} ^{\hermite}
+                       &= \frac{1}{\Tframe} \sum _{\tframe = 1} ^{\Tframe} \weight (\var _{\src,\tframe}) (\rotMat _{\rotSpat} \refpos{\Obs} _{\ft}) (\refpos{\Obs} _{\ft} ^{\hermite} \rotMat _{\rotSpat} ^{\hermite}) \\
+                       &= \rotMat _{\rotSpat} \left(\frac{1}{\Tframe} \sum _{\tframe = 1} ^{\Tframe} \weight (\var _{\src,\tframe}) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite}\right) \rotMat _{\rotSpat} ^{\hermite} \\
+                       &= \rotMat _{\rotSpat} \refpos{\cov} _{\src,\freq} \rotMat _{\rotSpat} ^{\hermite}
   \\
-  \Est _{\ft} &= \irot{\Demix} _{\ft} \irot{\Obs} _{\ft} \\
-              &= \irot{\Demix} _{\ft} \underbrace{(\rotMat _{\rotDeg} ^{\hermite} \rotMat _{\rotDeg})} \irot{\Obs} _{\ft} \\
-              &= \underbrace{(\irot{\Demix} _{\ft} \rotMat _{\rotDeg} ^{\hermite})}_{\coloneqq \Demix _{\ft}} (\rotMat _{\rotDeg} \irot{\Obs} _{\ft}) \\
+  \Est _{\ft} &= \refpos{\Demix} _{\ft} \refpos{\Obs} _{\ft} \\
+              &= \refpos{\Demix} _{\ft} \underbrace{(\rotMat _{\rotSpat} ^{\hermite} \rotMat _{\rotSpat})} \refpos{\Obs} _{\ft} \\
+              &= \underbrace{(\refpos{\Demix} _{\ft} \rotMat _{\rotSpat} ^{\hermite})}_{\coloneqq \Demix _{\ft}} (\rotMat _{\rotSpat} \refpos{\Obs} _{\ft}) \\
               &= \Demix _{\ft} \Obs _{\ft}
 \end{align}
 
@@ -377,11 +392,11 @@ CMAが回転する前の時間フレーム$\tframe < \rotFra$における観測�
       \item \Cref{alg:naive}: 通常のOnline AuxIVA (\textbf{Naive})
       \item \Cref{alg:reset}: 回転後に$\Demix _{\ft}, \cov _{\src,\ft}$を初期化 (\textbf{Reset})
       \item \Cref{alg:sfi}: 回転後に観測信号の回転を補償 (\textbf{RT-obs})\\
-        $\Obs _{\ft} = \rotMat _{\rotDeg} ^{-1} \rot{\Obs} _{\ft}$
+        $\Obs _{\ft} = \rotMat _{\rotSpat} ^{-1} \rot{\Obs} _{\ft}$
       \item \Cref{alg:coord}: 回転後に$\Demix _{\ft}, \cov _{\src,\ft}$を``座標変換'' (\textbf{RT-cov})\\
-        $\rot{\Demix} _{\ft} \gets \Demix _{\ft} \rotMat _{\rotDeg} ^{\hermite}$,\; $\rot{\cov} _{\src,\ft} \gets \rotMat _{\rotDeg} \cov _{\src,\ft} \rotMat _{\rotDeg} ^{\hermite}$
+        $\rot{\Demix} _{\ft} \gets \Demix _{\ft} \rotMat _{\rotSpat} ^{\hermite}$,\; $\rot{\cov} _{\src,\ft} \gets \rotMat _{\rotSpat} \cov _{\src,\ft} \rotMat _{\rotSpat} ^{\hermite}$
     % \begin{itemize}
-    %   \item $\cov _{\src,\ft[-1]}$はそれ以前のすべての観測の情報を含んでいるので，それだけに$\rotMat _{\rotDeg}$をかけて，あとは観測をそのまま使って更新すればいいはず
+    %   \item $\cov _{\src,\ft[-1]}$はそれ以前のすべての観測の情報を含んでいるので，それだけに$\rotMat _{\rotSpat}$をかけて，あとは観測をそのまま使って更新すればいいはず
     % \end{itemize}
     \end{itemize}
   \item パラメータ
@@ -497,19 +512,19 @@ CMAが回転する前の時間フレーム$\tframe < \rotFra$における観測�
   \begin{pseudo}
     for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
       $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq}) \\-
-    $\rotMat _{\rotDeg}$ $\gets$ \pr{CalcRotationMatrix}(\Mic, \rotDeg) \\
+    $\rotMat _{\rotSpat}$ $\gets$ \pr{CalcRotationMatrix}(\Mic, \rotSpat) \\
     for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
-      $\irot{\Obs} _{\ft} \gets \rotMat _{\rotDeg} ^{-1} \Obs _{\ft}$ \ct{$(\forall \freq)$} \\
-      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\irot{\Obs} _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq})
+      $\refpos{\Obs} _{\ft} \gets \rotMat _{\rotSpat} ^{-1} \Obs _{\ft}$ \ct{$(\forall \freq)$} \\
+      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\refpos{\Obs} _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq})
   \end{pseudo}
 \end{algorithm}
 \begin{algorithm}{Online AuxIVA with ``transformation''}{coord}
   \begin{pseudo}
     for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
       $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq}) \\-
-    $\rotMat _{\rotDeg}$ $\gets$ \pr{CalcRotationMatrix}(\Mic, \rotDeg) \\
-    {$\rot{\Demix} _{\freq,\rotFra - 1}$} $\gets$ $\Demix _{\freq,\rotFra - 1} \rotMat _{\rotDeg} ^{\hermite}$ \ct{$(\forall \freq)$} \\
-    {$\rot{\cov} _{\src,\freq,\rotFra - 1}$} $\gets$ $\rotMat _{\rotDeg} \cov _{\src,\freq,\rotFra - 1} \rotMat _{\rotDeg} ^{\hermite}$ \ct{$(\forall \src,\freq)$} \\
+    $\rotMat _{\rotSpat}$ $\gets$ \pr{CalcRotationMatrix}(\Mic, \rotSpat) \\
+    {$\rot{\Demix} _{\freq,\rotFra - 1}$} $\gets$ $\Demix _{\freq,\rotFra - 1} \rotMat _{\rotSpat} ^{\hermite}$ \ct{$(\forall \freq)$} \\
+    {$\rot{\cov} _{\src,\freq,\rotFra - 1}$} $\gets$ $\rotMat _{\rotSpat} \cov _{\src,\freq,\rotFra - 1} \rotMat _{\rotSpat} ^{\hermite}$ \ct{$(\forall \src,\freq)$} \\
     for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
       $\{\rot{\Demix} _{\ft}\}_{\freq},\, \{\rot{\cov} _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\rot{\Demix} _{\ft[-1]}\}_{\freq},\, \{\rot{\cov} _{\src,\ft[-1]}\} _{\src,\freq})
   \end{pseudo}
