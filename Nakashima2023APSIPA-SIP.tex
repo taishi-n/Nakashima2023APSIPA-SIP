@@ -265,16 +265,15 @@ where
 \begin{equation}
   \rotMat _{\rotSpat} =
   \begin{bmatrix}
-    \rotmat _{0, 0}(\rotSpat) & \rotmat _{0, 1}(\rotSpat) & \dots & \rotmat _{0, \Mic - 1}(\rotSpat) \\
-    \rotmat _{1, 0}(\rotSpat) & \rotmat _{1, 1}(\rotSpat) & \dots & \rotmat _{1, \Mic - 1}(\rotSpat) \\
-    \vdots & \vdots  & \ddots & \vdots \\
-    \rotmat _{\Mic - 1, 0}(\rotSpat) & \rotmat _{\Mic - 1, 1}(\rotSpat) & \dots & \rotmat _{\Mic - 1, \Mic - 1}(\rotSpat)
+    \rotmat _{0, 0}(\rotSpat) & \dots & \rotmat _{0, \Mic - 1}(\rotSpat) \\
+    \vdots & \ddots & \vdots \\
+    \rotmat _{\Mic - 1, 0}(\rotSpat) & \dots & \rotmat _{\Mic - 1, \Mic - 1}(\rotSpat)
   \end{bmatrix}
   \in \C ^{\Mic\times\Mic}
 \end{equation}
-is called \emph{rotation matrix}, and its $(k,l)$element is calculated as:
+is called \emph{rotation matrix}, and its $(\src,\mic)$element $\rotmat _{\src,\mic} (\rotSpat)$ is calculated as:
 \begin{align}
-  \rotmat _{k,l}(\rotSpat) &=
+  \rotmat _{\src,\mic}(\rotSpat) &=
     \begin{cases}
       \displaystyle\frac{\twid ^{- \rotIdx (\frac{\Mic}{2} - 1) }}{\Mic} \frac{1 - \twid ^{\rotIdx \Mic}}{1 - \twid ^{\rotIdx}} & (\text{$\Mic$ is even}),\\[1em]
       \displaystyle\frac{\twid ^{- \rotIdx \frac{(\Src - 1)}{2}}}{\Mic} \frac{1 - \twid ^{\rotIdx \Mic}}{1 - \twid ^{\rotIdx}} & (\text{$\Mic$ is odd}),
@@ -287,38 +286,24 @@ is called \emph{rotation matrix}, and its $(k,l)$element is calculated as:
 \end{align}
 where $\twid \coloneqq \exp (j \frac{2\pi}{\Mic})$ is a twiddle factor in $\Mic$-points FFT,
 $\rotSmpl \coloneqq \frac{2\pi}{\Mic} \rotSpat$ is a non-integer shift on CMA,
-and $\rotIdx = l - k - \rotSmpl\; (k, l = 0, \dots, \Mic - 1)$ \cite{Wakabayashi:2023:ASLP}.
-This equation is an alternative expression for (3) in \cite{Wakabayashi:2023:ASLP}.
+and $\rotIdx = \mic - \src - \rotSmpl\; (\src, \mic = 0, \dots, \Mic - 1)$ \cite{Wakabayashi:2023:ASLP}.
+Equations \eqref{eq:rot:twid} and \eqref{eq:rot:sinc} are alternative expressions for (3) in \cite{Wakabayashi:2023:ASLP}.
 See Section II of \cite{Wakabayashi:2023:ASLP} for the detailed derivation.
+By derivation, $\rotMat _{\rotSpat}$ is a unitary matrix; $\rotMat _{\rotSpat} ^{-1} = \rotMat _{\rotSpat} ^{\hermite}$.
 
-CMAが回転する前の時間フレーム$\tframe < \rotFra$における観測信号$\Obs _{\ft}$を用いて分離行列$\Demix _{\ft}$が推定できていたとする．
-音場補間を適用し，回転前の観測信号を推定することで，CMAが回転した後も分離行列を推定し直すことなく分離信号$\Est _{\ft}$が得られる．
+\subsection{Direct Combination of Online BSS and SFI}
+% \subsection{Can Direct Combination of Online BSS and SFI Be a Solution of Our Problem?}
+
+Online BSSとSFIの単純な組み合わせは，CMAが回転する状況下でのonline BSSのひとつのあり得る解決策である．
+CMAが回転する前の観測信号$\refpos{\Obs} _{\ft}$を用いて分離行列$\refpos{\Demix} _{\ft}$が推定できていたとする．
+通常のOnline AuxIVAでは，回転前後で分離行列を推定し直す必要がある．
+もし回転前の観測信号を推定できれば，CMAが回転した後も分離行列を推定し直すことなく分離信号$\Est _{\ft}$を計算できる．
+そこで，CMAの回転後は観測信号に対してSFIを適用し，CMAが回転する前の観測信号を用いて推定した分離行列を利用してオンライン音源分離を行うことを考える：
 \begin{equation}
   \Est _{\ft} = \refpos{\Demix} _{\ft} \refpos{\Obs} _{\ft} = \refpos{\Demix} _{\ft} \left(\rotMat _{\rotSpat} ^{-1} \Obs _{\ft}\right).
 \end{equation}
-
-\subsection{Can Direct Combination of Online BSS and SFI Be a Solution of Our Problem?}
-\begin{itemize}
-  \item \todo{音場補間と音源分離を組み合わせただけのものを書く}
-  \item \todo{それではだめだという説明を入れる}
-    \begin{itemize}
-      \item \todo{求めたいのは回転後のリファレンス位置での音像であって，音場補間を行うとマイク位置が変わってしまう}
-    \end{itemize}
-\end{itemize}
-
-% It is shown how to approximate x̂=U(θ)x using a certain matrix U (θ) ∈ CM ×M, with the observed signal x̂ (t ≥ t̂) at the position after the microphone has rotated (see [1] for details).
-% Suppose that the separation matrix W could be estimated using the observed signal x in time frame t<t̂ before the CMA was rotated.
-% By applying sound field interpolation and estimating the observed signal before the rotation as follows, the separation signal y can be obtained after the CMA has rotated without having to re-estimate the separation matrix.
-
-% In this paper, auxiliary-function-based independent vector analysis (AuxIVA) [5] and its online extension (online AuxIVA; OIVA) [6] are used as source separation methods.
-% In AuxIVA, each source k = 1, . . . K, the time-invariant separation matrix W is estimated with the following update formula
-
-% where ek is the kth column vector of the identity matrix.
-% Vkf is called the weighted covariance matrix.
-% φ(r) is a function determined by the source model, and in this paper the time-invariant Gauss distribution φ(r) = F/r2 [7].
-% OIVA, on the other hand, updates the weighted covariance matrix Vkf t for each time frame t [6].
-% where α (0 ≤ α < 1) is the forgetting factor. The separation matrix is updated in the time frame in which it is written using the same update formula as in eq. (8), eq. (9).
-% For both methods, the signal is input again after applying the sound field interpolation to the observed signal including the CMA rotation.
+ただし，この方式では観測信号のマイク位置を変えてしまうため，本論文の目的である，回転した後の位置におけるsource imageが得られない．
+そのため，観測信号ではなく，分離信号を得るためのパラメータの方に何らかの変換を与えることで，マイクの位置は変えずにパラメータの再推定よりも良いonline BSSを考える．
 
 \section{Proposed Method}\label{sec:proposed}
 \subsection{Coordinate Transformation of SFI}
