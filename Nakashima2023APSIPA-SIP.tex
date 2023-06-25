@@ -259,8 +259,8 @@ where $\eye _{\src} \in \R ^{\Src}$ is the canonical basis vector with the $\src
 \subsection{Sound Field Interpolation on Circular Microphone Array}
 % TODO: 音場補間のイメージ図
 This subsection briefly reviews the sound field interpolation method on circular microphone array (CMA).
-We consider a situation where CMA is rotated of degree $\rotSpat _{\tframe}$ at time frame $\rotFra$ and let $\refpos{\Obs} _{\ft}$ be the observed signal recorded before CMA was rotated (\emph{reference position}).
-We assume that the observed signal \emph{after} CMA was rotated $\Obs _{\ft} (\tframe \geq \rotFra)$ is expressed as the following linear approximation:
+We consider a situation where CMA is rotated of degree $\rotSpat _{\tframe}$ at time frame $\tframe$ and let $\refpos{\Obs} _{\ft}$ be the observed signal recorded before CMA was rotated (\emph{reference position}).
+We assume that the observed signal \emph{after} CMA was rotated $\Obs _{\ft}$ is expressed as the following linear approximation:
 \begin{equation}
   \refpos{\Obs} _{\ft} = \rotMat ^{-1} (\rotSpat _{\tframe}) \Obs _{\ft},
 \end{equation}
@@ -276,7 +276,8 @@ where
 \end{equation}
 is called \emph{rotation matrix}, and its $(\src,\mic)$element $\rotmat _{\src,\mic} (\rotSpat _{\tframe})$ is calculated as:
 \begin{align}
-  \rotmat _{\src,\mic}(\rotSpat _{\tframe}) &=
+  \rotmat _{\src,\mic}(\rotSpat _{\tframe})
+  &=
     \begin{cases}
       \displaystyle\frac{\twid ^{- \rotIdx (\frac{\Mic}{2} - 1) }}{\Mic} \frac{1 - \twid ^{\rotIdx \Mic}}{1 - \twid ^{\rotIdx}} & (\text{$\Mic$ is even}),\\[1em]
       \displaystyle\frac{\twid ^{- \rotIdx \frac{(\Src - 1)}{2}}}{\Mic} \frac{1 - \twid ^{\rotIdx \Mic}}{1 - \twid ^{\rotIdx}} & (\text{$\Mic$ is odd}),
