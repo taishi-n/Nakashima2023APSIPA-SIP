@@ -311,22 +311,10 @@ CMAが回転する前の観測信号$\refpos{\Obs} _{\ft}$を用いて分離行�
 
 \section{Proposed Method}\label{sec:proposed}
 \subsection{Coordinate Transformation of SFI}
-\begin{itemize}
-  \item 究極の目的: マイクの回転に頑健なオンライン音源分離を開発したい
-  \item 音源分離では観測信号を ``混ぜ直して'' 新たに入力としても出力は変わらないはず
-    \begin{itemize}
-      \item ``混ぜ直し''例: 2chの入力$x_1, x_2$を$x_1+x_2, x_1-x_2$と改めて入力
-      \item 音場補間も一種の``混ぜ直し''
-        \begin{itemize}
-          \item 音場補間があってもなくても分離性能は変わらなさそうだが，以前の結果はそうではない
-          \item[$\Rightarrow$] わざわざ音場補間を行う意義を明らかにしたい
-        \end{itemize}
-    \end{itemize}
-  \item マイク回転前までに推定した$\refpos{\Demix} _{\ft},\, \refpos{\cov} _{\src,\ft}$を活用したい
-    \begin{itemize}
-      \item[$\Rightarrow$] 回転時に$\cov _{\src,\ft},\, \Demix _{\ft}$を ``座標変換''
-    \end{itemize}
-\end{itemize}
+
+本節では，音場補間によって推定されたreference positionにおける観測信号を活用して，CMAが回転した後の位置におけるsource imageを得る手順を示す．
+Reference positionにおける観測信号 $\refpos{\Obs} _{\ft}$ を用いて推定された分離行列および共分散行列を $\refpos{\Demix} _{\ft},\, \refpos{\cov} _{\src,\ft}$ とする．
+\todo{（行き詰まり中…）}
 \begin{align}
   {\cov} _{\src,\freq} &\coloneqq \frac{1}{\Tframe} \sum _{\tframe = 1} ^{\Tframe} \weight (\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite} \\
                        &= \frac{1}{\Tframe} \sum _{\tframe = 1} ^{\Tframe} \weight (\var _{\src,\tframe}) (\rotMat (\rotSpat _{\tframe}) \refpos{\Obs} _{\ft}) (\refpos{\Obs} _{\ft} ^{\hermite} \rotMat ^{\hermite} (\rotSpat _{\tframe})) \\
@@ -341,9 +329,28 @@ CMAが回転する前の観測信号$\refpos{\Obs} _{\ft}$を用いて分離行�
 
 \section{Experimental Validation}\label{sec:experiment}
 \subsection*{目的}
+\paragraph*{疑問}
 \begin{itemize}
-  \item 座標変換の有効性の確認
-  \item 座標変換と通常の音場補間との性能差を確認
+  \item オンラインAuxIVAでの共分散行列 ``座標変換'' ？\\ バッチの場合と勝手が違う気がする…\\
+    マイクは $\tframe \leq \rotFra - 1$ で基準位置，
+    $\tframe \geq \rotFra$ で回転後とする．
+    \begin{align*}
+      \cov _{\src,\ft} &= \forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite} \\
+                             &= \forget ^{\tframe} \refpos{\cov} _{\src,\freq,0}
+                                + \sum _{i = 1} ^{\rotFra - 1} \forget ^{\tframe - i} (1 - \forget) \weight(\var _{\src,i}) \refpos{\Obs} _{\freq,i} \refpos{\Obs} _{\freq,i} ^{\hermite} \\
+                             &\qquad + \sum _{j = \rotFra} ^{\tframe} \forget ^{\tframe - j} (1 - \forget) \weight(\var _{\src,j}) \Obs _{\freq,j} \Obs _{\freq,j} ^{\hermite}
+    \end{align*}
+  \item 音場補間，座標変換の良い命名？ロボット工学の用語でワールド座標系，ロボット座標系などがあるが，これをもじって簡潔に言い表せないか？
+\end{itemize}
+
+\subsection{Self-rotation Estimation by Maximum Likelihood Method}
+
+\begin{itemize}
+  \item 連君法によるframe by frameの推定
+  \item あるいは「マイクが回転する前の位置でのsource imageを推定する問題」を考えて新しい最適化問題を作る？
+    \begin{itemize}
+      \item 音源分離・残響除去の同時最適化と同じようなやり方で解けないか？
+    \end{itemize}
 \end{itemize}
 
 \subsection*{条件}
@@ -443,20 +450,6 @@ CMAが回転する前の観測信号$\refpos{\Obs} _{\ft}$を用いて分離行�
     \begin{itemize}
       \item FFT長2048以下，忘却係数0.95以下で$\cov _{\src,\ft} ^{-1}$が発散する
     \end{itemize}
-\end{itemize}
-
-\paragraph*{疑問}
-\begin{itemize}
-  \item オンラインAuxIVAでの共分散行列 ``座標変換'' ？\\ バッチの場合と勝手が違う気がする…\\
-    マイクは $\tframe \leq \rotFra - 1$ で基準位置，
-    $\tframe \geq \rotFra$ で回転後とする．
-    \begin{align*}
-      \rot{\cov} _{\src,\ft} &= \forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \rot{\Obs} _{\ft} \rot{\Obs} _{\ft} ^{\hermite} \\
-                             &= \forget ^{\tframe} \cov _{\src,\freq,0}
-                                + \sum _{i = 1} ^{\rotFra - 1} \forget ^{\tframe - i} (1 - \forget) \weight(\var _{\src,i}) \Obs _{\freq,i} \Obs _{\freq,i} ^{\hermite} \\
-                             &\qquad + \sum _{j = \rotFra} ^{\tframe} \forget ^{\tframe - j} (1 - \forget) \weight(\var _{\src,j}) \rot{\Obs} _{\freq,j} \rot{\Obs} _{\freq,j} ^{\hermite}
-    \end{align*}
-  \item 音場補間，座標変換のいい感じの名前？ロボット工学の用語でワールド座標系，ロボット座標系などがあるが，これをもじって簡潔に言い表せないか？
 \end{itemize}
 
 \paragraph*{TODO}
