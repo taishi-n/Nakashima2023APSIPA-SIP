@@ -306,13 +306,17 @@ CMAが回転する前の観測信号$\refpos{\Obs} _{\ft}$を用いて分離行�
 \begin{equation}
   \Est _{\ft} = \refpos{\Demix} _{\ft} \refpos{\Obs} _{\ft} = \refpos{\Demix} _{\ft} \left(\rotMat ^{\hermite} (\rotSpat _{\tframe}) \Obs _{\ft}\right).
 \end{equation}
-ただし，この方式では観測信号のマイク位置を変えてしまうため，本論文の目的である，回転した後の位置におけるsource imageが得られない．
-そのため，観測信号ではなく，分離信号を得るためのパラメータの方に何らかの変換を与えることで，マイクの位置は変えずにパラメータの再推定よりも良いonline BSSを考える．
+ただし，この処理は観測信号のマイク位置を変えるため，本論文の目的である，回転した後の位置におけるsource imageが得られない．
+そのため，観測信号ではなく，分離信号を得るためのパラメータに何らかの変換を適用することで，マイクの位置を変えずにマイク回転に頑健なonline BSSを提案する．
 
 \section{Proposed Method}\label{sec:proposed}
 \subsection{Coordinate Transformation of SFI}
 
 本節では，音場補間によって推定されたreference positionにおける観測信号を活用して，CMAが回転した後の位置におけるsource imageを得る手順を示す．
+前述したように，CMAの回転角度と回転時刻が得られていれば，音場補間によってCMAの回転をキャンセルできる．
+ただし，音場補間した観測信号は物理的な参照マイクとsource imageとの位置関係を変えるため，実応用に問題が生じる場合がある．
+例えば，head mounted displayを用いた拡張現実空間での音源分離は，回転した後のsource imageの位置から音が聞こえるように処理する必要がある．
+
 Reference positionにおける観測信号 $\refpos{\Obs} _{\ft}$ を用いて推定された分離行列および共分散行列を $\refpos{\Demix} _{\ft},\, \refpos{\cov} _{\src,\ft}$ とする．
 \todo{（行き詰まり中…）}
 \begin{align}
@@ -345,7 +349,7 @@ Reference positionにおける観測信号 $\refpos{\Obs} _{\ft}$ を用いて�
 
 \begin{itemize}
   \item 連君法によるframe by frameの推定
-  \item あるいは「マイクが回転する前の位置でのsource imageを推定する問題」を考えて新しい最適化問題を作る？
+  \item 「マイク回転前のsource imageを推定する問題」を解く？
     \begin{itemize}
       \item 音源分離・残響除去の同時最適化と同じようなやり方で解けないか？
     \end{itemize}
@@ -353,14 +357,12 @@ Reference positionにおける観測信号 $\refpos{\Obs} _{\ft}$ を用いて�
 
 \section{Experimental Validation}\label{sec:experiment}
 
-前述したように，CMAの回転角度が得られていれば，観測信号に対して音場補間を行うことでCMAの回転をキャンセルできる．
-ただし，観測信号に対する音場補間は参照マイクとsource imageとの位置関係を保つため，head mounted displayなど実応用を考えた場合に不自然な聞こえ方になる場合がある．
-Online AuxIVAはマイクの回転など環境の変化にも適応できるが，収束性能が忘却係数の設定に大きく依存する．
-さらに，BSSでは観測信号を``混ぜ直して''入力しても結果は変わらない．
-例えば，2 chの入力$x_1,\, x_2$を$x_1+x_2, x_1-x_2$として入力しても同じ出力が得られる．
-音場補間による観測信号の変換も一種の「混ぜ直し」と解釈できるため，CMAの回転前後で音場補間を行うかどうかにかかわらず，分離性能は変わらないと思われる．
-しかし，音場補間を行うことで分離性能が改善されるという報告がある \cite{Nakashima:2022:ASJ:A}．
-そこで，本節では音場補間が音源分離にどれだけ寄与するのかを実験的に確かめる．
+Online AuxIVAはマイクの回転など環境の変化に追従できるが，収束性能が忘却係数に大きく依存する．
+さらに，ICAおよびICAに基づくBSSでは観測信号を``混ぜ直して''入力しても結果は変わらない．
+例えば，2 chの観測信号$x_1,\, x_2$を$x_1+x_2, x_1-x_2$として入力しても同じ出力が得られる．
+音場補間による観測信号の変換も一種の``混ぜ直し''と解釈できるため，CMAの回転前後で音場補間を行うかどうかにかかわらず，分離性能は変わらないことが期待される．
+しかし，音場補間を行うことで分離性能が改善されることが報告されている \cite{Nakashima:2022:ASJ:A}．
+そこで，本節では音場補間が音源分離にどれだけ寄与するのかを実験的に確かめ，音場補間によるsource imageの位置の違いについても議論する．
 
 \subsection*{Setup}
 
