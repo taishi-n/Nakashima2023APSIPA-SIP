@@ -205,7 +205,6 @@ We aim to estimate demixing matrices and estimated signals using only the curren
   \Est _{\ft} &= \Demix _{\ft} \Obs _{\ft} \in \C ^{\Src},
 \end{align}
 where $\Demix _{\ft}$ is the demixing matrix, and $\Est _{\ft}$ is the estimated signal.
-Note that $\rotSpat _{\tframe}$ is assumed to be known or estimated in this paper.
 
 Unless specified, indices $\freq,\, \tframe,$ and $\src$ always ranges from 1 to $\Freq, \Tframe,$ and $\Src$, respectively.
 We omit the bounds of sets over these indices when they span the ranges.
@@ -278,8 +277,8 @@ where $\eye _{\src} \in \R ^{\Src}$ is the canonical basis vector with the $\src
 \subsection{Sound Field Interpolation on Circular Microphone Array}
 % TODO: 音場補間のイメージ図
 This subsection briefly reviews the sound field interpolation method on circular microphone array (CMA).
-We consider a situation where CMA is rotated of degree $\rotSpat _{\tframe}$ at time frame $\tframe$ and let $\refpos{\Obs} _{\ft}$ be the observed signal recorded before CMA was rotated (\emph{reference position}).
-We assume that the observed signal \emph{after} CMA was rotated $\Obs _{\ft}$ is expressed as the following linear approximation:
+We consider a situation where CMA is rotated of degree $\rotSpat _{\tframe}$ at time frame $\tframe$ and let $\refpos{\Obs} _{\ft}$ be the observed signal recorded without CMA rotation (\emph{reference position}).
+We assume that the observed signal with CMA rotation $\Obs _{\ft}$ is expressed as the following linear approximation:
 \begin{equation}
   \refpos{\Obs} _{\ft} = \rotMat ^{-1} (\rotSpat _{\tframe}) \Obs _{\ft},
 \end{equation}
@@ -291,7 +290,8 @@ where
     \vdots & \ddots & \vdots \\
     \rotmat _{\Mic - 1, 0}(\rotSpat _{\tframe}) & \dots & \rotmat _{\Mic - 1, \Mic - 1}(\rotSpat _{\tframe})
   \end{bmatrix}
-  \in \C ^{\Mic\times\Mic}
+  \in \C ^{\Mic\times\Mic}%
+  \label{eq:rotmat}
 \end{equation}
 is called \emph{rotation matrix}, and its $(\src,\mic)$element $\rotmat _{\src,\mic} (\rotSpat _{\tframe})$ is calculated as:
 \begin{align}
@@ -313,41 +313,59 @@ and $\rotIdx = \mic - \src - \rotSmpl\; (\src, \mic = 0, \dots, \Mic - 1)$ \cite
 Equations \eqref{eq:rot:twid} and \eqref{eq:rot:sinc} are alternative expressions for (3) in \cite{Wakabayashi:2023:ASLP}.
 See Section II of \cite{Wakabayashi:2023:ASLP} for the detailed derivation.
 By derivation, $\rotMat (\rotSpat _{\tframe})$ is a unitary matrix; $\rotMat ^{-1} (\rotSpat _{\tframe}) = \rotMat ^{\hermite} (\rotSpat _{\tframe})$.
-
-\begin{algorithm}{Online AuxIVA with sound field interpolation for observed signal (RT-obs)}{rtobs}
-  \begin{pseudo}
-    for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
-      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq}) \\-
-    $\rotMat (\rotSpat _{\tframe})$ $\gets$ \pr{CalcRotationMatrix}(\Mic, \rotSpat _{\tframe}) \\
-    for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
-      $\refpos{\Obs} _{\ft} \gets \rotMat ^{\hermite} (\rotSpat _{\tframe}) \Obs _{\ft}$ \ct{$(\forall \freq)$} \\
-      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\refpos{\Obs} _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq})
-  \end{pseudo}
-\end{algorithm}
+Note that $\rotSpat _{\tframe}$ is assumed to be known or estimated.
 
 \section{Proposed Method}\label{sec:proposed}
 
 \subsection{Direct Combination of Online BSS and SFI}
 % \subsection{Can Direct Combination of Online BSS and SFI Be a Solution of Our Problem?}
 
-Online BSSとSFIの単純な組み合わせは，CMAが回転する状況下でのonline BSSのひとつのあり得る解決策である．
-CMAが回転する前の観測信号$\refpos{\Obs} _{\ft}$を用いて分離行列$\refpos{\Demix} _{\ft}$が推定できていたとする．
-通常のOnline AuxIVAでは，回転前後で分離行列を推定し直す必要がある．
-もし回転前の観測信号を推定できれば，CMAが回転した後も分離行列を推定し直すことなく分離信号$\Est _{\ft}$を計算できる．
-そこで，CMAの回転後は観測信号に対してSFIを適用し，CMAが回転する前の観測信号を用いて推定した分離行列を利用してオンライン音源分離を行うことを考える：
+本節ではCMAの回転に頑健なonline BSSを提案する．
+以下では，CMAが時間フレーム$\rotFra$で角度$\rotSpat$瞬時に回転したとする．
+この場合，通常のOnline AuxIVAでは回転前後で分離行列を推定し直す必要がある．
+前述したように，CMAの回転角度と回転時刻が得られていれば，SFIによってCMAの回転をキャンセルできため，分離行列を推定し直すことなく音源分離できる．
+
+CMAが回転する前の観測信号$\{\Obs _{\ft}\} _{\tframe = 1} ^{\rotFra - 1}$を用いて分離行列$\Demix _{\ft}$が推定できていたとする．
+CMAの回転後，観測信号に対してSFIを適用し，$\Demix _{\ft}$を利用して再推定せずにオンライン音源分離を行う：
 \begin{equation}
-  \Est _{\ft} = \refpos{\Demix} _{\ft} \refpos{\Obs} _{\ft} = \refpos{\Demix} _{\ft} \left(\rotMat ^{\hermite} (\rotSpat _{\tframe}) \Obs _{\ft}\right).
+  \Est _{\ft} = \Demix _{\ft} \refpos{\Obs} _{\ft} = \Demix _{\ft} \left(\rotMat ^{\hermite} (\rotSpat _{\tframe}) \Obs _{\ft}\right)\; (\tframe = \rotFra + 1, \dots, \Tframe).
 \end{equation}
-ただし，この処理は観測信号のマイク位置を変えるため，本論文の目的である，回転した後の位置におけるsource imageが得られない．
-そのため，観測信号ではなく，分離信号を得るためのパラメータに何らかの変換を適用することで，マイクの位置を変えずにマイク回転に頑健なonline BSSを提案する．
+\Cref{alg:rtobs}に，観測信号に対する音場補間を用いたOnline AuxIVAをまとめる．
+しかし，この処理は観測信号のマイク位置を変えるため，回転後の位置におけるsource imageが得られず，実応用に問題が生じる場合がある．
+例えば，head mounted displayを用いた拡張現実空間での音源分離は，回転した後のsource imageの位置から音が聞こえるように処理する必要がある．
+\begin{algorithm}{Online AuxIVA with SFI for observed signal (RT-obs)}{rtobs}
+  \textbf{Input:} $\rotSpat$, $\rotFra$, $\{\Obs _{\ft}\} _{\ft}$ \\
+  \textbf{Output:} $\{\Demix _{\ft}\}_{\ft},\, \{\cov _{\src,\ft}\}_{\src,\ft}$
+  \begin{pseudo}
+    Initialize $\{\Demix _{\freq,0}\} _{\freq} \, \{\cov _{\src,\freq,0}\} _{\freq,\src}$ \\
+    for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
+      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq}) \\-
+    for $\src = 0, \dots, \Src$ \\+
+      for $\mic = 0, \dots, \Src$ \\+
+        $\rotIdx \gets \src - \mic - \frac{2\pi}{\Src} \rotSpat$ \\
+        $\rotmat _{\src,\mic}(\rotSpat) \gets
+          \begin{cases}
+            \displaystyle \frac{\sinc{(\rotIdx)}}{\sinc{\left(\rotIdx / \Mic\right)}} \twid ^{\frac{\rotIdx}{2}} & (\nf{\text{$\Mic$ is even}}),\\[1em]
+            \displaystyle \frac{\sinc{(\rotIdx)}}{\sinc{\left(\rotIdx / \Mic\right)}} & (\nf{\text{$\Mic$ is odd}}),
+          \end{cases}
+        $ \ct{\eqref{eq:rot:sinc}} \\--
+    $\rotMat (\rotSpat) \gets
+      \begin{bmatrix}
+        \rotmat _{0, 0}(\rotSpat) & \dots & \rotmat _{0, \Mic - 1}(\rotSpat) \\
+        \vdots & \ddots & \vdots \\
+        \rotmat _{\Mic - 1, 0}(\rotSpat) & \dots & \rotmat _{\Mic - 1, \Mic - 1}(\rotSpat)
+      \end{bmatrix}
+      $ \ct{\eqref{eq:rotmat}} \\
+    for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
+      $\refpos{\Obs} _{\ft} \gets \rotMat ^{\hermite} (\rotSpat) \Obs _{\ft}$ \ct{$(\forall \freq)$} \\
+      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\refpos{\Obs} _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq})
+  \end{pseudo}
+\end{algorithm}
 
 \subsection{Coordinate Transformation of SFI}
 
-本節では，音場補間によって推定されたreference positionにおける観測信号を活用して，CMAが回転した後の位置におけるsource imageを得る手順を示す．
-前述したように，CMAの回転角度と回転時刻が得られていれば，音場補間によってCMAの回転をキャンセルできる．
-ただし，音場補間した観測信号は物理的な参照マイクとsource imageとの位置関係を変えるため，実応用に問題が生じる場合がある．
-例えば，head mounted displayを用いた拡張現実空間での音源分離は，回転した後のsource imageの位置から音が聞こえるように処理する必要がある．
-
+前節の問題を解決するために，観測信号のかわりに分離信号を得るためのパラメータに対して変換を適用することで，マイクの位置を変えずにCMA回転に頑健なonline BSSを提案する．
+本節では，SFIによって推定されたreference positionにおける観測信号を活用して，CMAが回転した後の位置におけるsource imageを得る手順を示す．
 Reference positionにおける観測信号 $\refpos{\Obs} _{\ft}$ を用いて推定された分離行列および共分散行列を $\refpos{\Demix} _{\ft},\, \refpos{\cov} _{\src,\ft}$ とする．
 \todo{%
   \begin{itemize}
@@ -383,15 +401,33 @@ Reference positionにおける観測信号 $\refpos{\Obs} _{\ft}$ を用いて�
   \item 音場補間，座標変換の良い命名？ロボット工学の用語でワールド座標系，ロボット座標系などがあるが，これをもじって簡潔に言い表せないか？
 \end{itemize}
 
-\begin{algorithm}{Online AuxIVA with sound field interpolation for observed signal (RT-cov)}{rtcov}
+\begin{algorithm}{Online AuxIVA with SFI for observed signal (RT-cov)}{rtcov}
+  \textbf{Input:} $\rotSpat$, $\rotFra$, $\{\Obs _{\ft}\} _{\ft}$ \\
+  \textbf{Output:} $\{\Demix _{\ft}\}_{\ft},\, \{\cov _{\src,\ft}\}_{\src,\ft}$
   \begin{pseudo}
+    Initialize $\{\refpos{\Demix} _{\freq,0}\} _{\freq} \, \{\refpos{\cov} _{\src,\freq,0}\} _{\freq,\src}$ \\
     for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
-      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq}) \\-
-    $\rotMat (\rotSpat _{\tframe})$ $\gets$ \pr{CalcRotationMatrix}(\Mic, \rotSpat _{\tframe}) \\
-    {$\rot{\Demix} _{\freq,\rotFra - 1}$} $\gets$ $\Demix _{\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat)$ \ct{$(\forall \freq)$} \\
-    {$\rot{\cov} _{\src,\freq,\rotFra - 1}$} $\gets$ $\rotMat (\rotSpat _{\tframe}) \cov _{\src,\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat _{\tframe})$ \ct{$(\forall \src,\freq)$} \\
+      $\{\refpos{\Demix} _{\ft}\}_{\freq},\, \{\refpos{\cov} _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\refpos{\Demix} _{\ft[-1]}\}_{\freq},\, \{\refpos{\cov} _{\src,\ft[-1]}\} _{\src,\freq}) \\-
+    for $\src = 0, \dots, \Src$ \\+
+      for $\mic = 0, \dots, \Src$ \\+
+        $\rotIdx \gets \src - \mic - \frac{2\pi}{\Src} \rotSpat$ \\
+        $\rotmat _{\src,\mic}(\rotSpat) \gets
+          \begin{cases}
+            \displaystyle \frac{\sinc{(\rotIdx)}}{\sinc{\left(\rotIdx / \Mic\right)}} \twid ^{\frac{\rotIdx}{2}} & (\nf{\text{$\Mic$ is even}}),\\[1em]
+            \displaystyle \frac{\sinc{(\rotIdx)}}{\sinc{\left(\rotIdx / \Mic\right)}} & (\nf{\text{$\Mic$ is odd}}),
+          \end{cases}
+        $ \ct{\eqref{eq:rot:sinc}} \\--
+    $\rotMat (\rotSpat) \gets
+      \begin{bmatrix}
+        \rotmat _{0, 0}(\rotSpat) & \dots & \rotmat _{0, \Mic - 1}(\rotSpat) \\
+        \vdots & \ddots & \vdots \\
+        \rotmat _{\Mic - 1, 0}(\rotSpat) & \dots & \rotmat _{\Mic - 1, \Mic - 1}(\rotSpat)
+      \end{bmatrix}
+      $ \ct{\eqref{eq:rotmat}} \\
+    {$\Demix _{\freq,\rotFra - 1}$}    $\gets$ $\refpos{\Demix} _{\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat)$ \ct{$(\forall \freq)$} \\
+    {$\cov _{\src,\freq,\rotFra - 1}$} $\gets$ $\rotMat (\rotSpat) \refpos{\cov} _{\src,\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat)$ \ct{$(\forall \src,\freq)$} \\
     for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
-      $\{\rot{\Demix} _{\ft}\}_{\freq},\, \{\rot{\cov} _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\rot{\Demix} _{\ft[-1]}\}_{\freq},\, \{\rot{\cov} _{\src,\ft[-1]}\} _{\src,\freq})
+      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq})
   \end{pseudo}
 \end{algorithm}
 
@@ -459,10 +495,6 @@ SI-SDRの評価に用いる参照信号は，回転したマイクで録音し�
   \item 実際のマイク回転角度と推定した回転角度に誤差をつけた場合の実験
 \end{itemize}
 
-\newcommand{\NaiveIVA}{\texttt{Naive}}
-\newcommand{\ResetIVA}{\texttt{Reset}}
-\newcommand{\RTCov}{\texttt{RT-cov}}
-\newcommand{\RTObs}{\texttt{RT-obs}}
 \subsection{Source Separation Performance}
 
 次の4つの手法を比較した．
