@@ -262,6 +262,22 @@ IP cyclically updates each \emph{demixing vector} $\demix _{\src,\ft} ^{\hermite
 \end{align}
 where $\eye _{\src} \in \R ^{\Src}$ is the canonical basis vector with the $\src$th element unity.
 \Cref{alg:naive} summarises the Online AuxIVA algorithm.
+\begin{algorithm}{Online AuxIVA (OIVA)}{naive}
+  \textbf{Input:} $\{\Obs _{\ft}\} _{\freq},\, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\}_{\src,\freq}$\\
+  % \textbf{Output:} $\Est _{\ft},\, \Demix _{\ft},\, \cov _{\src,\ft}\; (\forall \src,\freq)$
+  \textbf{Output:} $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\}_{\src,\freq}$
+  \begin{pseudo}
+    {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
+    for $\itr = 1,\, \dots,\, \Itr$ \\+
+      for $\src = 1,\, \dots,\, \Src$ \\+
+        {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \\
+        {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{$(\forall \freq)$}\\-
+      forall $\src = 1, \dots, \Src$ \\+
+        {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{$(\forall \freq)$}\\
+        {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{$(\forall \freq)$}
+        % {$\Est _{\ft}  $} $\gets$ $\Demix _{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$}
+  \end{pseudo}
+\end{algorithm}
 
 \subsection{Sound Field Interpolation on Circular Microphone Array}
 % TODO: 音場補間のイメージ図
@@ -301,6 +317,17 @@ and $\rotIdx = \mic - \src - \rotSmpl\; (\src, \mic = 0, \dots, \Mic - 1)$ \cite
 Equations \eqref{eq:rot:twid} and \eqref{eq:rot:sinc} are alternative expressions for (3) in \cite{Wakabayashi:2023:ASLP}.
 See Section II of \cite{Wakabayashi:2023:ASLP} for the detailed derivation.
 By derivation, $\rotMat (\rotSpat _{\tframe})$ is a unitary matrix; $\rotMat ^{-1} (\rotSpat _{\tframe}) = \rotMat ^{\hermite} (\rotSpat _{\tframe})$.
+
+\begin{algorithm}{Online AuxIVA with sound field interpolation for observed signal (RT-obs)}{rtobs}
+  \begin{pseudo}
+    for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
+      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq}) \\-
+    $\rotMat (\rotSpat _{\tframe})$ $\gets$ \pr{CalcRotationMatrix}(\Mic, \rotSpat _{\tframe}) \\
+    for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
+      $\refpos{\Obs} _{\ft} \gets \rotMat ^{\hermite} (\rotSpat _{\tframe}) \Obs _{\ft}$ \ct{$(\forall \freq)$} \\
+      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\refpos{\Obs} _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq})
+  \end{pseudo}
+\end{algorithm}
 
 \section{Proposed Method}\label{sec:proposed}
 
@@ -360,6 +387,18 @@ Reference positionにおける観測信号 $\refpos{\Obs} _{\ft}$ を用いて�
   \item 音場補間，座標変換の良い命名？ロボット工学の用語でワールド座標系，ロボット座標系などがあるが，これをもじって簡潔に言い表せないか？
 \end{itemize}
 
+\begin{algorithm}{Online AuxIVA with sound field interpolation for observed signal (RT-cov)}{rtcov}
+  \begin{pseudo}
+    for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
+      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq}) \\-
+    $\rotMat (\rotSpat _{\tframe})$ $\gets$ \pr{CalcRotationMatrix}(\Mic, \rotSpat _{\tframe}) \\
+    {$\rot{\Demix} _{\freq,\rotFra - 1}$} $\gets$ $\Demix _{\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat)$ \ct{$(\forall \freq)$} \\
+    {$\rot{\cov} _{\src,\freq,\rotFra - 1}$} $\gets$ $\rotMat (\rotSpat _{\tframe}) \cov _{\src,\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat _{\tframe})$ \ct{$(\forall \src,\freq)$} \\
+    for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
+      $\{\rot{\Demix} _{\ft}\}_{\freq},\, \{\rot{\cov} _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\rot{\Demix} _{\ft[-1]}\}_{\freq},\, \{\rot{\cov} _{\src,\ft[-1]}\} _{\src,\freq})
+  \end{pseudo}
+\end{algorithm}
+
 \subsection{Self-rotation Estimation by Maximum Likelihood Method}
 
 \todo{%
@@ -397,6 +436,18 @@ Online AuxIVAはマイクの回転など環境の変化に追従できるが，�
 音源分離の出力のスケールは参照マイクを\cref{fig:layout}のマイク1として，\cref{alg:pb}に示すprojection backによって復元した．
 Scale-invariant signal-to-distortion ratio (SI-SDR) \cite{LeRoux:2019:ICASSP} およびその改善量（SI-SDR improvements; SI-SDRi）のチャネルごとの平均で分離性能を評価した．
 SI-SDRの評価に用いる参照信号は，回転したマイクで録音したsource imageを用いていることに注意されたい．
+\begin{algorithm}{Projection back}{pb}
+  \textbf{Input:} $\{\Obs _{\ft}\} _{\ft}$, $\{\Demix _{\ft}\} _{\ft}$, reference microphone index $\ell$\\
+  \textbf{Output:} Scale-restored $\Est _{\ft}$
+  \begin{pseudo}
+    for $\tframe = 1,\, \dots,\, \Tframe$ \\+
+      for $\freq = 1,\, \dots,\, \Freq$ \\+
+        $\begin{bmatrix} \steer _{1,\ft} & \dots & \steer _{\Mic,\ft} \end{bmatrix} \eqqcolon \Steer _{\ft} \gets \Demix _{\ft} ^{-1}$ \\
+        % $\tilde{\Demix} _{\ft} \gets \mathrm{diag}(\steer _{\ell,\ft}) \Demix _{\ft}$ \\
+        % \nf{$\phantom{\tilde{\Demix} _{\ft} \gets} = \begin{bmatrix} a _{1,\ell,\ft} & \dots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \dots & a _{\Src,\ell,\ft} \end{bmatrix} \Demix _{\ft}$} \\
+        $\Est _{\ft} \gets \mathrm{diag}(\steer _{\ell,\ft}) \Demix _{\ft} \Obs _{\ft}$
+  \end{pseudo}
+\end{algorithm}
 \begin{figure}[t]
   \centering
   \includegraphics{figures/room_layout.pdf}
@@ -456,22 +507,6 @@ $\cov _{\src,\ft} \gets \cov _{\src,\ft} + 10 ^{-3} \Eye$
   \label{fig:plots:sisdr}
 \end{figure}
 
-\begin{algorithm}{Online AuxIVA (OIVA)}{naive}
-  \textbf{Input:} $\{\Obs _{\ft}\} _{\freq},\, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\}_{\src,\freq}$\\
-  % \textbf{Output:} $\Est _{\ft},\, \Demix _{\ft},\, \cov _{\src,\ft}\; (\forall \src,\freq)$
-  \textbf{Output:} $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\}_{\src,\freq}$
-  \begin{pseudo}
-    {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
-    for $\itr = 1,\, \dots,\, \Itr$ \\+
-      for $\src = 1,\, \dots,\, \Src$ \\+
-        {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \\
-        {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{$(\forall \freq)$}\\-
-      forall $\src = 1, \dots, \Src$ \\+
-        {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{$(\forall \freq)$}\\
-        {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{$(\forall \freq)$}
-        % {$\Est _{\ft}  $} $\gets$ $\Demix _{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$}
-  \end{pseudo}
-\end{algorithm}
 \begin{algorithm}{Online AuxIVA with reset (\textbf{Reset})}{reset}
   \begin{pseudo}
     for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
@@ -480,41 +515,6 @@ $\cov _{\src,\ft} \gets \cov _{\src,\ft} + 10 ^{-3} \Eye$
     {$\cov _{\src,\freq,\rotFra - 1}$} $\gets$ $\varepsilon \Eye$ \ct{$(\forall \src,\freq)$} \\
     for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
       $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq})
-  \end{pseudo}
-\end{algorithm}
-
-\begin{algorithm}{Online AuxIVA with sound field interpolation for observed signal (RT-obs)}{rtobs}
-  \begin{pseudo}
-    for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
-      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq}) \\-
-    $\rotMat (\rotSpat _{\tframe})$ $\gets$ \pr{CalcRotationMatrix}(\Mic, \rotSpat _{\tframe}) \\
-    for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
-      $\refpos{\Obs} _{\ft} \gets \rotMat ^{\hermite} (\rotSpat _{\tframe}) \Obs _{\ft}$ \ct{$(\forall \freq)$} \\
-      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\refpos{\Obs} _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq})
-  \end{pseudo}
-\end{algorithm}
-\begin{algorithm}{Online AuxIVA with sound field interpolation for observed signal (RT-cov)}{rtcov}
-  \begin{pseudo}
-    for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
-      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq}) \\-
-    $\rotMat (\rotSpat _{\tframe})$ $\gets$ \pr{CalcRotationMatrix}(\Mic, \rotSpat _{\tframe}) \\
-    {$\rot{\Demix} _{\freq,\rotFra - 1}$} $\gets$ $\Demix _{\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat)$ \ct{$(\forall \freq)$} \\
-    {$\rot{\cov} _{\src,\freq,\rotFra - 1}$} $\gets$ $\rotMat (\rotSpat _{\tframe}) \cov _{\src,\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat _{\tframe})$ \ct{$(\forall \src,\freq)$} \\
-    for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
-      $\{\rot{\Demix} _{\ft}\}_{\freq},\, \{\rot{\cov} _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\rot{\Demix} _{\ft[-1]}\}_{\freq},\, \{\rot{\cov} _{\src,\ft[-1]}\} _{\src,\freq})
-  \end{pseudo}
-\end{algorithm}
-
-\begin{algorithm}{Projection back (online)}{pb}
-  \textbf{Input:} $\Obs _{\ft}$, $\Demix _{\ft}$, reference microphone index $\ell$\\
-  \textbf{Output:} Scale-restored output signal $\Est _{\ft}$
-  \begin{pseudo}
-    for $\tframe = 1,\, \dots,\, \Tframe$ \\+
-      for $\freq = 1,\, \dots,\, \Freq$ \\+
-        $\begin{bmatrix} \steer _{1,\ft} & \dots & \steer _{\Mic,\ft} \end{bmatrix} \eqqcolon \Steer _{\ft} \gets \Demix _{\ft} ^{-1}$ \\
-        % $\tilde{\Demix} _{\ft} \gets \mathrm{diag}(\steer _{\ell,\ft}) \Demix _{\ft}$ \\
-        % \nf{$\phantom{\tilde{\Demix} _{\ft} \gets} = \begin{bmatrix} a _{1,\ell,\ft} & \dots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \dots & a _{\Src,\ell,\ft} \end{bmatrix} \Demix _{\ft}$} \\
-        $\Est _{\ft} \gets \mathrm{diag}(\steer _{\ell,\ft}) \Demix _{\ft} \Obs _{\ft}$
   \end{pseudo}
 \end{algorithm}
 
