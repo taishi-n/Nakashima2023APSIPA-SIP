@@ -175,9 +175,8 @@ Finally, \cref{sec:conclusion} concludes this paper.
 
 \section{Problem Formulation}\label{sec:problem}
 % TODO: マイクが回転する状況での音源分離の図
-\todo{CMAでの観測を前提として書き直す．}
+We model the observed signal recorded with a circular microphone array (CMA) that may be rotated during processing.
 Let $\Src$ and $\Mic$ be the number of sources and microphones, respectively.
-Also, we set the \emph{reference microphone} $\refmic = 1$ without loss of generality.
 We assume that the observed signal $\Obs _{\ft}$ is modeled as
 \begin{equation}
   \Obs _{\ft} = \steer _{1,\ft} \sig _{1,\ft} + \dots + \steer _{\Src,\ft} \sig _{\Src,\ft} = \sum _{\src=1} ^{\Src} \steer _{\src,\ft} \sig _{\src,\ft},\label{eq:mix}
@@ -185,25 +184,22 @@ We assume that the observed signal $\Obs _{\ft}$ is modeled as
 in the short-time Fourier transform (STFT) domain,
 where $\freq = 1, \dots, \Freq$ denotes the frequency bin index,
 $\tframe = 1, \dots, \Tframe$ denotes the time frame index,
-$\sig _{\src,\ft} \in \C\; (\src = 1, \dots, \Src)$ denotes the $\src$th source signal, and
+$\sig _{\src,\ft} \in \C\; (\src = 1, \dots, \Src)$ denotes the $\src$th source signal,
+and $\steer _{\src,\ft} \in \C ^{\Mic}$ denotes the steering vector of the $\src$th source signal to each microphone.
+Also, we here set the \emph{reference microphone} $\refmic = 1$ without loss of generality.
+In this case, each steering vector can be denoted as
 \begin{equation}
-  \steer _{\src,\ft} \coloneqq \begin{bmatrix} 1 & \str _{2\src,\ft} & \dots & \str _{\Mic\src,\ft} \end{bmatrix} ^{\top} \in \C ^{\Mic}\; (\src = 1, \dots, \Src)
+  \steer _{\src,\ft} \coloneqq \begin{bmatrix} 1 & \str _{2\src,\ft} & \dots & \str _{\Mic\src,\ft} \end{bmatrix} ^{\top}\; (\src = 1, \dots, \Src).
 \end{equation}
-denotes the steering vector of the $\src$th source signal to each microphone.
-\todo{%
-ここで，一般性を失わず，リファレンスマイクを1番目としている．
-このとき，$s_1, \dots, s_K$はリファレンスマイク位置でのsource imageを表すことになる．
-ステアリングベクトルが時変になるのはCMAが回転しうるためである．
-リファレンスマイクも移動するが，その場合でもステアリングベクトルはtime-varyingであり，その状況での各時刻のsource imageを求めたい．
-}
 In other words, $\str _{\mic\src,\ft} \; (\mic = 2, \dots, \Mic,\; \forall \src = 1, \dots, \Src)$ corresponds to the relative transfer function from the $\src$th source to the $\mic$th microphone.
-Our goal is to estimate \emph{source images} at the reference microphone $\sig _{1,\ft},\, \dots,\, \sig _{\Src,\ft}$.
+Note that many BSS methods require a time-invariant mixing system $\steer _{\src,\freq}\; (\forall \src)$,
+whereas, in this paper, steering vectors are time-variant $\steer _{\src,\ft}\; (\forall \src)$ to account for CMA rotations.
+We aim to estimate \emph{source images} at the reference microphone $\sig _{1,\ft},\, \dots,\, \sig _{\Src,\ft}$, even if the CMA is rotated.
 
-Next, we assume that the observed signal $\Obs _{\ft}$ is recorded with a circular microphone array (CMA), and CMA may be rotated at angle $\rotSpat _{\tframe}$ during processing.
-We consider an online BSS problem under such a situation.
+Next, we consider an online BSS problem with the model defined above.
 We henceforth assume that the number of microphones of CMA is equal to that of sources; $\Mic = \Src$.
 \renewcommand{\Mic}{\Src}%
-Online blind source separation estimates demixing matrices and estimated signals using only the current and past observed signals $\Obs _{\freq,1},\, \dots,\, \Obs _{\freq,\tframe}$:
+We aim to estimate demixing matrices and estimated signals using only the current and past observed signals $\Obs _{\freq,1},\, \dots,\, \Obs _{\freq,\tframe}$:
 \begin{align}
   \Demix _{\ft} &= \begin{bmatrix} \demix _{1\ft} & \dots & \demix _{\Src,\ft} \end{bmatrix} ^{\hermite} \in \C ^{\Src \times \Mic}, \\
   \Est _{\ft} &= \Demix _{\ft} \Obs _{\ft} \in \C ^{\Src},
