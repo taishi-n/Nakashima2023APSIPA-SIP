@@ -115,7 +115,7 @@
   One major issue for real-time BSS is robustness against environmental changes such as the movement of the source or microphone.
   Parameter re-estimation is generally necessary if environmental changes occur during real-time processing.
   OIVA is robust against smooth movement of sources and achieves high separation performance.
-  However, OIVA does not perform well against sudden movements of microphones.
+  However, OIVA does not perform well against rapid movements of microphones.
   Therefore, we employ sound field interpolation (SFI) for circular microphone arrays (CMAs) with OIVA in this paper.
   SFI cancels out the rotation of the CMA, enabling us to apply BSS without parameter re-estimation.
   Simulation experiments confirmed that SFI improves the robustness of the OIVA in situations where the microphone is rotating.
@@ -150,11 +150,11 @@ Many methods have been proposed based on block batch \cite{Koldovsky:2019:ICASSP
 Online AuxIVA shows high separation performance in real-time situations \cite{Taniguchi:2014:HSCMA}.
 It also has been actively researched recently for applications in hearing aids \cite{Sunohara:2017:ICASSP}, joint optimization with dereverberation \cite{Ueda:2021:ICASSP}, and computationally efficient optimization \cite{Nakashima:2023:ICASSP}.
 Online AuxIVA estimates demixing matrices frame-by-frame manner and can track smooth environmental changes in ATS, such as slow movement of sources.
-However, sudden changes in ATS, such as the emergence of new sources or microphone movement, makes online BSS difficult and thus degrade separation performance.
+However, rapid changes in ATS, such as the emergence of new sources or microphone movement, makes online BSS difficult and thus degrade separation performance.
 
 \todo{AR, VR関連のサーベイ追加}
 
-Several methods have been proposed to cope with such sudden changes in ATS.
+Several methods have been proposed to cope with such rapid changes in ATS.
 Sound field interpolation (SFI) for circular microphone array (CMA) has been proposed to address the rotation of a CMA \cite{Wakabayashi:2023:ASLP}.
 This method exploits the symmetry of the CMA to estimate the sound field before the rotation of the CMA by a simple linear operation.
 Applications to beamforming \cite{Wakabayashi:2021:ICASSP} and steering vector estimation \cite{Wakabayashi:2021:ASJ:A} have also been proposed,
