@@ -175,6 +175,7 @@ Finally, \cref{sec:conclusion} concludes this paper.
 
 \section{Problem Formulation}\label{sec:problem}
 % TODO: マイクが回転する状況での音源分離の図
+\todo{CMAでの観測を前提として書き直す．}
 Let $\Src$ and $\Mic$ be the number of sources and microphones, respectively.
 Also, we set the \emph{reference microphone} $\refmic = 1$ without loss of generality.
 We assume that the observed signal $\Obs _{\ft}$ is modeled as
@@ -185,10 +186,16 @@ in the short-time Fourier transform (STFT) domain,
 where $\freq = 1, \dots, \Freq$ denotes the frequency bin index,
 $\tframe = 1, \dots, \Tframe$ denotes the time frame index,
 $\sig _{\src,\ft} \in \C\; (\src = 1, \dots, \Src)$ denotes the $\src$th source signal, and
-\begin{equation*}
+\begin{equation}
   \steer _{\src,\ft} \coloneqq \begin{bmatrix} 1 & \str _{2\src,\ft} & \dots & \str _{\Mic\src,\ft} \end{bmatrix} ^{\top} \in \C ^{\Mic}\; (\src = 1, \dots, \Src)
-\end{equation*}
+\end{equation}
 denotes the steering vector of the $\src$th source signal to each microphone.
+\todo{%
+ここで，一般性を失わず，リファレンスマイクを1番目としている．
+このとき，$s_1, \dots, s_K$はリファレンスマイク位置でのsource imageを表すことになる．
+ステアリングベクトルが時変になるのはCMAが回転しうるためである．
+リファレンスマイクも移動するが，その場合でもステアリングベクトルはtime-varyingであり，その状況での各時刻のsource imageを求めたい．
+}
 In other words, $\str _{\mic\src,\ft} \; (\mic = 2, \dots, \Mic,\; \forall \src = 1, \dots, \Src)$ corresponds to the relative transfer function from the $\src$th source to the $\mic$th microphone.
 Our goal is to estimate \emph{source images} at the reference microphone $\sig _{1,\ft},\, \dots,\, \sig _{\Src,\ft}$.
 
@@ -295,6 +302,8 @@ Equations \eqref{eq:rot:twid} and \eqref{eq:rot:sinc} are alternative expression
 See Section II of \cite{Wakabayashi:2023:ASLP} for the detailed derivation.
 By derivation, $\rotMat (\rotSpat _{\tframe})$ is a unitary matrix; $\rotMat ^{-1} (\rotSpat _{\tframe}) = \rotMat ^{\hermite} (\rotSpat _{\tframe})$.
 
+\section{Proposed Method}\label{sec:proposed}
+
 \subsection{Direct Combination of Online BSS and SFI}
 % \subsection{Can Direct Combination of Online BSS and SFI Be a Solution of Our Problem?}
 
@@ -309,7 +318,6 @@ CMAが回転する前の観測信号$\refpos{\Obs} _{\ft}$を用いて分離行�
 ただし，この処理は観測信号のマイク位置を変えるため，本論文の目的である，回転した後の位置におけるsource imageが得られない．
 そのため，観測信号ではなく，分離信号を得るためのパラメータに何らかの変換を適用することで，マイクの位置を変えずにマイク回転に頑健なonline BSSを提案する．
 
-\section{Proposed Method}\label{sec:proposed}
 \subsection{Coordinate Transformation of SFI}
 
 本節では，音場補間によって推定されたreference positionにおける観測信号を活用して，CMAが回転した後の位置におけるsource imageを得る手順を示す．
@@ -318,6 +326,13 @@ CMAが回転する前の観測信号$\refpos{\Obs} _{\ft}$を用いて分離行�
 例えば，head mounted displayを用いた拡張現実空間での音源分離は，回転した後のsource imageの位置から音が聞こえるように処理する必要がある．
 
 Reference positionにおける観測信号 $\refpos{\Obs} _{\ft}$ を用いて推定された分離行列および共分散行列を $\refpos{\Demix} _{\ft},\, \refpos{\cov} _{\src,\ft}$ とする．
+\todo{%
+  \begin{itemize}
+    \item $t$までが回転前, $t+1$で回転後として，回転前までで推定された共分散を回転後の共分散に変換したい
+    \item 各時刻フレームの信号を確率過程とみなし，時刻のsumではなく，理想的な$\cov _{\src,\ft}$を$\weight (\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft}^{\hermite}$の期待値演算で書き，
+      その推定としてオンライン型の更新式を使うという立場で書く
+  \end{itemize}
+}
 \todo{（行き詰まり中…）}
 \begin{align}
   {\cov} _{\src,\freq} &\coloneqq \frac{1}{\Tframe} \sum _{\tframe = 1} ^{\Tframe} \weight (\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite} \\
@@ -336,24 +351,26 @@ Reference positionにおける観測信号 $\refpos{\Obs} _{\ft}$ を用いて�
   \item オンラインAuxIVAでの共分散行列 ``座標変換'' ？\\ バッチの場合と勝手が違う気がする…\\
     マイクは $\tframe \leq \rotFra - 1$ で基準位置，
     $\tframe \geq \rotFra$ で回転後とする．
-    \begin{align*}
+    \begin{align}
       \cov _{\src,\ft} &= \forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite} \\
                              &= \forget ^{\tframe} \refpos{\cov} _{\src,\freq,0}
                                 + \sum _{i = 1} ^{\rotFra - 1} \forget ^{\tframe - i} (1 - \forget) \weight(\var _{\src,i}) \refpos{\Obs} _{\freq,i} \refpos{\Obs} _{\freq,i} ^{\hermite} \\
                              &\qquad + \sum _{j = \rotFra} ^{\tframe} \forget ^{\tframe - j} (1 - \forget) \weight(\var _{\src,j}) \Obs _{\freq,j} \Obs _{\freq,j} ^{\hermite}
-    \end{align*}
+    \end{align}
   \item 音場補間，座標変換の良い命名？ロボット工学の用語でワールド座標系，ロボット座標系などがあるが，これをもじって簡潔に言い表せないか？
 \end{itemize}
 
 \subsection{Self-rotation Estimation by Maximum Likelihood Method}
 
-\begin{itemize}
-  \item 連君法によるframe by frameの推定
-  \item 「マイク回転前のsource imageを推定する問題」を解く？
-    \begin{itemize}
-      \item 音源分離・残響除去の同時最適化と同じようなやり方で解けないか？
-    \end{itemize}
-\end{itemize}
+\todo{%
+  \begin{itemize}
+    \item 連君法によるframe by frameの推定
+    \item 「マイク回転前のsource imageを推定する問題」を解く？
+      \begin{itemize}
+        \item 音源分離・残響除去の同時最適化と同じようなやり方で解けないか？
+      \end{itemize}
+  \end{itemize}
+}
 
 \section{Experimental Validation}\label{sec:experiment}
 
