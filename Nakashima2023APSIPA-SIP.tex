@@ -495,29 +495,29 @@ $\refpos{\Demix} _{\freq} = \Demix _{\freq} \rotMat (\rotSpat)$より，その�
 
 \section{Experimental Validation}\label{sec:experiment}
 
-Online AuxIVAはマイクの回転など環境の変化に追従できるが，収束性能が忘却係数に大きく依存する．
-さらに，ICAおよびICAに基づくBSSでは観測信号を``混ぜ直して''入力しても結果は変わらない．
-例えば，2 chの観測信号$x_1,\, x_2$を$x_1+x_2, x_1-x_2$として入力しても同じ出力が得られる．
-音場補間による観測信号の変換も一種の``混ぜ直し''と解釈できるため，CMAの回転前後で音場補間を行うかどうかにかかわらず，分離性能は変わらないことが期待される．
-しかし，音場補間を行うことで分離性能が改善されることが報告されている \cite{Nakashima:2022:ASJ:A}．
-そこで，本節では音場補間が音源分離にどれだけ寄与するのかを実験的に確かめ，音場補間によるsource imageの位置の違いについても議論する．
+Although online AuxIVA can track environmental changes such as microphone rotation, its convergence performance highly depends on the forgetting factor.
+Furthermore, ICA-based BSS methods do not change the results even if the observed signals are ``remixed.''
+For example, the same output is obtained by inputting the 2-channel observed signals $x_1$ and $x_2$ as $x_1 + x_2$ and $x_1 - x_2$.
+Since the transformation of the observed signals by the SFI can also be interpreted as a kind of ``remixing,''
+the separation performance is expected to remain the same regardless of whether or not the SFI is performed before or after the CMA rotation.
+However, it has been reported that SFI improves the separation performance \cite{Nakashima:2022:ASJ:A}.
+In this section, we experimentally confirm how much SFI contributes to BSS and discuss the difference in the location of the source image due to the SFI.
 
-\subsection*{Setup}
+\subsection{Setup}
 
-円状アレイが回転する環境におけるブラインド音源分離の性能を評価する．
-音源信号として，JNAS \cite{Itou:1999:AST}から男性話者2名，女性話者3名の合計5個の音声を使用した．
-音源信号のサンプリング周波数は\SI{16}{\kilo\hertz}であり，長さ\SI{60}{\second}になるよう加工した．
-これらの信号を鏡像法 \cite{Allen:1979:JASA} によるシミュレーションを行い音像を生成した．
-残響時間は約\SI{100}{\milli\second}となるようにパラメータを設定した．
-マイクロホンアレイとしてマイク数$\Mic = 5$，半径\SI{2}{\cm}の円状アレイを用いた．
-\Cref{fig:layout}に音源・マイクの配置を示す．
-円状アレイを\cref{fig:layout}中の水平軸から反時計周りに40度回転させた場合の音像を生成し，
-それぞれ0--30\si{\second}，30--60\si{\second}の区間でつなぎ合わせることでマイクロホンアレイの回転を擬似的に再現した．
-本節では，音場補間による頑健性向上に着目するために，回転角度および回転時刻はoracle的に与えた．
-得られた観測信号に対してフレーム長4096点，シフト長2048点，Hamming窓で短時間フーリエ変換を行った．
-音源分離の出力のスケールは参照マイクを\cref{fig:layout}のマイク1として，\cref{alg:pb}に示すprojection backによって復元した．
-Scale-invariant signal-to-distortion ratio (SI-SDR) \cite{LeRoux:2019:ICASSP} およびその改善量（SI-SDR improvements; SI-SDRi）のチャネルごとの平均で分離性能を評価した．
-SI-SDRの評価に用いる参照信号は，回転したマイクで録音したsource imageを用いていることに注意されたい．
+To evaluate the performance of blind source separation in a rotating circular array environment.
+Five speech sounds from the JNAS dataset \cite{Itou:1999:AST}, two male and three female speakers, were processed to a length of \SI{60}{\second} and used as the source signals.
+The sampling frequency of the source signals was \SI{16}{\kilo\hertz}.
+These signals were simulated using the image source method \cite{Allen:1979:JASA} to generate a sound image.
+The parameters were set so that the reverberation time was approximately \SI{100}{\milli\second}.
+A circular microphone array with $\Src = 5$ channels and a radius of \SI{2}{\centi\metre} was placed in the center of the room.
+\Cref{fig:layout} shows the arrangement of the sound sources and microphones.
+To simulate the rotation of the microphone array, the sound images were generated when the circular array was rotated \SI{40}{\degree} counter-clockwise from the horizontal axis in \cref{fig:layout} 1 and was stitched together in the 0--30\si{\second} and 30--60\si{\second} intervals, respectively.
+Note that the rotation angle and rotation time are given oracle-manner to focus on improving the robustness of the sound field interpolation.
+A short-time Fourier transform with a frame length of 4096 points, a shift length of 2048 points, and a Hamming window was performed on the obtained observed signals.
+The scale of the output signal was restored by the projection back shown in \cref{alg:pb}, with the reference microphone as microphone 1 in \cref{fig:layout}.
+The separation performance was evaluated by averaging the scale-invariant signal-to-distortion ratio (SI-SDR) \cite{LeRoux:2019:ICASSP} and its improvement (SI-SDR improvements; SI-SDRi) per channel.
+The reference signal used for the SI-SDR evaluation was the source image recorded with a rotated CMA.
 \begin{algorithm}{Projection back}{pb}
   \textbf{Input:} $\{\Obs _{\ft}\} _{\ft}$, $\{\Demix _{\ft}\} _{\ft}$, reference microphone index $\ell$\\
   \textbf{Output:} Scale-restored $\Est _{\ft}$
@@ -547,32 +547,29 @@ SI-SDRの評価に用いる参照信号は，回転したマイクで録音し�
 
 \subsection{Source Separation Performance}
 
-次の4つの手法を比較した．
+We compared the following four methods:
 \begin{description}
-  \item[\NaiveIVA] \Cref{subsec:oiva}で説明したOnline AuxIVAをベースラインとして用いる．\Cref{alg:naive}に処理の流れを示す．
-  \item[\ResetIVA] CMAの回転後に，分離行列および共分散行列を初期化する．\Cref{alg:reset}に処理の流れを示す．
-  \item[\RTObs] CMAの回転後に，フレームごとに観測信号を対して音場補間を適用したあとに分離行列を推定する．\Cref{alg:rtobs}に処理の流れを示す．
-    $\Obs _{\ft} = \rotMat ^{\hermite} (\rotSpat _{\tframe}) \rot{\Obs} _{\ft}$
-  \item[\RTCov] CMAの回転後に，分離行列および共分散行列を``座標変換''したあとに分離行列を推定する．\Cref{alg:rtcov}に処理の流れを示す．
-    $\rot{\Demix} _{\ft} \gets \Demix _{\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$,\; $\rot{\cov} _{\src,\ft} \gets \rotMat (\rotSpat _{\tframe}) \cov _{\src,\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$
+  \item[\NaiveIVA] Online AuxIVA described in \cref{subsec:oiva} as a baseline in our experiments. (See \Cref{alg:naive}.)
+  \item[\ResetIVA] Re-initialize covariance and demixing matrices after the CMA rotation CMA. (See \Cref{alg:reset}.)
+  \item[\RTObs] Apply SFI for observed signals after the CMA rotation CMA frame by frame. (See \Cref{alg:rtobs}.)
+    % \\ $\Obs _{\ft} = \rotMat ^{\hermite} (\rotSpat _{\tframe}) \rot{\Obs} _{\ft}$
+  \item[\RTCov] Apply parameter transformation for covariance and demixing matrices after CMA rotation.  (See \Cref{alg:rtcov}.)
+    % \\ $\rot{\Demix} _{\ft} \gets \Demix _{\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$,\; $\rot{\cov} _{\src,\ft} \gets \rotMat (\rotSpat _{\tframe}) \cov _{\src,\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$
 \end{description}
 
-分離行列および共分散行列の初期値はそれぞれ
-$\Demix _{\freq,0} = \Eye\; (\forall \freq)$, $\cov _{\src,\freq,0} = 10^{-3}\times\Eye\; (\forall \src, \freq)$
-に設定し，フレームごとの反復回数$\Itr$は5とした．
-OIVAは忘却係数$\forget = 0.9, 0.95, 0.98, 0.99$と変化させた．
-これらの忘却係数は，近似的な有効フレーム数$\frac{1}{1 - \forget} = 10, 20, 50, 100$となるよう選んだ．
-さらに，IPにおける逆行列演算の安定性を向上させるため，\eqref{eq:cov}による更新後，
-$\cov _{\src,\ft} \gets \cov _{\src,\ft} + 10 ^{-3} \Eye$
-として微小な単位行列を加算した．
+The initial values for demixing and covariance matrices were
+$\Demix _{\freq,0} = \Eye\; (\forall \freq)$, $\cov _{\src,\freq,0} = 10^{-3}\times\Eye\; (\forall \src, \freq)$, respectively.
+We set the number of iteration in each time frame in \cref{alg:naive} $\Itr$ to 5.
+We ran experiments with varying forgetting factors $\forget = 0.9, 0.95, 0.98, 0.99$, which were chosen so that the approximate number of frames $\frac{1}{1 - \forget} = 10, 20, 50, 100$.
+To increase numerous stability for implementation of online AuxIVA,
+we applied the following ad-hoc normalization $\cov _{\src,\ft} \gets \cov _{\src,\ft} + 10 ^{-3} \Eye$ after updates by \eqref{eq:cov}.
 
-\Cref{fig:plots:sisdr}に\SI{1}{\second}ごとのSI-SDRiを示す．
-全体的に，\NaiveIVA{}と\ResetIVA{}はCMAの回転後に大きく性能が低下し，時間とともに再び性能が改善した．
-特に，\ResetIVA{}がすべての忘却係数に対して，回転後の性能が最も低く，忘却係数が1に近づくほど悪くなる．
-\NaiveIVA{}は\ResetIVA{}よりも性能の低下は小さく，低下した後の性能は忘却係数によらずほとんど一定である．
-それに対して，提案法の\RTCov{}と\RTObs{}は，CMAの回転後であっても分離性能を維持できた．
-特に，\RTCov{}と\RTObs{}を比較すると，\RTCov{}の方がわずかに性能が良い．
-これは，\RTObs{}が基準位置でのsource imageを推定しているが，SI-SDRの参照信号に回転後の位置におけるsource imageを用いたことから生じた誤差であると考えられる．
+\Cref{fig:plots:sisdr} shows the SI-SDRi every \SI{1}{\second}.
+Overall, \NaiveIVA{} and \ResetIVA{} showed a significant performance drop after the CMA rotation and improved again with time.
+Notably, \ResetIVA{} has the lowest performance before CMA rotaion among all forgetting factors, which gets worse as the forgetting factor approaches 1.
+In contrast, proposed \RTCov{} and \RTObs{} methods maintained performance even after the CMA rotation.
+Comparing \RTCov{} and \RTObs{}, \RTCov{} performed slightly better.
+This may be due to the fact that \RTObs{} estimates the source image at the reference microphone, while the reference signal for SI-SDR evaluation was the source image at the reference position.
 \begin{figure}[t]
   \begin{minipage}[t]{\linewidth}
     \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_900.pdf}\subcaption{$\forget = 0.90 $}\label{fig:plot:gauss:900}
