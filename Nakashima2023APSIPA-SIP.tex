@@ -276,9 +276,8 @@ where $\eye _{\src} \in \R ^{\Src}$ is the canonical basis vector with the $\src
 \end{algorithm}
 
 \subsection{Sound Field Interpolation on Circular Microphone Array}
-% TODO: 音場補間のイメージ図
-This subsection briefly reviews the sound field interpolation method on circular microphone array (CMA).
-Let $\sfcma (\rotCoor)$ be a continuous sound pressure on the circumference of a circle at a spatial angle $\rotCoor \in \interval[open right,soft open fences]{0}{2\pi}$.
+This subsection briefly reviews the sound field interpolation method on circular microphone array (CMA), which is originally proposed in \cite{Wakabayashi:2021:ICASSP}.
+Let $\sfcma (\rotCoor)$ be a continuous sound pressure on the circumference of a circle at a spatial angle $\rotCoor \in \interval[open right,soft open fences]{0}{2\pi}$, as shown in \cref{fig:sfi}.
 Then we observe a sound field with $\Mic$ microphones on the circle at even intervals.
 The $\mic$th observed signal is denoted as
 \begin{equation}
@@ -286,6 +285,11 @@ The $\mic$th observed signal is denoted as
   \label{eq:sfi:model}
 \end{equation}
 In other words, we regard observations of the sound field with a CMA as discretizations of that along an angle on the circumference $\rotCoor$.
+\begin{figure}[t]
+  \includegraphics{figures/diagrams/sfi.pdf}
+  \caption{Concept of sound field interpolation on a circular microphone array.}%
+  \label{fig:sfi}
+\end{figure}
 
 Next, we formulate a sound field interpolation problem with the model above.
 If the CMA is rotated by a spatial angle $\rotSpat \in \R$, we can regard its observation as the $\rotSmpl$-sample shift of $\sfcma _{\mic}$;
