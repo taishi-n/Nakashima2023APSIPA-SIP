@@ -312,12 +312,20 @@ where $\dft _{\Src} [\sfcma _{\mic}]$ is the $\Mic$-points discrete Fourier tran
 From these assumptions, we have
 \begin{align}
   \sfcma _{\mic + \rotSmpl} &= \dft _{\Src} ^{-1} \left[\Sfcma _{\src} \twid ^{\rotSmpl \src}\right], \\
-                            &= \frac{1}{\Mic} \sum _{\src = \lceil - \frac{\Mic-1}{2} \rceil} ^{\lceil \frac{\Mic-1}{2} \rceil}\left( \Sfcma _{\src}\twid ^{\rotSmpl\src} \right) \twid ^{\mic\src}, \\
-                            &= \frac{1}{\Mic} \sum _{\src = \lceil - \frac{\Mic-1}{2} \rceil} ^{\lceil \frac{\Mic-1}{2} \rceil} \left(\sum _{n=0} ^{\Mic - 1} \sfcma _{n} \twid ^{-n\src}\right) \left( \twid ^{(\rotSmpl + \mic)\src} \right), \\
-                            &= \sum _{\dum = 0} ^{\Mic - 1} \sfcma _{\dum} \left( \frac{1}{\Mic} \sum _{\src = \lceil - \frac{\Mic-1}{2} \rceil} ^{\lceil \frac{\Mic-1}{2} \rceil} \twid ^{(\rotSmpl + \mic - \dum)\src} \right)
-                            \coloneqq \sum _{\dum = 0} ^{\Mic - 1} \sfcma _{\dum} \rotmat _{\mic, \dum}(\rotSmpl).
+                            &= \frac{1}{\Mic} \sum _{\src \in \SRC} \left(\Sfcma _{\src}\twid ^{\rotSmpl\src} \right) \twid ^{\mic\src}, \\
+                            &= \frac{1}{\Mic} \sum _{\src \in \SRC} \left(\sum _{n=0} ^{\Mic - 1} \sfcma _{n} \twid ^{-n\src}\right) \left( \twid ^{(\rotSmpl + \mic)\src} \right), \\
+                            &= \sum _{\dum = 0} ^{\Mic - 1} \sfcma _{\dum} \left( \frac{1}{\Mic} \sum _{\src \in \SRC} \twid ^{(\rotSmpl + \mic - \dum)\src} \right)
+                            \coloneqq \sum _{\dum = 0} ^{\Mic - 1} \sfcma _{\dum} \rotmat _{\mic, \dum}(\rotSmpl),
 \end{align}
-\todo{（和の範囲を上記のようにとる意味は…？？）}
+where $\SRC$ is a set of indices defined as {\small\todo{（和の範囲を次のようにとる理由…？）}}
+\begin{align}
+  \SRC &= \left\{\left\lceil - \frac{\Mic-1}{2} \right\rceil, \dots, \left\lceil \frac{\Mic-1}{2} \right\rceil\right\} \\
+       &=
+  \begin{cases}
+    \left\{-\frac{\Src}{2} + 1, -\frac{\Src}{2} + 2, \dots, \frac{\Src}{2}\right\} & \text{($\Src$ is even)} \\
+    \left\{-\frac{\Src - 1}{2}, -\frac{\Src - 1}{2} + 1, \dots, \frac{\Src - 1}{2}\right\} & \text{($\Src$ is odd)}
+  \end{cases}
+\end{align}
 The coefficient $\rotmat _{\mic,\dum}(\rotSmpl)$ can be calculated as
 \begin{align}
   \rotmat _{\mic,\dum}(\rotSpat)
