@@ -8,6 +8,7 @@
 \usepackage{amsfonts}
 \usepackage{bm}
 \usepackage{mathtools}
+\usepackage{interval}
 \usepackage{siunitx}
 \usepackage[skip=1pt]{subcaption}
 
@@ -277,7 +278,65 @@ where $\eye _{\src} \in \R ^{\Src}$ is the canonical basis vector with the $\src
 \subsection{Sound Field Interpolation on Circular Microphone Array}
 % TODO: 音場補間のイメージ図
 This subsection briefly reviews the sound field interpolation method on circular microphone array (CMA).
-We consider a situation where CMA is rotated of degree $\rotSpat _{\tframe}$ at time frame $\tframe$ and let $\refpos{\Obs} _{\ft}$ be the observed signal recorded without CMA rotation (\emph{reference position}).
+Let $\sfcma (\rotCoor)$ be a continuous sound pressure on the circumference of a circle at a spatial angle $\rotCoor \in \interval[open right,soft open fences]{0}{2\pi}$.
+Then we observe a sound field with $\Mic$ microphones on the circle at even intervals.
+The $\mic$th observed signal is denoted as
+\begin{equation}
+  \sfcma _{\mic} = \sfcma \left(2\pi \frac{\mic}{\Mic}\right),\; (\mic = 0, \dots, \Mic - 1).%
+  \label{eq:sfi:model}
+\end{equation}
+In other words, we regard observations of the sound field with a CMA as discretizations of that along an angle on the circumference $\rotCoor$.
+
+Next, we formulate a sound field interpolation problem with the model above.
+If the CMA is rotated by a spatial angle $\rotSpat \in \R$, we can regard its observation as the $\rotSmpl$-sample shift of $\sfcma _{\mic}$;
+\begin{equation}
+  \sfcma \left(\frac{2\pi}{\Mic} \mic + \rotSpat \right)%
+  \coloneqq
+  \sfcma _{\mic + \rotSmpl},
+  \label{eq:sfi:shift:obs}
+\end{equation}
+where $\rotSmpl = \frac{\Mic}{2\pi} \rotSpat$.
+Also, we assume the \emph{``non-integer sample shift theorem''};
+\begin{align}
+  \dft _{\Src} [\sfcma _{\mic + \rotSmpl}] &= \Sfcma _{\src} \twid ^{\rotSmpl \src},%
+  \label{eq:sfi:shift:dft}\\
+  \twid &\coloneqq \exp \left(j\frac{2\pi}{\Mic}\right),
+\end{align}
+where $\dft _{\Src} [\sfcma _{\mic}]$ is the $\Mic$-points discrete Fourier transform (DFT) defined as
+\begin{align}
+  \dft _{\Src} [\sfcma _{\mic}] &= \sum _{\mic = 0} ^{\Mic - 1} \sfcma _{\mic} \twid ^{-\mic\src} \coloneqq \Sfcma _{\src},
+  \intertext{and its inverse transform is defined as}
+  \dft _{\Src} ^{-1} [\Sfcma _{\src}] &= \frac{1}{\Mic} \sum _{\src = 0} ^{\Mic - 1} \Sfcma _{\src} \twid ^{\mic\src}.
+\end{align}
+% and $j$ is the imaginary unit.
+From these assumptions, we have
+\begin{align}
+  \sfcma _{\mic + \rotSmpl} &= \dft _{\Src} ^{-1} \left[\Sfcma _{\src} \twid ^{\rotSmpl \src}\right], \\
+                            &= \frac{1}{\Mic} \sum _{\src = \lceil - \frac{\Mic-1}{2} \rceil} ^{\lceil \frac{\Mic-1}{2} \rceil}\left( \Sfcma _{\src}\twid ^{\rotSmpl\src} \right) \twid ^{\mic\src}, \\
+                            &= \frac{1}{\Mic} \sum _{\src = \lceil - \frac{\Mic-1}{2} \rceil} ^{\lceil \frac{\Mic-1}{2} \rceil} \left(\sum _{n=0} ^{\Mic - 1} \sfcma _{n} \twid ^{-n\src}\right) \left( \twid ^{(\rotSmpl + \mic)\src} \right), \\
+                            &= \sum _{\dum = 0} ^{\Mic - 1} \sfcma _{\dum} \left( \frac{1}{\Mic} \sum _{\src = \lceil - \frac{\Mic-1}{2} \rceil} ^{\lceil \frac{\Mic-1}{2} \rceil} \twid ^{(\rotSmpl + \mic - \dum)\src} \right)
+                            \coloneqq \sum _{\dum = 0} ^{\Mic - 1} \sfcma _{\dum} \rotmat _{\mic, \dum}(\rotSmpl).
+\end{align}
+\todo{（和の範囲を上記のようにとる意味は…？？）}
+The coefficient $\rotmat _{\mic,\dum}(\rotSmpl)$ can be calculated as
+\begin{align}
+  \rotmat _{\mic,\dum}(\rotSpat)
+  &=
+    \begin{cases}
+      \displaystyle\frac{\twid ^{- \rotIdx (\frac{\Mic}{2} - 1) }}{\Mic} \frac{1 - \twid ^{\rotIdx \Mic}}{1 - \twid ^{\rotIdx}} & (\text{$\Mic$ is even}),\\[1em]
+      \displaystyle\frac{\twid ^{- \rotIdx \frac{(\Src - 1)}{2}}}{\Mic} \frac{1 - \twid ^{\rotIdx \Mic}}{1 - \twid ^{\rotIdx}} & (\text{$\Mic$ is odd}),
+    \end{cases}\label{eq:rot:twid} \\
+  &=
+    \begin{cases}
+      \displaystyle \frac{\sinc{(\rotIdx)}}{\sinc{\left(\rotIdx / \Mic\right)}} \twid ^{\frac{\rotIdx}{2}} & (\text{$\Mic$ is even}),\\[1em]
+      \displaystyle \frac{\sinc{(\rotIdx)}}{\sinc{\left(\rotIdx / \Mic\right)}} & (\text{$\Mic$ is odd}),
+    \end{cases}\label{eq:rot:sinc}
+\end{align}
+where and $\rotIdx =\rotSmpl + \mic - \dum; (\mic, \dum = 0, \dots, \Mic - 1)$ \cite{Wakabayashi:2023:ASLP}.
+Equations \eqref{eq:rot:twid} and \eqref{eq:rot:sinc} are alternative expressions for (3) in \cite{Wakabayashi:2023:ASLP}.
+See Section II of \cite{Wakabayashi:2023:ASLP} for the detailed derivation.
+
+In STFT domain, we consider a situation where CMA is rotated of degree $\rotSpat _{\tframe}$ at time frame $\tframe$ and let $\refpos{\Obs} _{\ft}$ be the observed signal recorded without CMA rotation (\emph{reference position}).
 We assume that the observed signal with CMA rotation $\Obs _{\ft}$ is expressed as the following linear approximation:
 \begin{equation}
   \refpos{\Obs} _{\ft} = \rotMat ^{-1} (\rotSpat _{\tframe}) \Obs _{\ft},
@@ -293,27 +352,9 @@ where
   \in \C ^{\Mic\times\Mic}%
   \label{eq:rotmat}
 \end{equation}
-is called \emph{rotation matrix}, and its $(\src,\mic)$element $\rotmat _{\src,\mic} (\rotSpat _{\tframe})$ is calculated as:
-\begin{align}
-  \rotmat _{\src,\mic}(\rotSpat _{\tframe})
-  &=
-    \begin{cases}
-      \displaystyle\frac{\twid ^{- \rotIdx (\frac{\Mic}{2} - 1) }}{\Mic} \frac{1 - \twid ^{\rotIdx \Mic}}{1 - \twid ^{\rotIdx}} & (\text{$\Mic$ is even}),\\[1em]
-      \displaystyle\frac{\twid ^{- \rotIdx \frac{(\Src - 1)}{2}}}{\Mic} \frac{1 - \twid ^{\rotIdx \Mic}}{1 - \twid ^{\rotIdx}} & (\text{$\Mic$ is odd}),
-    \end{cases}\label{eq:rot:twid} \\
-  &=
-    \begin{cases}
-      \displaystyle \frac{\sinc{(\rotIdx)}}{\sinc{\left(\rotIdx / \Mic\right)}} \twid ^{\frac{\rotIdx}{2}} & (\text{$\Mic$ is even}),\\[1em]
-      \displaystyle \frac{\sinc{(\rotIdx)}}{\sinc{\left(\rotIdx / \Mic\right)}} & (\text{$\Mic$ is odd}),
-    \end{cases}\label{eq:rot:sinc}
-\end{align}
-where $\twid \coloneqq \exp (j \frac{2\pi}{\Mic})$ is a twiddle factor in $\Mic$-points FFT,
-$\rotSmpl \coloneqq \frac{2\pi}{\Mic} \rotSpat _{\tframe}$ is a non-integer shift on CMA,
-and $\rotIdx = \mic - \src - \rotSmpl\; (\src, \mic = 0, \dots, \Mic - 1)$ \cite{Wakabayashi:2023:ASLP}.
-Equations \eqref{eq:rot:twid} and \eqref{eq:rot:sinc} are alternative expressions for (3) in \cite{Wakabayashi:2023:ASLP}.
-See Section II of \cite{Wakabayashi:2023:ASLP} for the detailed derivation.
+is called \emph{rotation matrix}, and its $(\src,\mic)$element $\rotmat _{\src,\mic} (\rotSpat _{\tframe})$ is calculated by \eqref{eq:rot:sinc}.
 By derivation, $\rotMat (\rotSpat _{\tframe})$ is a unitary matrix; $\rotMat ^{-1} (\rotSpat _{\tframe}) = \rotMat ^{\hermite} (\rotSpat _{\tframe})$.
-Note that $\rotSpat _{\tframe}$ is assumed to be known or estimated.
+Note that $\rotSpat _{\tframe}$ is required to be known or estimated.
 
 \section{Proposed Method}\label{sec:proposed}
 
