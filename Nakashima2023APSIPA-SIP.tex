@@ -405,42 +405,51 @@ CMAの回転後，観測信号に対してSFIを適用し，$\Demix _{\ft}$を�
 
 \subsection{Coordinate Transformation of SFI}
 
-前節の問題を解決するために，観測信号のかわりに分離信号を得るためのパラメータに対して変換を適用することで，マイクの位置を変えずにCMA回転に頑健なonline BSSを提案する．
-本節では，SFIによって推定されたreference positionにおける観測信号を活用して，CMAが回転した後の位置におけるsource imageを得る手順を示す．
-Reference positionにおける観測信号 $\refpos{\Obs} _{\ft}$ を用いて推定された分離行列および共分散行列を $\refpos{\Demix} _{\ft},\, \refpos{\cov} _{\src,\ft}$ とする．
-\todo{%
-  \begin{itemize}
-    \item $t$までが回転前, $t+1$で回転後として，回転前までで推定された共分散を回転後の共分散に変換したい
-    \item 各時刻フレームの信号を確率過程とみなし，時刻のsumではなく，理想的な$\cov _{\src,\ft}$を$\weight (\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft}^{\hermite}$の期待値演算で書き，
-      その推定としてオンライン型の更新式を使うという立場で書く
-  \end{itemize}
-}
-\todo{（行き詰まり中…）}
+前節の問題を解決するために，マイクの位置を変えずにCMA回転に頑健なonline BSSを提案する．
+観測信号のかわりに分離信号を得るためのパラメータを変換することで，CMAが回転した後の位置におけるsource imageを得る手順を示す．
+まず，簡単のために，時不変な環境におけるパラメータ変換を議論する．
+角度$\rotSpat$回転したCMAで録音された観測信号が次の関係を厳密に満たしていると仮定する：
+\begin{equation}
+  \Obs _{\ft} = \rotMat (\rotSpat) \refpos{\Obs} _{\ft}.
+\end{equation}
+このとき，分離信号$\Est _{\ft}$は次で計算される：
 \begin{align}
-  {\cov} _{\src,\freq} &\coloneqq \frac{1}{\Tframe} \sum _{\tframe = 1} ^{\Tframe} \weight (\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite} \\
-                       &= \frac{1}{\Tframe} \sum _{\tframe = 1} ^{\Tframe} \weight (\var _{\src,\tframe}) (\rotMat (\rotSpat _{\tframe}) \refpos{\Obs} _{\ft}) (\refpos{\Obs} _{\ft} ^{\hermite} \rotMat ^{\hermite} (\rotSpat _{\tframe})) \\
-                       &= \rotMat (\rotSpat _{\tframe}) \left(\frac{1}{\Tframe} \sum _{\tframe = 1} ^{\Tframe} \weight (\var _{\src,\tframe}) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite}\right) \rotMat ^{\hermite} (\rotSpat _{\tframe}) \\
-                       &= \rotMat (\rotSpat _{\tframe}) \refpos{\cov} _{\src,\freq} \rotMat ^{\hermite} (\rotSpat _{\tframe})
-  \\
-  \Est _{\ft} &= \refpos{\Demix} _{\ft} \refpos{\Obs} _{\ft} \\
-              &= \refpos{\Demix} _{\ft} \left(\rotMat ^{\hermite} (\rotSpat _{\tframe}) \rotMat (\rotSpat _{\tframe})\right) \refpos{\Obs} _{\ft} \\
-              &= \underbrace{\left(\refpos{\Demix} _{\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})\right)}_{\coloneqq \Demix _{\ft}} \left(\rotMat (\rotSpat _{\tframe}) \refpos{\Obs} _{\ft}\right) \\
-              &= \Demix _{\ft} \Obs _{\ft}
+  \Est _{\ft} &= \Demix _{\freq} \Obs _{\ft}, \\
+              &= \Demix _{\freq} \rotMat (\rotSpat) \refpos{\Obs} _{\ft} \coloneqq \refpos{\Demix} _{\freq} \refpos{\Obs} _{\ft},
+\end{align}
+$\refpos{\Demix} _{\freq}$は，reference positionにおける観測信号を用いて推定された時不変な分離行列とみなせる．
+同様に，$\refpos{\Obs} _{\ft}$を用いて推定された時不変な共分散行列 $\refpos{\cov} _{\src,\freq}$ は次で計算される：
+\begin{align}
+  \refpos{\cov} _{\src,\freq} &= \expct  _{\tframe} \left[\weight (\refpos{\var} _{\src,\tframe}) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite}\right], \\
+  \weight (\refpos{\var} _{\src,\tframe}) &= \frac{1}{\Freq} \sum _{\freq = 1} ^{\Freq} \lvert \refpos{\demix} _{\src,\freq} ^{\hermite} \refpos{\Obs} _{\ft} \rvert ^2,
+\end{align}
+ただし，$\expct _{\tframe}\left[\bm{A} _{\tframe}\right]$はある確率変数行列$\bm{A}{\tframe}$の時間フレーム$\tframe$に対する期待値演算である．
+$\Obs _{\ft}$の共分散行列${\cov} _{\src,\freq}$を，$\refpos{\cov} _{\src,\freq}$を用いて表すことを考える．
+$\refpos{\Demix} _{\freq} = \Demix _{\freq} \rotMat (\rotSpat)$より，その各行ベクトルは$\refpos{\demix} _{\src,\freq} ^{\hermite} = \demix _{\src,\freq} ^{\hermite} \rotMat (\rotSpat)$であるので，
+重み関数$\weight(\var _{\src,\tframe})$は，
+\begin{align}
+  \weight (\var _{\src,\tframe}) &= \frac{1}{\Freq} \sum _{\freq = 1} ^{\Freq} \lvert \demix _{\src,\freq} ^{\hermite} \Obs _{\ft} \rvert ^2, \\
+                                 &= \frac{1}{\Freq} \sum _{\freq = 1} ^{\Freq} \lvert \demix _{\src,\freq} ^{\hermite} \rotMat (\rotSpat) \refpos{\Obs} _{\ft} \rvert ^2, \\
+                                 &= \frac{1}{\Freq} \sum _{\freq = 1} ^{\Freq} \lvert \refpos{\demix} _{\src,\freq} ^{\hermite} \refpos{\Obs} _{\ft} \rvert ^2 = \weight (\refpos{\var} _{\src,\tframe}).
+\end{align}
+したがって，共分散行列は，
+\begin{align}
+  \cov _{\src,\freq} &= \expct  _{\tframe} \left[\weight (\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}\right], \\
+                     &= \expct  _{\tframe} \left[\weight (\refpos{\var} _{\src,\tframe}) \rotMat (\rotSpat) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite} \rotMat ^{\hermite} (\rotSpat)\right], \\
+                     &= \rotMat (\rotSpat)\; \expct  _{\tframe} \left[\weight (\refpos{\var} _{\src,\tframe}) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite} \right] \rotMat ^{\hermite} (\rotSpat), \\
+                     &= \rotMat (\rotSpat) \refpos{\cov} _{\src,\freq} \rotMat ^{\hermite} (\rotSpat).
 \end{align}
 
-\paragraph*{疑問}
-\begin{itemize}
-  \item オンラインAuxIVAでの共分散行列 ``座標変換'' ？\\ バッチの場合と勝手が違う気がする…\\
-    マイクは $\tframe \leq \rotFra - 1$ で基準位置，
-    $\tframe \geq \rotFra$ で回転後とする．
-    \begin{align}
-      \cov _{\src,\ft} &= \forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite} \\
-                             &= \forget ^{\tframe} \refpos{\cov} _{\src,\freq,0}
-                                + \sum _{i = 1} ^{\rotFra - 1} \forget ^{\tframe - i} (1 - \forget) \weight(\var _{\src,i}) \refpos{\Obs} _{\freq,i} \refpos{\Obs} _{\freq,i} ^{\hermite} \\
-                             &\qquad + \sum _{j = \rotFra} ^{\tframe} \forget ^{\tframe - j} (1 - \forget) \weight(\var _{\src,j}) \Obs _{\freq,j} \Obs _{\freq,j} ^{\hermite}
-    \end{align}
-  \item 音場補間，座標変換の良い命名？ロボット工学の用語でワールド座標系，ロボット座標系などがあるが，これをもじって簡潔に言い表せないか？
-\end{itemize}
+以上の結果の近似として，オンラインAuxIVAにおいては次の式を用いて，CMA回転時刻においてパラメータを変換する：
+\begin{align}
+  \Demix _{\freq,\rotFra - 1} &\gets \refpos{\Demix} _{\freq,\rotFra} \rotMat ^{\hermite} (\rotSpat), \\
+  \cov _{\src,\freq,\rotFra - 1} &\gets \rotMat (\rotSpat) \refpos{\cov} _{\src,\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat).
+\end{align}
+この手法は観測信号はマイクが回転した信号を変換せずに扱うことができるため，回転後の位置における音像が推定される．
+さらに，前節の観測信号に対して音場補間する手法とは異なり，回転後の毎フレームに対して変換が必要なく，回転した時間フレーム時点の１回だけ変換を行えばよい．
+\todo{%
+  （良い命名？ロボット工学の用語でワールド座標系，ロボット座標系などがあるが，これをもじる？）
+}
 
 \begin{algorithm}{Online AuxIVA with SFI for observed signal (RT-cov)}{rtcov}
   \textbf{Input:} $\rotSpat$, $\rotFra$, $\{\Obs _{\ft}\} _{\ft}$ \\
