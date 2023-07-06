@@ -556,10 +556,13 @@ The reference signal used for the SI-SDR evaluation was the source image recorde
   \begin{pseudo}
     for $\tframe = 1,\, \dots,\, \Tframe$ \\+
       for $\freq = 1,\, \dots,\, \Freq$ \\+
-        $\begin{bmatrix} \steer _{1,\ft} & \dots & \steer _{\Mic,\ft} \end{bmatrix} \eqqcolon \Steer _{\ft} \gets \Demix _{\ft} ^{-1}$ \\
-        % $\tilde{\Demix} _{\ft} \gets \mathrm{diag}(\steer _{\ell,\ft}) \Demix _{\ft}$ \\
-        % \nf{$\phantom{\tilde{\Demix} _{\ft} \gets} = \begin{bmatrix} a _{1,\ell,\ft} & \dots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \dots & a _{\Src,\ell,\ft} \end{bmatrix} \Demix _{\ft}$} \\
-        $\Est _{\ft} \gets \mathrm{diag}(\steer _{\ell,\ft}) \Demix _{\ft} \Obs _{\ft}$
+        \nf{$
+          \begin{bmatrix}
+            a _{1,1,\ft} & \dots & a _{1,\Src,\ft} \\
+            \vdots & \ddots & \vdots \\
+            a _{\Src,1,\ft} & \dots & a _{\Src,\Src,\ft}
+          \end{bmatrix} \gets \Demix _{\ft} ^{-1}$} \\
+        \nf{$\Est _{\ft} \gets \begin{bmatrix} a _{\ell,1,\ft} & \dots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \dots & a _{\ell,\Src,\ft} \end{bmatrix} \Demix _{\ft} \Obs _{\ft}$}
   \end{pseudo}
 \end{algorithm}
 \begin{figure}[t]
