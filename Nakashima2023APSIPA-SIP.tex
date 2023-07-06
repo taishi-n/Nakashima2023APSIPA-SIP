@@ -325,7 +325,7 @@ From these assumptions, we have
                             &= \frac{1}{\Mic} \sum _{\src \in \SRC} \left(\Sfcma _{\src}\twid ^{\rotSmpl\src} \right) \twid ^{\mic\src}, \\
                             &= \frac{1}{\Mic} \sum _{\src \in \SRC} \left(\sum _{n=0} ^{\Mic - 1} \sfcma _{n} \twid ^{-n\src}\right) \left( \twid ^{(\rotSmpl + \mic)\src} \right), \\
                             &= \sum _{\dum = 0} ^{\Mic - 1} \sfcma _{\dum} \left( \frac{1}{\Mic} \sum _{\src \in \SRC} \twid ^{(\rotSmpl + \mic - \dum)\src} \right)
-                            \coloneqq \sum _{\dum = 0} ^{\Mic - 1} \sfcma _{\dum} \rotmat _{\mic, \dum}(\rotSmpl),
+                            \coloneqq \sum _{\dum = 0} ^{\Mic - 1} \sfcma _{\dum} \rotmat _{\mic, \dum}(\rotSmpl) \label{eq:sfi:elem},
 \end{align}
 where $\SRC$ is a set of indices defined as {\small\todo{（和の範囲を次のようにとる理由…？）}}
 \begin{align}
@@ -354,24 +354,38 @@ where and $\rotIdx =\rotSmpl + \mic - \dum; (\mic, \dum = 0, \dots, \Mic - 1)$ \
 Equations \eqref{eq:rot:twid} and \eqref{eq:rot:sinc} are alternative expressions for (3) in \cite{Wakabayashi:2023:ASLP}.
 See Section II of \cite{Wakabayashi:2023:ASLP} for the detailed derivation.
 
-In STFT domain, we consider a situation where CMA is rotated of degree $\rotSpat _{\tframe}$ at time frame $\tframe$ and let $\refpos{\Obs} _{\ft}$ be the observed signal recorded without CMA rotation (\emph{reference position}).
-We assume that the observed signal with CMA rotation $\Obs _{\ft}$ is expressed as the following linear approximation:
+The above relationship also holds in the frequency domain.
+Let us define the following vector:
+\begin{align}
+  \bm{\sfcma} &= \begin{bmatrix} \sfcma _{0} & \dots & \sfcma _{\Mic - 1} \end{bmatrix} ^{\top}, \\
+  \bm{\sfcma} _{\rotSmpl} &= \begin{bmatrix} \sfcma _{0+\rotSmpl} & \dots & \sfcma _{(\Mic - 1)+\rotSmpl} \end{bmatrix} ^{\top}.
+\end{align}
+From \eqref{eq:sfi:elem}, we have
 \begin{equation}
-  \refpos{\Obs} _{\ft} = \rotMat ^{-1} (\rotSpat _{\tframe}) \Obs _{\ft},
-\end{equation}
-where
-\begin{equation}
-  \rotMat (\rotSpat _{\tframe}) =
+  \bm{\sfcma} _{\rotSmpl}
+  =
   \begin{bmatrix}
-    \rotmat _{0, 0}(\rotSpat _{\tframe}) & \dots & \rotmat _{0, \Mic - 1}(\rotSpat _{\tframe}) \\
+    \rotmat _{0, 0}(\rotSpat) & \dots & \rotmat _{0, \Mic - 1}(\rotSpat) \\
     \vdots & \ddots & \vdots \\
-    \rotmat _{\Mic - 1, 0}(\rotSpat _{\tframe}) & \dots & \rotmat _{\Mic - 1, \Mic - 1}(\rotSpat _{\tframe})
+    \rotmat _{\Mic - 1, 0}(\rotSpat) & \dots & \rotmat _{\Mic - 1, \Mic - 1}(\rotSpat)
   \end{bmatrix}
-  \in \C ^{\Mic\times\Mic}%
+  \bm{\sfcma}
+  \coloneqq
+  \rotMat (\rotSpat) \bm{\sfcma},
   \label{eq:rotmat}
 \end{equation}
-is called \emph{rotation matrix}, and its $(\src,\mic)$element $\rotmat _{\src,\mic} (\rotSpat _{\tframe})$ is calculated by \eqref{eq:rot:sinc}.
-By derivation, $\rotMat (\rotSpat _{\tframe})$ is a unitary matrix; $\rotMat ^{-1} (\rotSpat _{\tframe}) = \rotMat ^{\hermite} (\rotSpat _{\tframe})$.
+where $\rotMat (\rotSpat) \in \C ^{\Mic\times\Mic}$ is called \emph{rotation matrix}.
+By derivation, $\rotMat (\rotSpat)$ is a unitary matrix; $\rotMat ^{-1} (\rotSpat) = \rotMat ^{\hermite} (\rotSpat)$.
+Next, let $\bm{\Sfcma}$ be its DFT defined as $\begin{bmatrix} \Sfcma _{0} & \dots & \Sfcma _{\Mic - 1}\end{bmatrix} ^{\top} = \bm{F} \bm{\sfcma}$, where $\bm{F}$ is a DFT matrix.
+By using these expression, $\rotMat (\rotSpat)$ can be diagonarized as $\bm{F}^{\hermite} \rotMat (\rotSpat) \bm{F}$ since $\rotMat (\rotSpat)$ is a unitary matrix.
+Therefore, the relationship between $\bm{\Sfcma}$ and $\bm{\Sfcma} _{\rotSmpl}$ can be expressed as $\bm{X} _{\rotSmpl} = \rotMat (\rotSpat) \bm{X}$,
+bacause $\bm{\sfcma} _{\rotSmpl} = \bm{F}^{\hermite} \rotMat (\rotSpat) \bm{F} \bm{\sfcma}$.
+
+In STFT domain, we consider a situation where CMA is rotated of degree $\rotSpat _{\tframe}$ at time frame $\tframe$ and let $\refpos{\Obs} _{\ft}$ be the observed signal recorded without CMA rotation (\emph{reference position}).
+By using the expression above, we assume that the observed signal with CMA rotation $\Obs _{\ft}$ is expressed as the following linear approximation:
+\begin{equation}
+  \refpos{\Obs} _{\ft} = \rotMat ^{-1} (\rotSpat _{\tframe}) \Obs _{\ft}.
+\end{equation}
 Note that $\rotSpat _{\tframe}$ is required to be known or estimated.
 
 \section{Proposed Method}\label{sec:proposed}
