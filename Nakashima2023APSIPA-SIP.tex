@@ -403,20 +403,31 @@ Note that $\rotSpat _{\tframe}$ is required to be known or estimated.
 
 \subsection{Direct Combination of Online BSS and SFI}
 % \subsection{Can Direct Combination of Online BSS and SFI Be a Solution of Our Problem?}
+% TODO: 観測信号に対する音場補間，W/Vに対する変換との違いのイメージ図
 
-本節ではCMAの回転に頑健なonline BSSを提案する．
-以下では，CMAが時間フレーム$\rotFra$で角度$\rotSpat$瞬時に回転したとする．
-この場合，通常のOnline AuxIVAでは回転前後で分離行列を推定し直す必要がある．
-前述したように，CMAの回転角度と回転時刻が得られていれば，SFIによってCMAの回転をキャンセルできため，分離行列を推定し直すことなく音源分離できる．
+% 本節ではCMAの回転に頑健なonline BSSを提案する．
+% 以下では，CMAが時間フレーム$\rotFra$で角度$\rotSpat$瞬時に回転したとする．
+% この場合，通常のOnline AuxIVAでは回転前後で分離行列を推定し直す必要がある．
+% 前述したように，CMAの回転角度と回転時刻が得られていれば，SFIによってCMAの回転をキャンセルできため，分離行列を推定し直すことなく音源分離できる．
+We propose a robust online BSS method against the rotation of CMA.
+Henceforth, we assume that CMA was instantaneously rotated at an angle $\rotSpat$ at time frame $\rotFra$.
+Conventional online AuxIVA requires re-estimating demixing matrices under such a situation.
+As described earlier, if we know the rotation angle $\rotSpat$ and rotation time frame $\rotFra$ of the CMA, the SFI can cancel the rotation of the CMA, thus enabling BSS without re-estimating the demixing matrix.
 
-CMAが回転する前の観測信号$\{\Obs _{\ft}\} _{\tframe = 1} ^{\rotFra - 1}$を用いて分離行列$\Demix _{\ft}$が推定できていたとする．
-CMAの回転後，観測信号に対してSFIを適用し，$\Demix _{\ft}$を利用して再推定せずにオンライン音源分離を行う：
+% CMAが回転する前の観測信号$\{\Obs _{\ft}\} _{\tframe = 1} ^{\rotFra - 1}$を用いて分離行列$\Demix _{\ft}$が推定できていたとする．
+% CMAの回転後，観測信号に対してSFIを適用し，$\Demix _{\ft}$を再推定せずにオンライン音源分離を行う：
+Suppose that the demixing matrix $\Demix _{\ft}$ is estimated using the observed signal $\{\Obs _{\ft}\} _{\tframe = 1} ^{\rotFra - 1}$ before the rotation of the CMA;
+after the rotation of the CMA, online BSS can be applied without re-estimating $\Demix _{\ft}$ by applying SFI to the observed signal.
 \begin{equation}
-  \Est _{\ft} = \Demix _{\ft} \refpos{\Obs} _{\ft} = \Demix _{\ft} \left(\rotMat ^{\hermite} (\rotSpat _{\tframe}) \Obs _{\ft}\right)\; (\tframe = \rotFra + 1, \dots, \Tframe).
+  \Est _{\ft} = \Demix _{\ft} \refpos{\Obs} _{\ft} = \Demix _{\ft} \left(\rotMat ^{\hermite} (\rotSpat) \Obs _{\ft}\right)\; (\tframe = \rotFra + 1, \dots, \Tframe).
 \end{equation}
-\Cref{alg:rtobs}に，観測信号に対する音場補間を用いたOnline AuxIVAをまとめる．
-しかし，この処理は観測信号のマイク位置を変えるため，回転後の位置におけるsource imageが得られず，実応用に問題が生じる場合がある．
-例えば，head mounted displayを用いた拡張現実空間での音源分離は，回転した後のsource imageの位置から音が聞こえるように処理する必要がある．
+% \Cref{alg:rtobs}に，観測信号に対する音場補間を用いたOnline AuxIVAをまとめる．
+% しかし，この処理は仮想的に観測信号のマイク位置を変えるため，回転後の位置におけるsource imageが得られず，実応用に問題が生じる場合がある．
+% 例えば，head mounted displayを用いた拡張現実空間での音源分離は，回転した後のsource imageの位置から音が聞こえるように処理する必要がある．
+\Cref{alg:rtobs} summarises online AuxIVA using SFI for the observed signal.
+However, this process virtually changes the microphone position of the observed signal.
+As a result, the source image at the rotated position cannot be obtained, which causes problems in practical applications.
+For example, BSS in augmented reality space using a head mounted display needs to be processed so that the sound can be heard from the position of the source image after rotation.
 \begin{algorithm}{Online AuxIVA with SFI for observed signal (RT-obs)}{rtobs}
   \textbf{Input:} $\rotSpat$, $\rotFra$, $\{\Obs _{\ft}\} _{\ft}$ \\
   \textbf{Output:} $\{\Demix _{\ft}\}_{\ft},\, \{\cov _{\src,\ft}\}_{\src,\ft}$
@@ -448,48 +459,64 @@ CMAの回転後，観測信号に対してSFIを適用し，$\Demix _{\ft}$を�
 
 \subsection{Coordinate Transformation of SFI}
 
-前節の問題を解決するために，マイクの位置を変えずにCMA回転に頑健なonline BSSを提案する．
-観測信号のかわりに分離信号を得るためのパラメータを変換することで，CMAが回転した後の位置におけるsource imageを得る手順を示す．
-まず，簡単のために，時不変な環境におけるパラメータ変換を議論する．
-角度$\rotSpat$回転したCMAで録音された観測信号が次の関係を厳密に満たしていると仮定する：
+% 前節の問題を解決するために，マイクの位置を保ったままCMA回転に頑健なonline BSSを提案する．
+% 観測信号のかわりにパラメータを変換することで，CMAが回転した後の位置におけるsource imageを得る手順を示す．
+% まず，簡単のために，時不変な環境におけるパラメータ変換を議論する．
+% 角度$\rotSpat$回転したCMAで録音された観測信号が，次の関係を厳密に満たしていると仮定する：
+To solve the problem in the previous section, we propose an online BSS robust against CMA rotation while preserving the microphone position.
+We present a procedure to obtain the source image at the position after the CMA rotation by transforming the parameters instead of the observed signal.
+First, for simplicity, we discuss the parameter transformation in a \emph{time-invariant} case.
+We assume that the observed signal recorded by a CMA rotated by an angle $\rotSpat$ strictly holds the following relation:
 \begin{equation}
   \Obs _{\ft} = \rotMat (\rotSpat) \refpos{\Obs} _{\ft}.
 \end{equation}
-このとき，分離信号$\Est _{\ft}$は次で計算される：
+From this, we have the estimated signal $\Est _{\ft}$ as:
+% これより，分離信号$\Est _{\ft}$は次で計算される：
 \begin{align}
   \Est _{\ft} &= \Demix _{\freq} \Obs _{\ft}, \\
-              &= \Demix _{\freq} \rotMat (\rotSpat) \refpos{\Obs} _{\ft} \coloneqq \refpos{\Demix} _{\freq} \refpos{\Obs} _{\ft},
+              &= \Demix _{\freq} \rotMat (\rotSpat) \refpos{\Obs} _{\ft} \coloneqq \refpos{\Demix} _{\freq} \refpos{\Obs} _{\ft}, \label{eq:rt:demix:batch}
 \end{align}
-$\refpos{\Demix} _{\freq}$は，reference positionにおける観測信号を用いて推定された時不変な分離行列とみなせる．
-同様に，$\refpos{\Obs} _{\ft}$を用いて推定された時不変な共分散行列 $\refpos{\cov} _{\src,\freq}$ は次で計算される：
+% $\refpos{\Demix} _{\freq}$は，reference positionにおける観測信号を用いて推定された時不変な分離行列とみなせる．
+% 同様に，$\refpos{\Obs} _{\ft}$を用いて推定された時不変な共分散行列 $\refpos{\cov} _{\src,\freq}$ は次で計算される：
+where $\refpos{\Demix} _{\freq}$ is a time-invariant demixing matrix estimated using the observed signal at the reference position.
+Similarly, the time-invariant covariance matrix $\refpos{\cov} _{\src,\freq}$ estimated using $\refpos{\Obs} _{\ft}$ is calculated by:
 \begin{align}
   \refpos{\cov} _{\src,\freq} &= \expct  _{\tframe} \left[\weight (\refpos{\var} _{\src,\tframe}) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite}\right], \\
   \weight (\refpos{\var} _{\src,\tframe}) &= \frac{1}{\Freq} \sum _{\freq = 1} ^{\Freq} \lvert \refpos{\demix} _{\src,\freq} ^{\hermite} \refpos{\Obs} _{\ft} \rvert ^2,
 \end{align}
-ただし，$\expct _{\tframe}\left[\bm{A} _{\tframe}\right]$はある確率変数行列$\bm{A}{\tframe}$の時間フレーム$\tframe$に対する期待値演算である．
-$\Obs _{\ft}$の共分散行列${\cov} _{\src,\freq}$を，$\refpos{\cov} _{\src,\freq}$を用いて表すことを考える．
-$\refpos{\Demix} _{\freq} = \Demix _{\freq} \rotMat (\rotSpat)$より，その各行ベクトルは$\refpos{\demix} _{\src,\freq} ^{\hermite} = \demix _{\src,\freq} ^{\hermite} \rotMat (\rotSpat)$であるので，
-重み関数$\weight(\var _{\src,\tframe})$は，
+% ただし，$\expct _{\tframe}\left[\bm{A} _{\tframe}\right]$は，ある確率変数行列$\bm{A}_{\tframe}$の時間フレーム$\tframe$に対する期待値演算である．
+% $\Obs _{\ft}$の共分散行列${\cov} _{\src,\freq}$を，$\refpos{\cov} _{\src,\freq}$を用いて表すことを考える．
+% $\refpos{\Demix} _{\freq} = \Demix _{\freq} \rotMat (\rotSpat)$より，その各行ベクトルは$\refpos{\demix} _{\src,\freq} ^{\hermite} = \demix _{\src,\freq} ^{\hermite} \rotMat (\rotSpat)$であるので，
+% 重み関数$\weight(\var _{\src,\tframe})$は，
+where $\expct _{\tframe}\left[\bm{A} _{\tframe}\right]$ is the expectation operation for a random variable matrix $\bm{A}_{\tframe}$ with respect to time frame $\tframe$.
+We rewrite the covariance matrix ${\cov} _{\src,\freq}$ of $\Obs _{\ft}$ using $\refpos{\cov} _{\src,\freq}$.
+From $\refpos{\Demix} _{\freq} = \Demix _{\freq} \rotMat (\rotSpat)$, each row vector is $\refpos{\demix} _{\src,\freq} ^{\hermite} = \demix _{\src,\freq} ^{\hermite} \rotMat (\rotSpat)$.
+We then have the weight function $\weight(\var _{\src,\tframe})$ as
 \begin{align}
   \weight (\var _{\src,\tframe}) &= \frac{1}{\Freq} \sum _{\freq = 1} ^{\Freq} \lvert \demix _{\src,\freq} ^{\hermite} \Obs _{\ft} \rvert ^2, \\
                                  &= \frac{1}{\Freq} \sum _{\freq = 1} ^{\Freq} \lvert \demix _{\src,\freq} ^{\hermite} \rotMat (\rotSpat) \refpos{\Obs} _{\ft} \rvert ^2, \\
                                  &= \frac{1}{\Freq} \sum _{\freq = 1} ^{\Freq} \lvert \refpos{\demix} _{\src,\freq} ^{\hermite} \refpos{\Obs} _{\ft} \rvert ^2 = \weight (\refpos{\var} _{\src,\tframe}).
 \end{align}
-したがって，共分散行列は，
+Also, we have the covariance matrix as:
 \begin{align}
   \cov _{\src,\freq} &= \expct  _{\tframe} \left[\weight (\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}\right], \\
                      &= \expct  _{\tframe} \left[\weight (\refpos{\var} _{\src,\tframe}) \rotMat (\rotSpat) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite} \rotMat ^{\hermite} (\rotSpat)\right], \\
                      &= \rotMat (\rotSpat)\; \expct  _{\tframe} \left[\weight (\refpos{\var} _{\src,\tframe}) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite} \right] \rotMat ^{\hermite} (\rotSpat), \\
-                     &= \rotMat (\rotSpat) \refpos{\cov} _{\src,\freq} \rotMat ^{\hermite} (\rotSpat).
+                     &= \rotMat (\rotSpat) \refpos{\cov} _{\src,\freq} \rotMat ^{\hermite} (\rotSpat). \label{eq:rt:cov:batch}
 \end{align}
+% したがって，CMAの回転角度$\rotSpat$とその時刻$\rotFra$を知っていれば，その時刻において\eqref{eq:rt:demix:batch}, \eqref{eq:rt:cov:batch}の変換を行うことで前節と同じ結果を得ることができる．
+Therefore, if we know the rotation angle $\rotSpat$ and its time frame $\rotFra$, we can get the same result as the previous subsection by performing the transformations \eqref{eq:rt:demix:batch} and \eqref{eq:rt:cov:batch}.
 
-以上の結果の近似として，オンラインAuxIVAにおいては次の式を用いて，CMA回転時刻においてパラメータを変換する：
+% 以上の結果の近似として，オンラインAuxIVAにおいては次の式を用いて，CMA回転時刻においてパラメータを変換する：
+For online AuxIVA, we perform the following transformation at the rotation time $\rotFra$ as an approximation of the results above:
 \begin{align}
   \Demix _{\freq,\rotFra - 1} &\gets \refpos{\Demix} _{\freq,\rotFra} \rotMat ^{\hermite} (\rotSpat), \\
   \cov _{\src,\freq,\rotFra - 1} &\gets \rotMat (\rotSpat) \refpos{\cov} _{\src,\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat).
 \end{align}
-この手法は観測信号はマイクが回転した信号を変換せずに扱うことができるため，回転後の位置における音像が推定される．
-さらに，前節の観測信号に対して音場補間する手法とは異なり，回転後の毎フレームに対して変換が必要なく，回転した時間フレーム時点の１回だけ変換を行えばよい．
+% この手法は観測信号はマイクが回転した信号を変換せずに扱うことができるため，回転後の位置における音像が推定される．
+% さらに，前節の観測信号に対して音場補間する手法とは異なり，回転後の毎フレームに対して変換が必要なく，回転した時間フレーム時点の１回だけ変換を行えばよい．
+This method can handle the observed signal without transforming the observed signal after the CMA rotation, so the source image at the post-rotated position is estimated.
+Furthermore, unlike the method of SFI for the observation signal in the previous subsection, no transformation is required for every single frame after rotation, and only one transformation at the time of the rotated time frame is needed.
 \todo{%
   （良い命名？ロボット工学の用語でワールド座標系，ロボット座標系などがあるが，これをもじる？）
 }
