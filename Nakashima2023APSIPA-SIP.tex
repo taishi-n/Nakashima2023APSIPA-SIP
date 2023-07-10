@@ -145,15 +145,22 @@
 Blind source separation (BSS) \cite{Makino:2018:ASS} is a technique to extract the source signals from their observed mixture.
 Popular approaches for BSS include independent vector analysis (IVA) \cite{Kim:2006:ASLP,Hiroe:2006:ICA} and extensions \cite{Kitamura:2016:ASLP,Nugraha:2020:SPL,Brendel:2020:SP}.
 These methods assume a time-invariant acoustic transfer system (ATS).
-On the other hand, for practical applications, it is necessary to consider time variations of the ATS, such as movements of the microphone or source.
-Many methods have been proposed based on block batch \cite{Koldovsky:2019:ICASSP,Koldovsky:2021:SP,Jansky:2022:ASMP} or online processing \cite{Kim:2010:CASI,Taniguchi:2014:HSCMA}.
+On the other hand, for practical applications, it is necessary to consider time variations of the ATS, such as microphone or source movements.
+Many BSS methods have been proposed based on block batch \cite{Koldovsky:2019:ICASSP,Koldovsky:2021:SP,Jansky:2022:ASMP} or online processing \cite{Kim:2010:CASI,Taniguchi:2014:HSCMA}.
 
 Online AuxIVA shows high separation performance in real-time situations \cite{Taniguchi:2014:HSCMA}.
 It also has been actively researched recently for applications in hearing aids \cite{Sunohara:2017:ICASSP}, joint optimization with dereverberation \cite{Ueda:2021:ICASSP}, and computationally efficient optimization \cite{Nakashima:2023:ICASSP}.
 Online AuxIVA estimates demixing matrices frame-by-frame manner and can track smooth environmental changes in ATS, such as slow movement of sources.
 However, rapid changes in ATS, such as the emergence of new sources or microphone movement, makes online BSS difficult and thus degrade separation performance.
 
-\todo{AR, VR関連のサーベイ追加}
+% 近年，動的な環境下における音声処理を題材としたチャレンジが多数開催されている．
+% Clarity Challengeは補聴器の音声明瞭度向上のためのチャレンジであり，聴取者の頭の動きのデータも含まれている．
+% SPEAR challengeでは，頭部装着型のヒアラブルデバイスのための音声強調チャレンジであり，話者や頭の動きのデータを含んだ広範なデータセットが配布されている．
+% このように，動的な環境においても頑健にに動作するマルチチャネル音響信号処理の需要がますます高まっている．
+In recent years, several challenges have been held on the subject of speech processing under dynamic environments.
+The Clarity Challenge is a challenge to improve speech intelligibility in hearing aids and includes data on the listeners' head movements \cite{Akeroyd:2023:ICASSP}.
+The SPEAR challenge is a speech enhancement challenge for head-worn hearable devices, and extensive datasets have been distributed that include speaker and head movement data \cite{Donley:2021:arxiv,Guiraud:2022:IWAENC}.
+Thus, there is an increasing demand for speech enhancement or source separation methods that can perform robustly in dynamic environments.
 
 Several methods have been proposed to cope with such rapid changes in ATS.
 Sound field interpolation (SFI) for circular microphone array (CMA) has been proposed to address the rotation of a CMA \cite{Wakabayashi:2023:ASLP}.
@@ -169,7 +176,7 @@ Experiments show that our proposed scheme is significantly better than the conve
 
 The rest of this paper is organized as follows.
 We formulate our motivation in \cref{sec:problem}.
-\Cref{sec:conventional} describes SFI and how to apply it to online BSS.
+\Cref{sec:conventional} describes online BSS, SFI, and how to combine them.
 In \cref{sec:proposed}, we propose an efficient online BSS that utilizes the information before and after the rotation of CMA.
 We conduct some experiments to show the efficacy of the SFI for online BSS in \cref{sec:experiment}.
 Finally, \cref{sec:conclusion} concludes this paper.
