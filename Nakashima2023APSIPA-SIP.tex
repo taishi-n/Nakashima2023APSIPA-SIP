@@ -175,8 +175,12 @@ We conduct some experiments to show the efficacy of the SFI for online BSS in \c
 Finally, \cref{sec:conclusion} concludes this paper.
 
 \section{Problem Formulation}\label{sec:problem}
-% TODO: マイクが回転する状況での音源分離の図
-We model the observed signal recorded with a circular microphone array (CMA) that may be rotated during processing.
+\begin{figure}[t]
+  \includegraphics{figures/diagrams/bss.pdf}%
+  \caption{Overview of blind source separation problem with circular microphone array that may move dusing processing.}%
+  \label{fig:bss}
+\end{figure}
+We model the observed signal recorded with a circular microphone array (CMA) that may be rotated during processing as shown in \cref{fig:bss}.
 Let $\Src$ and $\Mic$ be the number of sources and microphones, respectively.
 We assume that the observed signal $\Obs _{\ft}$ is modeled as
 \begin{equation}
