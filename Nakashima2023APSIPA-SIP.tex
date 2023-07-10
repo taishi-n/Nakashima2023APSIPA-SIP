@@ -1,5 +1,5 @@
-\PassOptionsToPackage{dvipdfmx}{graphicx}% NOTE: only for Japanese
-\PassOptionsToPackage{dvipdfmx}{xcolor}% NOTE: only for Japanese
+% \PassOptionsToPackage{dvipdfmx}{graphicx}% NOTE: only for Japanese
+% \PassOptionsToPackage{dvipdfmx}{xcolor}% NOTE: only for Japanese
 \documentclass[sip,biber]{now-journal}
 \addbibresource{IEEEabrv.bib}
 \addbibresource{ref.bib}
@@ -515,7 +515,8 @@ For online AuxIVA, we perform the following transformation at the rotation time 
 This method can handle the observed signal without transforming the observed signal after the CMA rotation, so the source image at the post-rotated position is estimated.
 Furthermore, unlike the method of SFI for the observation signal in the previous subsection, no transformation is required for every single frame after rotation, and only one transformation at the time of the rotated time frame is needed.
 \todo{%
-  （良い命名？ロボット工学の用語でワールド座標系，ロボット座標系などがあるが，これをもじる？）
+  Good naming for proposed methods...
+  % （良い命名？ロボット工学の用語でワールド座標系，ロボット座標系などがあるが，これをもじる？）
 }
 
 \begin{algorithm}{Online AuxIVA with SFI for observed signal (RT-cov)}{rtcov}
@@ -551,13 +552,7 @@ Furthermore, unlike the method of SFI for the observation signal in the previous
 \subsection{Self-rotation Estimation by Maximum Likelihood Method}
 
 \todo{%
-  \begin{itemize}
-    \item 連君法によるframe by frameの推定
-    \item 「マイク回転前のsource imageを推定する問題」を解く？
-      \begin{itemize}
-        \item 音源分離・残響除去の同時最適化と同じようなやり方で解けないか？
-      \end{itemize}
-  \end{itemize}
+Frame by frame estimation by maximum likelihood method \cite{Lian:2021:APSIPA}
 }
 
 \section{Experimental Validation}\label{sec:experiment}
@@ -608,12 +603,13 @@ The reference signal used for the SI-SDR evaluation was the source image recorde
 \end{figure}
 
 \subsection{Preliminary Experiment}
-\todo{準備中…}
+\todo{%
+  WORK IN PROGRESS...
 \begin{itemize}
-  \color{red}
-  \item 座標変換あり・なしの場合の共分散行列・分離行列の誤差
-  \item 実際のマイク回転角度と推定した回転角度に誤差をつけた場合の実験
+  \item Error of covariance/demixing matrices between with/without coodinate transformation%座標変換あり・なしの場合の共分散行列・分離行列の誤差
+  \item Experiments with an error between the microphone rotation angle in ground truth and the estimated rotation angle%真のマイク回転角度と推定した回転角度に誤差をつけた場合の実験
 \end{itemize}
+}
 
 \subsection{Source Separation Performance}
 
@@ -664,7 +660,7 @@ This may be due to the fact that \RTObs{} estimates the source image at the refe
 \end{algorithm}
 
 \subsection{Online Rotation Angle Estimation Performance}
-\todo{準備中…}
+\todo{WORK IN PROGRESS...}
 
 \section{Conclusion}\label{sec:conclusion}
 % 本研究では，円状等間隔マイクロホンアレイにおける音場補間をブラインド音源分離に応用した．
