@@ -110,6 +110,7 @@
   % しかし，OIVAはマイクの突発的な移動に対しては十分な性能が得られない．
   % そこで本論文では，円状等間隔マイクロホンアレイ(CMA)のための音場補間処理を利用したOIVAを提案する．
   % 音場補間はCMAの回転を打ち消し，パラメータの再推定を必要とせずにBSSを可能にする．
+  % 我々は，SFIを前処理として組み合わせた単純な手法と，適切なパラメータ変換を用いたより実応用な手法の２つを提案する．
   % シミュレーション実験の結果は音場補間によりマイクが回転する状況における音源分離の頑健性が向上したことを確認した．
   In this paper, we propose a robust online blind source separation (BSS) method against the self-rotation of microphone arrays.
   Online auxiliary-function-based independent vector analysis (OIVA) is one of the promising methods for real-time BSS.
@@ -117,8 +118,9 @@
   Parameter re-estimation is generally necessary if environmental changes occur during real-time processing.
   OIVA is robust against smooth movement of sources and achieves high separation performance.
   However, OIVA does not perform well against rapid movements of microphones.
-  Therefore, we employ sound field interpolation (SFI) for circular microphone arrays (CMAs) with OIVA in this paper.
+  Therefore, in this paper, we employ sound field interpolation (SFI) for circular microphone arrays (CMAs) with OIVA.
   SFI cancels out the rotation of the CMA, enabling us to apply BSS without parameter re-estimation.
+  We propose two methods: a simple method combining SFI as a pre-processing step and a more practical method using parameter transformations. 
   Simulation experiments confirmed that SFI improves the robustness of the OIVA in situations where the microphone is rotating.
 \end{abstract}
 
@@ -394,7 +396,7 @@ By using the expression above, we assume that the observed signal with CMA rotat
 \begin{equation}
   \refpos{\Obs} _{\ft} = \rotMat ^{-1} (\rotSpat _{\tframe}) \Obs _{\ft}.
 \end{equation}
-Note that $\rotSpat _{\tframe}$ is required to be known or estimated.
+Note that $\rotSpat _{\tframe}$ is required to be known with inertial measurement unit sensors or estimated by using maximum likelihood estimation proposed in \cite{Lian:2021:APSIPA}.
 
 \section{Proposed Method}\label{sec:proposed}
 
