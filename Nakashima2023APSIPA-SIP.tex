@@ -421,7 +421,8 @@ after the rotation of the CMA, online BSS can be applied without re-estimating $
   \Est _{\ft} = \Demix _{\ft} \refpos{\Obs} _{\ft} = \Demix _{\ft} \left(\rotMat ^{\hermite} (\rotSpat) \Obs _{\ft}\right)\; (\tframe = \rotFra + 1, \dots, \Tframe).
 \end{equation}
 % \Cref{alg:rtobs}に，観測信号に対する音場補間を用いたOnline AuxIVAをまとめる．
-% しかし，この処理は仮想的に観測信号のマイク位置を変えるため，回転後の位置におけるsource imageが得られず，実応用に問題が生じる場合がある．
+% この手法は，CMAが回転する状況下でのビームフォーミングの適用方法としても提案されている．
+% この処理は仮想的に観測信号のマイク位置を変えるため，回転後の位置におけるsource imageが得られず，実応用に問題が生じる場合がある．
 % 例えば，head mounted displayを用いた拡張現実空間での音源分離は，回転した後のsource imageの位置から音が聞こえるように処理する必要がある．
 \Cref{alg:rtobs} summarises online AuxIVA using SFI for the observed signal.
 In this methods, SFI was simply applied as a pre-processing for online AuxIVA.
