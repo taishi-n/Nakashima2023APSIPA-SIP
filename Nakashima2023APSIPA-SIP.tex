@@ -416,10 +416,8 @@ As described earlier, if we know the rotation angle $\rotSpat$ and rotation time
 % CMAが回転する前の観測信号$\{\Obs _{\ft}\} _{\tframe = 1} ^{\rotFra - 1}$を用いて分離行列$\Demix _{\ft}$が推定できていたとする．
 % CMAの回転後，観測信号に対してSFIを適用し，$\Demix _{\ft}$を再推定せずにオンライン音源分離を行う：
 Suppose that the demixing matrix $\Demix _{\ft}$ is estimated using the observed signal $\{\Obs _{\ft}\} _{\tframe = 1} ^{\rotFra - 1}$ before the rotation of the CMA;
-after the rotation of the CMA, online BSS can be applied without re-estimating $\Demix _{\ft}$ by applying SFI to the observed signal.
-\begin{equation}
-  \Est _{\ft} = \Demix _{\ft} \refpos{\Obs} _{\ft} = \Demix _{\ft} \left(\rotMat ^{\hermite} (\rotSpat) \Obs _{\ft}\right)\; (\tframe = \rotFra + 1, \dots, \Tframe).
-\end{equation}
+after the rotation of the CMA, online BSS can be applied without re-estimating $\Demix _{\ft}$ by applying SFI to the observed signal
+$\Obs _{\ft} \gets \left(\rotMat ^{\hermite} (\rotSpat) \Obs _{\ft}\right) \coloneqq \refpos{\Obs} _{\ft}$.
 % \Cref{alg:rtobs}に，観測信号に対する音場補間を用いたOnline AuxIVAをまとめる．
 % この手法は，CMAが回転する状況下でのビームフォーミングの適用方法としても提案されている．
 % この処理は仮想的に観測信号のマイク位置を変えるため，回転後の位置におけるsource imageが得られず，実応用に問題が生じる場合がある．
@@ -468,12 +466,12 @@ For example, BSS in augmented reality space using a head-mounted display needs t
 To solve the problem in the previous section, we propose an online BSS robust against CMA rotation while preserving the microphone position.
 We present a procedure to obtain the source image at the position after the CMA rotation by transforming the parameters instead of the observed signal.
 First, for simplicity, we discuss the parameter transformation in a \emph{time-invariant} case.
+In this case, demixing matrices $\Demix _{\freq}$ and covariance matrices $\cov _{\src,\freq}$ are independent on time frame $\tframe$.
 We assume that the observed signal recorded by a CMA rotated by an angle $\rotSpat$ strictly holds the following relation:
 \begin{equation}
   \Obs _{\ft} = \rotMat (\rotSpat) \refpos{\Obs} _{\ft}.
 \end{equation}
 From this, we have the estimated signal $\Est _{\ft}$ as:
-% これより，分離信号$\Est _{\ft}$は次で計算される：
 \begin{align}
   \Est _{\ft} &= \Demix _{\freq} \Obs _{\ft}, \\
               &= \Demix _{\freq} \rotMat (\rotSpat) \refpos{\Obs} _{\ft} \coloneqq \refpos{\Demix} _{\freq} \refpos{\Obs} _{\ft}, \label{eq:rt:demix:batch}
