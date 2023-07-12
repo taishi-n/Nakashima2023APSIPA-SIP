@@ -404,11 +404,11 @@ Note that $\rotSpat _{\tframe}$ is required to be known with inertial measuremen
 % \subsection{Can Direct Combination of Online BSS and SFI Be a Solution of Our Problem?}
 % TODO: 観測信号に対する音場補間，W/Vに対する変換との違いのイメージ図
 
-% 本節ではCMAの回転に頑健なonline BSSを提案する．
+% 本節では，CMAの回転に頑健なonline BSSを提案するために，BSSと文献1で提案されたSFIを組み合わせることを考える．
 % 以下では，CMAが時間フレーム$\rotFra$で角度$\rotSpat$瞬時に回転したとする．
 % この場合，通常のOnline AuxIVAでは回転前後で分離行列を推定し直す必要がある．
 % 前述したように，CMAの回転角度と回転時刻が得られていれば，SFIによってCMAの回転をキャンセルできため，分離行列を推定し直すことなく音源分離できる．
-We propose a robust online BSS method against the rotation of CMA.
+In this section, we first consider the combined method of online BSS and SFI \cite{Wakabayashi:2023:ASLP} to propose a robust online BSS method against the rotation of CMA.
 Henceforth, we assume that CMA was instantaneously rotated at an angle $\rotSpat$ at time frame $\rotFra$.
 Conventional online AuxIVA requires re-estimating demixing matrices under such a situation.
 As described earlier, if we know the rotation angle $\rotSpat$ and rotation time frame $\rotFra$ of the CMA, the SFI can cancel the rotation of the CMA, thus enabling BSS without re-estimating the demixing matrix.
@@ -424,9 +424,11 @@ after the rotation of the CMA, online BSS can be applied without re-estimating $
 % しかし，この処理は仮想的に観測信号のマイク位置を変えるため，回転後の位置におけるsource imageが得られず，実応用に問題が生じる場合がある．
 % 例えば，head mounted displayを用いた拡張現実空間での音源分離は，回転した後のsource imageの位置から音が聞こえるように処理する必要がある．
 \Cref{alg:rtobs} summarises online AuxIVA using SFI for the observed signal.
-However, this process virtually changes the microphone position of the observed signal.
+In this methods, SFI was simply applied as a pre-processing for online AuxIVA.
+A similar scheme which is for beamforming has been proposed in \cite{Wakabayashi:2023:ASLP}.
+One drawback of \cref{alg:rtobs} is that it virtually changes the microphone position of the observed signal.
 As a result, the source image at the rotated position cannot be obtained, which causes problems in practical applications.
-For example, BSS in augmented reality space using a head mounted display needs to be processed so that the sound can be heard from the position of the source image after rotation.
+For example, BSS in augmented reality space using a head-mounted display needs to be processed so that the sound can be heard from the position of the source image after rotation.
 \begin{algorithm}{Online AuxIVA with SFI for observed signal (RT-obs)}{rtobs}
   \textbf{Input:} $\rotSpat$, $\rotFra$, $\{\Obs _{\ft}\} _{\ft}$ \\
   \textbf{Output:} $\{\Demix _{\ft}\}_{\ft},\, \{\cov _{\src,\ft}\}_{\src,\ft}$
