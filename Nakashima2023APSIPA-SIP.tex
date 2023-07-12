@@ -167,7 +167,7 @@ as well as a method for self-estimating the rotation angle of a CMA \cite{Lian:2
 We expect the combination of online BSS and SFI to improve the robustness against the rotation.
 
 In this paper, we address blind source separation in situations where a CMA rotates.
-SFT cancels out the effect of the rotation, and BSS is applied in the latter stage.
+SFI cancels out the effect of the rotation, and BSS is applied in the latter stage.
 As described in \cref{sec:proposed}, simply applying SFI to online BSS is computationally expensive since SFI is required for the observed signal every time frame.
 In contrast, this study introduces a more straightforward method than that and demonstrates its effectiveness through experiments.
 Experiments show that our proposed scheme is significantly better than the conventional online AuxIVA for the source separation task.
@@ -182,10 +182,10 @@ We conduct some experiments to show the efficacy of the SFI for online BSS in \c
 \section{Problem Formulation}\label{sec:problem}
 \begin{figure}[t]
   \includegraphics{figures/diagrams/bss.pdf}%
-  \caption{Overview of blind source separation problem with circular microphone array that may move dusing processing.}%
+  \caption{Overview of blind source separation problem with circular microphone array that may move during processing.}%
   \label{fig:bss}
 \end{figure}
-We model the observed signal recorded with a circular microphone array (CMA) that may be rotated during processing as shown in \cref{fig:bss}.
+We model the observed signal recorded with a CMA that may be rotated during processing as shown in \cref{fig:bss}.
 Let $\Src$ and $\Mic$ be the number of sources and microphones, respectively.
 We assume that the observed signal $\Obs _{\ft}$ is modeled as
 \begin{equation}
@@ -211,7 +211,7 @@ We henceforth assume that the number of microphones of CMA is equal to that of s
 \renewcommand{\Mic}{\Src}%
 We aim to estimate demixing matrices and estimated signals using only the current and past observed signals $\Obs _{\freq,1},\, \dots,\, \Obs _{\freq,\tframe}$:
 \begin{align}
-  \Demix _{\ft} &= \begin{bmatrix} \demix _{1\ft} & \dots & \demix _{\Src,\ft} \end{bmatrix} ^{\hermite} \in \C ^{\Src \times \Mic}, \\
+  \Demix _{\ft} &= \begin{bmatrix} \demix _{1,\ft} & \dots & \demix _{\Src,\ft} \end{bmatrix} ^{\hermite} \in \C ^{\Src \times \Mic}, \\
   \Est _{\ft} &= \Demix _{\ft} \Obs _{\ft} \in \C ^{\Src},
 \end{align}
 where $\Demix _{\ft}$ is the demixing matrix, and $\Est _{\ft}$ is the estimated signal.
@@ -285,7 +285,7 @@ where $\eye _{\src} \in \R ^{\Src}$ is the canonical basis vector with the $\src
 \end{algorithm}
 
 \subsection{Sound Field Interpolation on Circular Microphone Array}
-This subsection briefly reviews the sound field interpolation method on circular microphone array (CMA), which is originally proposed in \cite{Wakabayashi:2021:ICASSP}.
+This subsection briefly reviews the sound field interpolation method on circular microphone array (CMA), which is originally proposed in \cite{Wakabayashi:2021:ICASSP,Wakabayashi:2023:ASLP}.
 Let $\sfcma (\rotCoor)$ be a continuous sound pressure on the circumference of a circle at a spatial angle $\rotCoor \in \interval[open right,soft open fences]{0}{2\pi}$, as shown in \cref{fig:sfi}.
 Then we observe a sound field with $\Mic$ microphones on the circle at even intervals.
 The $\mic$th observed signal is denoted as
