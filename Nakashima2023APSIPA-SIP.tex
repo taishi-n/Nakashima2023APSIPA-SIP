@@ -610,7 +610,13 @@ The separation performance was evaluated by averaging the scale-invariant signal
 The reference signal used for the SI-SDR evaluation was the source image recorded with a rotated CMA.
 \begin{figure}[t]
   \centering
-  \includegraphics{figures/room_layout.pdf}
+  % \includegraphics{figures/room_layout.pdf}
+  \begin{minipage}[t]{.45\linewidth}
+    \centering\includegraphics{figures/room_layout_000.pdf}\subcaption{Room layout before rotation.}\label{fig:room:ref}
+  \end{minipage}
+  \begin{minipage}[t]{.45\linewidth}
+    \centering\includegraphics{figures/room_layout_040.pdf}\subcaption{Room layout before rotation.}\label{fig:room:rot}
+  \end{minipage}
   \caption{Room layout.}%
   \label{fig:layout}
 \end{figure}
