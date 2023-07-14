@@ -641,6 +641,16 @@ We compared the following four methods:
   \item[\RTCov] Apply parameter transformation for covariance and demixing matrices after CMA rotation.  (See \Cref{alg:rtcov}.)
     % \\ $\rot{\Demix} _{\ft} \gets \Demix _{\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$,\; $\rot{\cov} _{\src,\ft} \gets \rotMat (\rotSpat _{\tframe}) \cov _{\src,\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$
 \end{description}
+\begin{algorithm}{Online AuxIVA with reset (\textbf{Reset})}{reset}
+  \begin{pseudo}
+    for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
+      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq}) \\-
+    {$\Demix _{\freq,\rotFra - 1}$} $\gets$ $\Eye$ \ct{$(\forall \freq)$} \\
+    {$\cov _{\src,\freq,\rotFra - 1}$} $\gets$ $\varepsilon \Eye$ \ct{$(\forall \src,\freq)$} \\
+    for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
+      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq})
+  \end{pseudo}
+\end{algorithm}
 
 The initial values for demixing and covariance matrices were
 $\Demix _{\freq,0} = \Eye\; (\forall \freq)$, $\cov _{\src,\freq,0} = 10^{-3}\times\Eye\; (\forall \src, \freq)$, respectively.
@@ -667,16 +677,22 @@ This may be due to the fact that \RTObs{} estimates the source image at the refe
   \label{fig:plots:sisdr}
 \end{figure}
 
-\begin{algorithm}{Online AuxIVA with reset (\textbf{Reset})}{reset}
-  \begin{pseudo}
-    for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
-      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq}) \\-
-    {$\Demix _{\freq,\rotFra - 1}$} $\gets$ $\Eye$ \ct{$(\forall \freq)$} \\
-    {$\cov _{\src,\freq,\rotFra - 1}$} $\gets$ $\varepsilon \Eye$ \ct{$(\forall \src,\freq)$} \\
-    for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
-      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq})
-  \end{pseudo}
-\end{algorithm}
+\Cref{fig:plots:bp} shows the beam patterns of demixing matrices calculated with \RTObs{} and \RTCov{}.
+\begin{figure}[t]
+  \begin{minipage}[t]{.3\linewidth}
+    \centering\includegraphics{figures/plots/beam-pattern/RTcov_ref.pdf}\subcaption{Before rotation.}\label{fig:plot:bp:ref}
+  \end{minipage}
+  \begin{minipage}[t]{.3\linewidth}
+    \centering\includegraphics{figures/plots/beam-pattern/RTcov_rot.pdf}\subcaption{\RTCov{} after rotation.}\label{fig:plot:bp:cov}
+  \end{minipage}
+  \begin{minipage}[t]{.3\linewidth}
+    \centering\includegraphics{figures/plots/beam-pattern/RTobs_rot.pdf}\subcaption{\RTObs{} after rotation.}\label{fig:plot:bp:obs}
+  \end{minipage}
+  \caption{Beam patterns of demixing matrices.}%
+  \label{fig:plots:bp}
+\end{figure}
+\todo{Explanation of the results...}
+
 
 \subsection{Online Rotation Angle Estimation Performance}
 \todo{WORK IN PROGRESS...}
