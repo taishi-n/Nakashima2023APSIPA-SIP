@@ -309,6 +309,7 @@ we apply back-projection technique \cite{Murata:2001:NC} as a post-processing.
 \subsection{Sound Field Interpolation on Circular Microphone Array}
 This subsection briefly reviews the sound field interpolation method on circular microphone array (CMA), which is originally proposed in \cite{Wakabayashi:2021:ICASSP,Wakabayashi:2023:ASLP}.
 Let $\sfcma (\rotCoor)$ be a continuous sound pressure on the circumference of a circle at a spatial angle $\rotCoor \in \interval[open right,soft open fences]{0}{2\pi}$, as shown in \cref{fig:sfi}.
+We assume that the spatial sampling frequency is satisfied, \emph{i.e.}, $\sfcma (\rotCoor)$ contains no higher frequency components higher than half of the sampling frequency on the circumference of the circle.
 Then we observe a sound field with $\Mic$ microphones on the circle at even intervals.
 The $\mic$th observed signal is denoted as
 \begin{equation}
@@ -316,6 +317,13 @@ The $\mic$th observed signal is denoted as
   \label{eq:sfi:model}
 \end{equation}
 In other words, we regard observations of the sound field with a CMA as discretizations of that along an angle on the circumference $\rotCoor$.
+If the CMA is rotated by a spatial angle $\rotSpat \in \R$, we can regard its observation as the $\rotSmpl$-sample shift of $\sfcma _{\mic}$ where $\rotSmpl = \frac{\Mic}{2\pi} \rotSpat$;
+\begin{equation}
+  \sfcma \left(\frac{2\pi}{\Mic} \mic + \rotSpat \right)%
+  \coloneqq
+  \sfcma _{\mic + \rotSmpl}.
+  \label{eq:sfi:shift:obs}
+\end{equation}
 \begin{figure}[t]
   \centering
   \includegraphics{figures/diagrams/sfi.pdf}
@@ -330,27 +338,23 @@ In other words, we regard observations of the sound field with a CMA as discreti
 \end{figure}
 
 Next, we formulate a sound field interpolation problem with the model above.
-If the CMA is rotated by a spatial angle $\rotSpat \in \R$, we can regard its observation as the $\rotSmpl$-sample shift of $\sfcma _{\mic}$;
+We define the $\Mic$-points spatial discrete Fourier transform (DFT) of $\sfcma _{\mic}$ and its inverse transform as
+\begin{align}
+  \dft _{\Src} [\sfcma _{\mic}] &= \sum _{\mic = 0} ^{\Mic - 1} \sfcma _{\mic} \twid ^{-\mic\src} \coloneqq \Sfcma _{\src},\\
+  \dft _{\Src} ^{-1} [\Sfcma _{\src}] &= \frac{1}{\Mic} \sum _{\src = 0} ^{\Mic - 1} \Sfcma _{\src} \twid ^{\mic\src}, \\
+  \twid &= \exp \left(j\frac{2\pi}{\Mic}\right),
+\end{align}
+where $j$ is the imaginary unit.
+As is well known, from the shift theorem of DFT, the following equation is satisfied for all integers $d$;
 \begin{equation}
-  \sfcma \left(\frac{2\pi}{\Mic} \mic + \rotSpat \right)%
-  \coloneqq
-  \sfcma _{\mic + \rotSmpl},
-  \label{eq:sfi:shift:obs}
+  \dft _{\Src} [\sfcma _{\mic + d}] = \Sfcma _{\src} \twid ^{d \src}.%
+  \label{eq:sfi:shift:int}
 \end{equation}
-where $\rotSmpl = \frac{\Mic}{2\pi} \rotSpat$.
-Also, we assume the \emph{``non-integer sample shift theorem''};
-\begin{align}
-  \dft _{\Src} [\sfcma _{\mic + \rotSmpl}] &= \Sfcma _{\src} \twid ^{\rotSmpl \src},%
-  \label{eq:sfi:shift:dft}\\
-  \twid &\coloneqq \exp \left(j\frac{2\pi}{\Mic}\right),
-\end{align}
-where $\dft _{\Src} [\sfcma _{\mic}]$ is the $\Mic$-points discrete Fourier transform (DFT) defined as
-\begin{align}
-  \dft _{\Src} [\sfcma _{\mic}] &= \sum _{\mic = 0} ^{\Mic - 1} \sfcma _{\mic} \twid ^{-\mic\src} \coloneqq \Sfcma _{\src},
-  \intertext{and its inverse transform is defined as}
-  \dft _{\Src} ^{-1} [\Sfcma _{\src}] &= \frac{1}{\Mic} \sum _{\src = 0} ^{\Mic - 1} \Sfcma _{\src} \twid ^{\mic\src}.
-\end{align}
-% and $j$ is the imaginary unit.
+Although \eqref{eq:sfi:shift:int} does not hold strictly for real numbers, we assume that the following equation holds approximately for a real number $\rotSmpl$;
+\begin{equation}
+  \dft _{\Src} [\sfcma _{\mic + \rotSmpl}] = \Sfcma _{\src} \twid ^{\rotSmpl \src}.%
+  \label{eq:sfi:shift:dft}
+\end{equation}
 From these assumptions, we have
 \begin{align}
   \sfcma _{\mic + \rotSmpl} &= \dft _{\Src} ^{-1} \left[\Sfcma _{\src} \twid ^{\rotSmpl \src}\right], \\
