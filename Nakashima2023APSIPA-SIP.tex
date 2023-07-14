@@ -215,7 +215,7 @@ We henceforth assume that the number of microphones of CMA is equal to that of s
 We aim to estimate demixing matrices and estimated signals using only the current and past observed signals $\Obs _{\freq,1},\, \dots,\, \Obs _{\freq,\tframe}$:
 \begin{align}
   \Demix _{\ft} &= \begin{bmatrix} \demix _{1,\ft} & \dots & \demix _{\Src,\ft} \end{bmatrix} ^{\hermite} \in \C ^{\Src \times \Mic}, \\
-  \Est _{\ft} &= \Demix _{\ft} \Obs _{\ft} \in \C ^{\Src},
+  \Est _{\ft} &= \Demix _{\ft} \Obs _{\ft} \in \C ^{\Src},\label{eq:bss:sep}
 \end{align}
 where $\Demix _{\ft}$ is the demixing matrix, and $\Est _{\ft}$ is the estimated signal.
 
@@ -252,7 +252,7 @@ ${\{\Obs _{\ft}\}}_{\ft}$ denotes the set of $\Obs _{\ft}$ for all $\freq$ and $
 
 \subsection{Online Auxiliary-Function-Based Independent Vector Analysis}\label{subsec:oiva}
 
-Online AuxIVA \cite{Taniguchi:2014:HSCMA} is an online extension of AuxIVA \cite{Ono:2011:WASPAA} and estimates demixing matrices $\{\Demix _{\ft}\} _{\freq}$ at time frame $\tframe$ by minimizing the following objective function:
+Online AuxIVA \cite{Taniguchi:2014:HSCMA} is an extension of AuxIVA \cite{Ono:2011:WASPAA} and estimates demixing matrices $\{\Demix _{\ft}\} _{\freq}$ at time frame $\tframe$ by minimizing the following objective function:
 \begin{align}
   J _{\tframe}(\Demix _{\ft}) &= \sum _{\src = 1} ^{\Src} \demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft} ^{\nohermite} - \logdet{\Demix _{\ft}} ^2, \label{eq:obj} \\
   \cov _{\src,\ft} &= \forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} ^{\nohermite} \Obs _{\ft} ^{\hermite}, \label{eq:cov} \\
@@ -262,14 +262,18 @@ where $\weight\colon \R _{>0} \to \R _{>0}$ is defined as $\weight(\var) = \cont
 $\cont(\var)$ is called a contrast function and derived from the probability density function of source signals,
 and $\forget\; (0 \leq \forget < 1)$ is called a forgetting factor.
 In this paper, we assume that $\weight (\var) = \Freq/{\var ^2}$, which represents the time-varying Gaussian distribution \cite{Ono:2012:APSIPA}.
-Using the recursive update for covariance matrix \eqref{eq:cov}, we can apply efficient update methods proposed for batch AuxIVA algorithms, such as \emph{iterative projection (IP)} \cite{Ono:2011:WASPAA}, to minimize the objective function \eqref{eq:obj}.
+Using the recursive update for covariance matrix \eqref{eq:cov}, we can apply efficient update methods proposed for original (batch) AuxIVA algorithms, such as \emph{iterative projection (IP)} \cite{Ono:2011:WASPAA}, to minimize the objective function \eqref{eq:obj}.
 IP cyclically updates each \emph{demixing vector} $\demix _{\src,\ft} ^{\hermite}\; (\src = 1, \dots, \Src)$ (row of the demixing matrix $\Demix _{\ft}$) using the following update rule:
 \begin{align}
   \demix _{\src,\ft} &\gets (\Demix _{\ft} \cov _{\src\ft}) ^{-1} \eye _{\src} \label{eq:ip:proj}, \\
   \demix _{\src,\ft} &\gets \frac{{\demix _{\src,\ft}}}{{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}} \label{eq:ip:norm},
 \end{align}
 where $\eye _{\src} \in \R ^{\Src}$ is the canonical basis vector with the $\src$th element unity.
-\Cref{alg:naive} summarises the Online AuxIVA algorithm.
+We then have the estimated signal by \eqref{eq:bss:sep}.
+The scale of output estimated signal $\Est _{\ft}$ may be contaminated because of scale ambiguity problem.
+To restore the scale ambiguity and get estimated source image at the reference microphone,
+we apply back-projection technique \cite{Murata:2001:NC} as a post-processing.
+\Cref{alg:naive} summarises the online AuxIVA algorithm, and \cref{alg:pb} summarises the back-projection technique.
 \begin{algorithm}{Online AuxIVA (OIVA)}{naive}
   \textbf{Input:} $\{\Obs _{\ft}\} _{\freq},\, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\}_{\src,\freq}$\\
   % \textbf{Output:} $\Est _{\ft},\, \Demix _{\ft},\, \cov _{\src,\ft}\; (\forall \src,\freq)$
@@ -284,6 +288,21 @@ where $\eye _{\src} \in \R ^{\Src}$ is the canonical basis vector with the $\src
         {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{$(\forall \freq)$}\\
         {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{$(\forall \freq)$}
         % {$\Est _{\ft}  $} $\gets$ $\Demix _{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$}
+  \end{pseudo}
+\end{algorithm}
+\begin{algorithm}{Back-projection}{pb}
+  \textbf{Input:} $\{\Obs _{\ft}\} _{\ft}$, $\{\Demix _{\ft}\} _{\ft}$, reference microphone index $\ell$\\
+  \textbf{Output:} Scale-restored $\Est _{\ft}$
+  \begin{pseudo}
+    for $\tframe = 1,\, \dots,\, \Tframe$ \\+
+      for $\freq = 1,\, \dots,\, \Freq$ \\+
+        \nf{$
+          \begin{bmatrix}
+            a _{1,1,\ft} & \dots & a _{1,\Src,\ft} \\
+            \vdots & \ddots & \vdots \\
+            a _{\Src,1,\ft} & \dots & a _{\Src,\Src,\ft}
+          \end{bmatrix} \gets \Demix _{\ft} ^{-1}$} \\
+        \nf{$\Est _{\ft} \gets \begin{bmatrix} a _{\ell,1,\ft} & \dots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \dots & a _{\ell,\Src,\ft} \end{bmatrix} \Demix _{\ft} \Obs _{\ft}$}
   \end{pseudo}
 \end{algorithm}
 
@@ -582,24 +601,9 @@ A circular microphone array with $\Src = 5$ channels and a radius of \SI{2}{\cen
 To simulate the rotation of the microphone array, the sound images were generated when the circular array was rotated \SI{40}{\degree} counter-clockwise from the horizontal axis in \cref{fig:layout} 1 and was stitched together in the 0--30\si{\second} and 30--60\si{\second} intervals, respectively.
 Note that the rotation angle and rotation time are given oracle-manner to focus on improving the robustness of the sound field interpolation.
 A short-time Fourier transform with a frame length of 4096 points, a shift length of 2048 points, and a Hamming window was performed on the obtained observed signals.
-The scale of the output signal was restored by the projection back shown in \cref{alg:pb}, with the reference microphone as microphone 1 in \cref{fig:layout}.
+The scale of the output signal was restored by the back-projection shown in \cref{alg:pb}, with the reference microphone as microphone 1 in \cref{fig:layout}.
 The separation performance was evaluated by averaging the scale-invariant signal-to-distortion ratio (SI-SDR) \cite{LeRoux:2019:ICASSP} and its improvement (SI-SDR improvements; SI-SDRi) per channel.
 The reference signal used for the SI-SDR evaluation was the source image recorded with a rotated CMA.
-\begin{algorithm}{Projection back}{pb}
-  \textbf{Input:} $\{\Obs _{\ft}\} _{\ft}$, $\{\Demix _{\ft}\} _{\ft}$, reference microphone index $\ell$\\
-  \textbf{Output:} Scale-restored $\Est _{\ft}$
-  \begin{pseudo}
-    for $\tframe = 1,\, \dots,\, \Tframe$ \\+
-      for $\freq = 1,\, \dots,\, \Freq$ \\+
-        \nf{$
-          \begin{bmatrix}
-            a _{1,1,\ft} & \dots & a _{1,\Src,\ft} \\
-            \vdots & \ddots & \vdots \\
-            a _{\Src,1,\ft} & \dots & a _{\Src,\Src,\ft}
-          \end{bmatrix} \gets \Demix _{\ft} ^{-1}$} \\
-        \nf{$\Est _{\ft} \gets \begin{bmatrix} a _{\ell,1,\ft} & \dots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \dots & a _{\ell,\Src,\ft} \end{bmatrix} \Demix _{\ft} \Obs _{\ft}$}
-  \end{pseudo}
-\end{algorithm}
 \begin{figure}[t]
   \centering
   \includegraphics{figures/room_layout.pdf}
