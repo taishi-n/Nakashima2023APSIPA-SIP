@@ -677,19 +677,35 @@ This may be due to the fact that \RTObs{} estimates the source image at the refe
   \label{fig:plots:sisdr}
 \end{figure}
 
-\Cref{fig:plots:bp} shows the beam patterns of demixing matrices calculated with \RTObs{} and \RTCov{}.
+\Cref{fig:plots:bp} shows the beam patterns of demixing matrices calculated with \RTObs{} and \RTCov{} in polar axes.
 \begin{figure}[t]
   \begin{minipage}[t]{.3\linewidth}
-    \centering\includegraphics{figures/plots/beam-pattern/RTcov_ref.pdf}\subcaption{Before rotation.}\label{fig:plot:bp:ref}
+    \centering\includegraphics{figures/plots/beam-pattern/polar_RTcov_ref.pdf}\subcaption{Before rotation.}\label{fig:plot:bp:pol:ref}
   \end{minipage}
   \begin{minipage}[t]{.3\linewidth}
-    \centering\includegraphics{figures/plots/beam-pattern/RTcov_rot.pdf}\subcaption{\RTCov{} after rotation.}\label{fig:plot:bp:cov}
+    \centering\includegraphics{figures/plots/beam-pattern/polar_RTcov_rot.pdf}\subcaption{\RTCov{} after rotation.}\label{fig:plot:bp:pol:cov}
   \end{minipage}
   \begin{minipage}[t]{.3\linewidth}
-    \centering\includegraphics{figures/plots/beam-pattern/RTobs_rot.pdf}\subcaption{\RTObs{} after rotation.}\label{fig:plot:bp:obs}
+    \centering\includegraphics{figures/plots/beam-pattern/polar_RTobs_rot.pdf}\subcaption{\RTObs{} after rotation.}\label{fig:plot:bp:pol:obs}
   \end{minipage}
-  \caption{Beam patterns of demixing matrices.}%
-  \label{fig:plots:bp}
+  \caption{Beam patterns of demixing matrices (polar axis plot).}%
+  \label{fig:plots:bp:pol}
+\end{figure}
+\todo{Explanation of the results...}
+
+\Cref{fig:plots:bp} shows the beam patterns of demixing matrices calculated with \RTObs{} and \RTCov{} in linear axes.
+\begin{figure}[t]
+  \begin{minipage}[t]{\linewidth}
+    \centering\includegraphics{figures/plots/beam-pattern/linear_RTcov_ref.pdf}\subcaption{Before rotation.}\label{fig:plot:bp:lin:ref}
+  \end{minipage}
+  \begin{minipage}[t]{\linewidth}
+    \centering\includegraphics{figures/plots/beam-pattern/linear_RTcov_rot.pdf}\subcaption{\RTCov{} after rotation.}\label{fig:plot:bp:lin:cov}
+  \end{minipage}
+  \begin{minipage}[t]{\linewidth}
+    \centering\includegraphics{figures/plots/beam-pattern/linear_RTobs_rot.pdf}\subcaption{\RTObs{} after rotation.}\label{fig:plot:bp:lin:obs}
+  \end{minipage}
+  \caption{Beam patterns of demixing matrices (linear axis plot).}%
+  \label{fig:plots:bp:lin}
 \end{figure}
 \todo{Explanation of the results...}
 
