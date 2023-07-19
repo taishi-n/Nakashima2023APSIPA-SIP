@@ -425,8 +425,7 @@ Note that $\rotSpat _{\tframe}$ is required to be known with inertial measuremen
 
 \section{Proposed Method}\label{sec:proposed}
 
-\subsection{Direct Combination of Online BSS and SFI}
-% \subsection{Can Direct Combination of Online BSS and SFI Be a Solution of Our Problem?}
+\subsection{SFI-based Online AuxIVA with Transformation of Latest Observation}
 % TODO: 観測信号に対する音場補間，W/Vに対する変換との違いのイメージ図
 
 % 本節では，CMAの回転に頑健なonline BSSを提案するために，BSSと文献1で提案されたSFIを組み合わせることを考える．
@@ -443,17 +442,17 @@ As described earlier, if we know the rotation angle $\rotSpat$ and rotation time
 Suppose that the demixing matrix $\Demix _{\ft}$ is estimated using the observed signal $\{\Obs _{\ft}\} _{\tframe = 1} ^{\rotFra - 1}$ before the rotation of the CMA;
 after the rotation of the CMA, online BSS can be applied without re-estimating $\Demix _{\ft}$ by applying SFI to the observed signal
 $\Obs _{\ft} \gets \left(\rotMat ^{\hermite} (\rotSpat) \Obs _{\ft}\right) \coloneqq \refpos{\Obs} _{\ft}$.
-% \Cref{alg:rtobs}に，観測信号に対する音場補間を用いたOnline AuxIVAをまとめる．
+% \Cref{alg:sfiva-o}に，観測信号に対する音場補間を用いたOnline AuxIVAをまとめる．
 % この手法は，CMAが回転する状況下でのビームフォーミングの適用方法としても提案されている．
 % この処理は仮想的に観測信号のマイク位置を変えるため，回転後の位置におけるsource imageが得られず，実応用に問題が生じる場合がある．
 % 例えば，head mounted displayを用いた拡張現実空間での音源分離は，回転した後のsource imageの位置から音が聞こえるように処理する必要がある．
-\Cref{alg:rtobs} summarises online AuxIVA using SFI for the observed signal.
+\Cref{alg:sfiva-o} summarises online AuxIVA using SFI for the observed signal.
 In this methods, SFI was simply applied as a pre-processing for online AuxIVA.
 A similar scheme which is for beamforming has been proposed in \cite{Wakabayashi:2023:ASLP}.
-One drawback of \cref{alg:rtobs} is that it virtually changes the microphone position of the observed signal.
+One drawback of \cref{alg:sfiva-o} is that it virtually changes the microphone position of the observed signal.
 As a result, the source image at the rotated position cannot be obtained, which causes problems in practical applications.
 For example, BSS in augmented reality space using a head-mounted display needs to be processed so that the sound can be heard from the position of the source image after rotation.
-\begin{algorithm}{Online AuxIVA with SFI for observed signal (RT-obs)}{rtobs}
+\begin{algorithm}{SFI-based Online AuxIVA using Transformation of Latest Observed Signal (\SFIIVAo)}{sfiva-o}
   \textbf{Input:} $\rotSpat$, $\rotFra$, $\{\Obs _{\ft}\} _{\ft}$ \\
   \textbf{Output:} $\{\Demix _{\ft}\}_{\ft},\, \{\cov _{\src,\ft}\}_{\src,\ft}$
   \begin{pseudo}
@@ -482,7 +481,7 @@ For example, BSS in augmented reality space using a head-mounted display needs t
   \end{pseudo}
 \end{algorithm}
 
-\subsection{Coordinate Transformation of SFI}
+\subsection{SFI-based Online AuxIVA with Transformation of Pre-update Demixing and Covariance Matrices}
 
 % 前節の問題を解決するために，マイクの位置を保ったままCMA回転に頑健なonline BSSを提案する．
 % 観測信号のかわりにパラメータを変換することで，CMAが回転した後の位置におけるsource imageを得る手順を示す．
@@ -547,7 +546,7 @@ Furthermore, unlike the method of SFI for the observation signal in the previous
   % （良い命名？ロボット工学の用語でワールド座標系，ロボット座標系などがあるが，これをもじる？）
 }
 
-\begin{algorithm}{Online AuxIVA with SFI for observed signal (RT-cov)}{rtcov}
+\begin{algorithm}{SFI-based Online AuxIVA with Transformation of Pre-update Demixing and Covariance Matrices (\SFIIVAm)}{sfiva-m}
   \textbf{Input:} $\rotSpat$, $\rotFra$, $\{\Obs _{\ft}\} _{\ft}$ \\
   \textbf{Output:} $\{\Demix _{\ft}\}_{\ft},\, \{\cov _{\src,\ft}\}_{\src,\ft}$
   \begin{pseudo}
@@ -636,9 +635,9 @@ We compared the following four methods:
 \begin{description}
   \item[\NaiveIVA] Online AuxIVA described in \cref{subsec:oiva} as a baseline in our experiments. (See \Cref{alg:naive}.)
   \item[\ResetIVA] Re-initialize covariance and demixing matrices after the CMA rotation CMA. (See \Cref{alg:reset}.)
-  \item[\RTObs] Apply SFI for observed signals after the CMA rotation CMA frame by frame. (See \Cref{alg:rtobs}.)
+  \item[\SFIIVAo] Apply SFI for observed signals after the CMA rotation CMA frame by frame. (See \Cref{alg:sfiva-o}.)
     % \\ $\Obs _{\ft} = \rotMat ^{\hermite} (\rotSpat _{\tframe}) \rot{\Obs} _{\ft}$
-  \item[\RTCov] Apply parameter transformation for covariance and demixing matrices after CMA rotation.  (See \Cref{alg:rtcov}.)
+  \item[\SFIIVAm] Apply parameter transformation for covariance and demixing matrices after CMA rotation.  (See \Cref{alg:sfiva-m}.)
     % \\ $\rot{\Demix} _{\ft} \gets \Demix _{\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$,\; $\rot{\cov} _{\src,\ft} \gets \rotMat (\rotSpat _{\tframe}) \cov _{\src,\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$
 \end{description}
 \begin{algorithm}{Online AuxIVA with reset (\textbf{Reset})}{reset}
@@ -662,9 +661,9 @@ we applied the following ad-hoc normalization $\cov _{\src,\ft} \gets \cov _{\sr
 \Cref{fig:plots:sisdr} shows the SI-SDRi every \SI{1}{\second}.
 Overall, \NaiveIVA{} and \ResetIVA{} showed a significant performance drop after the CMA rotation and improved again with time.
 Notably, \ResetIVA{} has the lowest performance before CMA rotaion among all forgetting factors, which gets worse as the forgetting factor approaches 1.
-In contrast, proposed \RTCov{} and \RTObs{} methods maintained performance even after the CMA rotation.
-Comparing \RTCov{} and \RTObs{}, \RTCov{} performed slightly better.
-This may be due to the fact that \RTObs{} estimates the source image at the reference microphone, while the reference signal for SI-SDR evaluation was the source image at the reference position.
+In contrast, proposed \SFIIVAm{} and \SFIIVAo{} methods maintained performance even after the CMA rotation.
+Comparing \SFIIVAm{} and \SFIIVAo{}, \SFIIVAm{} performed slightly better.
+This may be due to the fact that \SFIIVAo{} estimates the source image at the reference microphone, while the reference signal for SI-SDR evaluation was the source image at the reference position.
 \begin{figure}[t]
   \begin{minipage}[t]{\linewidth}
     \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_900.pdf}\subcaption{$\forget = 0.90 $}\label{fig:plot:gauss:900}
@@ -677,16 +676,24 @@ This may be due to the fact that \RTObs{} estimates the source image at the refe
   \label{fig:plots:sisdr}
 \end{figure}
 
-\Cref{fig:plots:bp} shows the beam patterns of demixing matrices calculated with \RTObs{} and \RTCov{} in polar axes.
+\Cref{fig:plots:bp:pol} shows the beam patterns of demixing matrices in polar axes.
+\Cref{fig:plot:bp:pol:ref} is the result calculated before rotation.
+\Cref{fig:plot:bp:pol:cov} and \cref{fig:plot:bp:pol:obs} were respectively calculated with \SFIIVAo{} and \SFIIVAm{} after rotation.
+Dark regions in each plot represent nulls in that direction.
+In the case of BSS, the desired result is that the direction of the estimated source is brighter and the direction of the others is darker.
+The solid and dotted white lines respectively show the true direction of each source before and after rotation.
+As shown in \cref{fig:plots:bp:pol}, the results of \cref{fig:plot:bp:pol:ref} and \cref{fig:plot:bp:pol:cov} were similar each other, and only \cref{fig:plot:bp:pol:obs} was different from others.
+The dark areas of \cref{fig:plot:bp:pol:ref} and \cref{fig:plot:bp:pol:cov} were nearly at the desired directions.
+% The bright\Cref{fig:plot:bp:pol:obs}, bright areas 
 \begin{figure}[t]
   \begin{minipage}[t]{.3\linewidth}
     \centering\includegraphics{figures/plots/beam-pattern/polar_RTcov_ref.pdf}\subcaption{Before rotation.}\label{fig:plot:bp:pol:ref}
   \end{minipage}
   \begin{minipage}[t]{.3\linewidth}
-    \centering\includegraphics{figures/plots/beam-pattern/polar_RTcov_rot.pdf}\subcaption{\RTCov{} after rotation.}\label{fig:plot:bp:pol:cov}
+    \centering\includegraphics{figures/plots/beam-pattern/polar_RTcov_rot.pdf}\subcaption{\SFIIVAm{} after rotation.}\label{fig:plot:bp:pol:cov}
   \end{minipage}
   \begin{minipage}[t]{.3\linewidth}
-    \centering\includegraphics{figures/plots/beam-pattern/polar_RTobs_rot.pdf}\subcaption{\RTObs{} after rotation.}\label{fig:plot:bp:pol:obs}
+    \centering\includegraphics{figures/plots/beam-pattern/polar_RTobs_rot.pdf}\subcaption{\SFIIVAo{} after rotation.}\label{fig:plot:bp:pol:obs}
   \end{minipage}
   \caption{Beam patterns of demixing matrices (polar axis plot).}%
   \label{fig:plots:bp:pol}
