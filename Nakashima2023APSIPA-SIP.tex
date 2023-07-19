@@ -273,36 +273,31 @@ We then have the estimated signal by \eqref{eq:bss:sep}.
 The scale of output estimated signal $\Est _{\ft}$ may be contaminated because of scale ambiguity problem.
 To restore the scale ambiguity and get estimated source image at the reference microphone,
 we apply back-projection technique \cite{Murata:2001:NC} as a post-processing.
-\Cref{alg:naive} summarises the online AuxIVA algorithm, and \cref{alg:pb} summarises the back-projection technique.
-\begin{algorithm}{Online AuxIVA (OIVA)}{naive}
+\Cref{alg:iva} summarises the online AuxIVA algorithm.
+\begin{algorithm}{Online AuxIVA (OIVA)}{iva}
   \textbf{Input:} $\{\Obs _{\ft}\} _{\freq},\, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\}_{\src,\freq}$\\
   % \textbf{Output:} $\Est _{\ft},\, \Demix _{\ft},\, \cov _{\src,\ft}\; (\forall \src,\freq)$
-  \textbf{Output:} $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\}_{\src,\freq}$
+  \textbf{Output:} $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\}_{\src,\freq},\, \Est _{\ft}$
   \begin{pseudo}
     {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
     for $\itr = 1,\, \dots,\, \Itr$ \\+
+      \ct{Update demixing matrices} \\
       for $\src = 1,\, \dots,\, \Src$ \\+
         {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \\
         {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{$(\forall \freq)$}\\-
-      forall $\src = 1, \dots, \Src$ \\+
+      for $\src = 1, \dots, \Src$ \\+
         {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{$(\forall \freq)$}\\
-        {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{$(\forall \freq)$}
-        % {$\Est _{\ft}  $} $\gets$ $\Demix _{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$}
-  \end{pseudo}
-\end{algorithm}
-\begin{algorithm}{Back-projection}{pb}
-  \textbf{Input:} $\{\Obs _{\ft}\} _{\ft}$, $\{\Demix _{\ft}\} _{\ft}$, reference microphone index $\ell$\\
-  \textbf{Output:} Scale-restored $\Est _{\ft}$
-  \begin{pseudo}
-    for $\tframe = 1,\, \dots,\, \Tframe$ \\+
-      for $\freq = 1,\, \dots,\, \Freq$ \\+
+        {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{$(\forall \freq)$}\\--
+        \ct{Back-projection} \\
+        % {$\Est _{\ft}  $} $\gets$ $\Demix _{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$}\\
         \nf{$
           \begin{bmatrix}
             a _{1,1,\ft} & \dots & a _{1,\Src,\ft} \\
             \vdots & \ddots & \vdots \\
             a _{\Src,1,\ft} & \dots & a _{\Src,\Src,\ft}
-          \end{bmatrix} \gets \Demix _{\ft} ^{-1}$} \\
-        \nf{$\Est _{\ft} \gets \begin{bmatrix} a _{\ell,1,\ft} & \dots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \dots & a _{\ell,\Src,\ft} \end{bmatrix} \Demix _{\ft} \Obs _{\ft}$}
+          \end{bmatrix} \gets \Demix _{\ft} ^{-1}$} \ct{$(\forall \freq)$} \\
+        % \nf{$\Est _{\ft} \gets \begin{bmatrix} a _{\ell,1,\ft} & \dots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \dots & a _{\ell,\Src,\ft} \end{bmatrix} \Demix _{\ft} \Obs _{\ft}$}
+        \nf{$\Est _{\ft} \gets \diag\left(a _{\ell,1,\ft} \; \dots \; a _{\ell,\Src,\ft}\right) \Demix _{\ft} \Obs _{\ft}$} \ct{$(\forall \freq)$}
   \end{pseudo}
 \end{algorithm}
 
@@ -604,7 +599,7 @@ A circular microphone array with $\Src = 5$ channels and a radius of \SI{2}{\cen
 To simulate the rotation of the microphone array, the sound images were generated when the circular array was rotated \SI{40}{\degree} counter-clockwise from the horizontal axis in \cref{fig:layout} 1 and was stitched together in the 0--30\si{\second} and 30--60\si{\second} intervals, respectively.
 Note that the rotation angle and rotation time are given oracle-manner to focus on improving the robustness of the sound field interpolation.
 A short-time Fourier transform with a frame length of 4096 points, a shift length of 2048 points, and a Hamming window was performed on the obtained observed signals.
-The scale of the output signal was restored by the back-projection shown in \cref{alg:pb}, with the reference microphone as microphone 1 in \cref{fig:layout}.
+The scale of the output signal was restored by the back-projection shown in \cref{alg:iva}, with the reference microphone as microphone 1 in \cref{fig:layout}.
 The separation performance was evaluated by averaging the scale-invariant signal-to-distortion ratio (SI-SDR) \cite{LeRoux:2019:ICASSP} and its improvement (SI-SDR improvements; SI-SDRi) per channel.
 The reference signal used for the SI-SDR evaluation was the source image recorded with a rotated CMA.
 \begin{figure}[t]
@@ -633,7 +628,7 @@ The reference signal used for the SI-SDR evaluation was the source image recorde
 
 We compared the following four methods:
 \begin{description}
-  \item[\NaiveIVA] Online AuxIVA described in \cref{subsec:oiva} as a baseline in our experiments. (See \Cref{alg:naive}.)
+  \item[\NaiveIVA] Online AuxIVA described in \cref{subsec:oiva} as a baseline in our experiments. (See \Cref{alg:iva}.)
   \item[\ResetIVA] Re-initialize covariance and demixing matrices after the CMA rotation CMA. (See \Cref{alg:reset}.)
   \item[\SFIIVAo] Apply SFI for observed signals after the CMA rotation CMA frame by frame. (See \Cref{alg:sfiva-o}.)
     % \\ $\Obs _{\ft} = \rotMat ^{\hermite} (\rotSpat _{\tframe}) \rot{\Obs} _{\ft}$
@@ -653,7 +648,7 @@ We compared the following four methods:
 
 The initial values for demixing and covariance matrices were
 $\Demix _{\freq,0} = \Eye\; (\forall \freq)$, $\cov _{\src,\freq,0} = 10^{-3}\times\Eye\; (\forall \src, \freq)$, respectively.
-We set the number of iteration in each time frame in \cref{alg:naive} $\Itr$ to 5.
+We set the number of iteration in each time frame in \cref{alg:iva} $\Itr$ to 5.
 We ran experiments with varying forgetting factors $\forget = 0.9, 0.95, 0.98, 0.99$, which were chosen so that the approximate number of frames $\frac{1}{1 - \forget} = 10, 20, 50, 100$.
 To increase numerous stability for implementation of online AuxIVA,
 we applied the following ad-hoc normalization $\cov _{\src,\ft} \gets \cov _{\src,\ft} + 10 ^{-3} \Eye$ after updates by \eqref{eq:cov}.
