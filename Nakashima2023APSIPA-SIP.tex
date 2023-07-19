@@ -672,23 +672,22 @@ This may be due to the fact that \SFIIVAo{} estimates the source image at the re
 \end{figure}
 
 \Cref{fig:plots:bp:pol} shows the beam patterns of demixing matrices in polar axes.
-\Cref{fig:plot:bp:pol:ref} is the result calculated before rotation.
-\Cref{fig:plot:bp:pol:cov} and \cref{fig:plot:bp:pol:obs} were respectively calculated with \SFIIVAo{} and \SFIIVAm{} after rotation.
+\Cref{fig:plot:bp:ref} is the result calculated before rotation.
+\Cref{fig:plot:bp:sfiivam} and \cref{fig:plot:bp:sfiivao} were respectively calculated with \SFIIVAo{} and \SFIIVAm{} after rotation.
 Dark regions in each plot represent nulls in that direction.
 In the case of BSS, the desired result is that the direction of the estimated source is brighter and the direction of the others is darker.
 The solid and dotted white lines respectively show the true direction of each source before and after rotation.
-As shown in \cref{fig:plots:bp:pol}, the results of \cref{fig:plot:bp:pol:ref} and \cref{fig:plot:bp:pol:cov} were similar each other, and only \cref{fig:plot:bp:pol:obs} was different from others.
-The dark areas of \cref{fig:plot:bp:pol:ref} and \cref{fig:plot:bp:pol:cov} were nearly at the desired directions.
-% The bright\Cref{fig:plot:bp:pol:obs}, bright areas 
+As shown in \cref{fig:plots:bp:pol}, the results of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivam} were similar each other, and only \cref{fig:plot:bp:sfiivao} was different from others.
+The dark areas of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivam} were nearly at the desired directions.
 \begin{figure}[t]
   \begin{minipage}[t]{.3\linewidth}
-    \centering\includegraphics{figures/plots/beam-pattern/polar_RTcov_ref.pdf}\subcaption{Before rotation.}\label{fig:plot:bp:pol:ref}
+    \centering\includegraphics{figures/plots/beam-pattern/ref.pdf}\subcaption{Before rotation.}\label{fig:plot:bp:ref}
   \end{minipage}
   \begin{minipage}[t]{.3\linewidth}
-    \centering\includegraphics{figures/plots/beam-pattern/polar_RTcov_rot.pdf}\subcaption{\SFIIVAm{} after rotation.}\label{fig:plot:bp:pol:cov}
+    \centering\includegraphics{figures/plots/beam-pattern/sfiiva-o_rot.pdf}\subcaption{\SFIIVAo{} after rotation.}\label{fig:plot:bp:sfiivao}
   \end{minipage}
   \begin{minipage}[t]{.3\linewidth}
-    \centering\includegraphics{figures/plots/beam-pattern/polar_RTobs_rot.pdf}\subcaption{\SFIIVAo{} after rotation.}\label{fig:plot:bp:pol:obs}
+    \centering\includegraphics{figures/plots/beam-pattern/sfiiva-m_rot.pdf}\subcaption{\SFIIVAm{} after rotation.}\label{fig:plot:bp:sfiivam}
   \end{minipage}
   \caption{Beam patterns of demixing matrices (polar axis plot).}%
   \label{fig:plots:bp:pol}
