@@ -660,12 +660,13 @@ In contrast, proposed \SFIIVAm{} and \SFIIVAo{} methods maintained performance e
 Comparing \SFIIVAm{} and \SFIIVAo{}, \SFIIVAm{} performed slightly better.
 This may be due to the fact that \SFIIVAo{} estimates the source image at the reference microphone, while the reference signal for SI-SDR evaluation was the source image at the reference position.
 \begin{figure}[t]
-  \begin{minipage}[t]{\linewidth}
+  \begin{minipage}[t]{.5\textwidth}
     \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_900.pdf}\subcaption{$\forget = 0.90 $}\label{fig:plot:gauss:900}
     \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:gauss:950}
+  \end{minipage}
+  \begin{minipage}[t]{.5\textwidth}
     \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:gauss:980}
     \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:gauss:990}
-    % \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_995.pdf}\subcaption{$\forget = 0.995$}\label{fig:plot:gauss:995}
   \end{minipage}
   \caption{Segmental SI-SDR improvements (SI-SDRi) every \SI{1}{\second} with $\Src = 5$ and $\text{RT}_{60} \approx \SI{100}{\milli\second}$.}%
   \label{fig:plots:sisdr}
@@ -680,14 +681,15 @@ The solid and dotted white lines respectively show the true direction of each so
 As shown in \cref{fig:plots:bp:pol}, the results of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivam} were similar each other, and only \cref{fig:plot:bp:sfiivao} was different from others.
 The dark areas of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivam} were nearly at the desired directions.
 \begin{figure}[t]
-  \begin{minipage}[t]{.3\linewidth}
-    \centering\includegraphics{figures/plots/beam-pattern/ref.pdf}\subcaption{Before rotation.}\label{fig:plot:bp:ref}
+  \centering
+  \begin{minipage}[t]{\linewidth}
+    \centering\includegraphics{figures/plots/beam-pattern/sfiiva-cov_ref.pdf}\subcaption{Before rotation.}\label{fig:plot:bp:ref}
   \end{minipage}
-  \begin{minipage}[t]{.3\linewidth}
-    \centering\includegraphics{figures/plots/beam-pattern/sfiiva-o_rot.pdf}\subcaption{\SFIIVAo{} after rotation.}\label{fig:plot:bp:sfiivao}
+  \begin{minipage}[t]{\linewidth}
+    \centering\includegraphics{figures/plots/beam-pattern/sfiiva-cov_rot.pdf}\subcaption{\SFIIVAo{} after rotation.}\label{fig:plot:bp:sfiivao}
   \end{minipage}
-  \begin{minipage}[t]{.3\linewidth}
-    \centering\includegraphics{figures/plots/beam-pattern/sfiiva-m_rot.pdf}\subcaption{\SFIIVAm{} after rotation.}\label{fig:plot:bp:sfiivam}
+  \begin{minipage}[t]{\linewidth}
+    \centering\includegraphics{figures/plots/beam-pattern/sfiiva-obs_rot.pdf}\subcaption{\SFIIVAm{} after rotation.}\label{fig:plot:bp:sfiivam}
   \end{minipage}
   \caption{Beam patterns of demixing matrices (polar axis plot).}%
   \label{fig:plots:bp:pol}

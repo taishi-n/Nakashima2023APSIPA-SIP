@@ -22,8 +22,10 @@ sns.set(
         "grid.linewidth": 0.5,
         "legend.fontsize": "x-small",
         "legend.frameon": True,
-        "legend.framealpha": 0.9,
+        "legend.framealpha": 0.8,
         "legend.title_fontsize": "x-small",
+        "legend.handlelength": 1.5,
+        "legend.columnspacing": 0.5,
         "lines.linewidth": 0.75,
         "lines.markersize": 1,
         "pdf.fonttype": 42,
@@ -32,8 +34,8 @@ sns.set(
         "text.usetex": True,
         "xtick.direction": "in",
         "ytick.direction": "in",
-        "xtick.labelsize": "small",
-        "ytick.labelsize": "small",
+        "xtick.labelsize": "x-small",
+        "ytick.labelsize": "x-small",
     },
     style="ticks",
 )
@@ -46,8 +48,8 @@ plot_kws = {
 
 # figure size
 mm = 1 / 25.4  # inch to mm
-aspect = 1.8
-fig_w = 64 * mm
+aspect = 1.6
+fig_w = 50 * mm
 fig_h = fig_w / aspect
 
 
@@ -91,8 +93,8 @@ print(group)
 
 # replace
 methods = {
-    "online-rot": "RT-cov",
-    "online-sfi": "RT-obs",
+    "online-rot": "SFIIVA-M",
+    "online-sfi": "SFIIVA-O",
     "online-reset": "Reset",
     "online": "Naive",
 }
