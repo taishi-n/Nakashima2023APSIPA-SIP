@@ -25,6 +25,8 @@
 \crefname{equation}{}{}
 \crefname{figure}{Figure}{Figures}
 \crefname{section}{Section}{Sections}
+\captionsetup[subfigure]{subrefformat=simple,labelformat=simple}
+\renewcommand\thesubfigure{(\alph{subfigure})}
 \def\crefrangeconjunction{--}
 
 % psuedo codes
@@ -673,29 +675,36 @@ This may be due to the fact that \SFIIVAo{} estimates the source image at the re
   \label{fig:plots:sisdr}
 \end{figure}
 
-\Cref{fig:plots:bp:pol} shows the beam patterns of demixing matrices in polar axes.
+\Cref{fig:plots:bp:pol} shows the beam patterns of demixing matrices calculated by each method.
 \Cref{fig:plot:bp:ref} is the result calculated before rotation.
-\Cref{fig:plot:bp:sfiivam} and \cref{fig:plot:bp:sfiivao} were respectively calculated with \SFIIVAo{} and \SFIIVAm{} after rotation.
+\Cref{fig:plot:bp:sfiivam} and \cref{fig:plot:bp:sfiivao} are the results with demixing matrices respectively calculated with \SFIIVAo{} and \SFIIVAm{} after rotation.
 Dark regions in each plot represent nulls in that direction.
-In the case of BSS, the desired result is that the direction of the estimated source is brighter and the direction of the others is darker.
-The solid and dotted white lines respectively show the true direction of each source before and after rotation.
-As shown in \cref{fig:plots:bp:pol}, the results of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivam} were similar each other, and only \cref{fig:plot:bp:sfiivao} was different from others.
-The dark areas of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivam} were nearly at the desired directions.
+In the case of BSS, the desired result is that the direction of the estimated source is brighter and the others are darker.
+% The white lines in each plot show the true direction of each source signal before and after rotation.
+As shown in \cref{fig:plots:bp:pol}, the results of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivao} were similar each other, and only \cref{fig:plot:bp:sfiivam} was different from others.
+The dark areas of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivao} were nearly at the desired directions since \SFIIVAo{} approximately canceled the rotation of CMA and thus updated demixing matrices in the same direction even after the rotation.
+In contrast, the result in \cref{fig:plot:bp:sfiivam} gave the correct direction after the CMA rotation.
 \begin{figure}[t]
   \centering
   \begin{minipage}[t]{\linewidth}
     \centering\includegraphics{figures/plots/beam-pattern/sfiiva-cov_ref.pdf}\subcaption{Before rotation.}\label{fig:plot:bp:ref}
   \end{minipage}
   \begin{minipage}[t]{\linewidth}
-    \centering\includegraphics{figures/plots/beam-pattern/sfiiva-cov_rot.pdf}\subcaption{\SFIIVAo{} after rotation.}\label{fig:plot:bp:sfiivao}
+    \centering\includegraphics{figures/plots/beam-pattern/sfiiva-obs_rot.pdf}\subcaption{\SFIIVAo{} after rotation.}\label{fig:plot:bp:sfiivao}
   \end{minipage}
   \begin{minipage}[t]{\linewidth}
-    \centering\includegraphics{figures/plots/beam-pattern/sfiiva-obs_rot.pdf}\subcaption{\SFIIVAm{} after rotation.}\label{fig:plot:bp:sfiivam}
+    \centering\includegraphics{figures/plots/beam-pattern/sfiiva-cov_rot.pdf}\subcaption{\SFIIVAm{} after rotation.}\label{fig:plot:bp:sfiivam}
   \end{minipage}
-  \caption{Beam patterns of demixing matrices (polar axis plot).}%
+  \caption{%
+    Beam patterns of demixing matrices.
+    The leftmost figure is a legend of the five plots on the right.
+    The five plots on the right are the beam patterns of the frequency-wise demixing matrices calculated by each method.
+    The radial direction of each plot represents the frequency, the tangential direction represents the angle from the centre of the CMA.
+    The light and dark colours represent the gain in decibel.
+    The five lines in each plot represent the true direction of the source signal.
+  }%
   \label{fig:plots:bp:pol}
 \end{figure}
-\todo{Explanation of the results...}
 
 \subsection{Online Rotation Angle Estimation Performance}
 \todo{WORK IN PROGRESS...}
