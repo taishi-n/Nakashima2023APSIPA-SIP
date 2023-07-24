@@ -115,7 +115,7 @@
   % 音場補間はCMAの回転を打ち消し，パラメータの再推定を必要とせずにBSSを可能にする．
   % 我々は，SFIを前処理として組み合わせた単純な手法と，適切なパラメータ変換を用いたより実応用な手法の２つを提案する．
   % シミュレーション実験の結果は音場補間によりマイクが回転する状況における音源分離の頑健性が向上したことを確認した．
-  In this paper, we propose a robust online blind source separation (BSS) method against the self-rotation of microphone arrays.
+  In this paper, we propose an online blind source separation (BSS) method robust against the self-rotation of microphone arrays.
   Online auxiliary-function-based independent vector analysis (OIVA) is one of the promising methods for real-time BSS.
   One major issue for real-time BSS is robustness against environmental changes such as the movement of the source or microphone.
   Parameter re-estimation is generally necessary if environmental changes occur during real-time processing.
@@ -207,10 +207,10 @@ In this case, each steering vector can be denoted as
 \begin{equation}
   \steer _{\src,\ft} \coloneqq \begin{bmatrix} 1 & \str _{2,\src,\ft} & \dots & \str _{\Mic,\src,\ft} \end{bmatrix} ^{\top}\; (\src = 1, \dots, \Src).
 \end{equation}
-Under the definition, $\str _{\mic,\src,\ft} \; (\mic = 2, \dots, \Mic,\; \forall \src = 1, \dots, \Src)$ corresponds to the relative transfer function from the $\src$th source to the $\mic$th microphone.
+Under the definition, $\str _{\mic,\src,\ft} \; (\mic = 2, \dots, \Mic,\; \forall \src = 1, \dots, \Src)$ corresponds to the relative transfer function from the $\src$th source to the $\mic$th microphone, and thus each source signal $\sig _{1,\ft},\, \dots,\, \sig _{\Src,\ft}$ can be regarded as the \emph{source image} at the reference microphone $\ell = 1$.
 Note that many BSS methods require a time-invariant mixing system $\steer _{\src,\freq}\; (\forall \src)$,
 whereas, in this paper, steering vectors are time-variant $\steer _{\src,\ft}\; (\forall \src)$ to account for CMA rotations.
-We aim to estimate \emph{source images} at the reference microphone $\sig _{1,\ft},\, \dots,\, \sig _{\Src,\ft}$, even if the CMA is rotated.
+We aim to estimate source images at the reference microphone even if the CMA is rotated.
 
 Next, we consider an online BSS problem with the model defined above.
 We henceforth assume that the number of microphones of CMA is equal to that of sources; $\Mic = \Src$.
