@@ -210,7 +210,7 @@
             paperheight=234mm,
             hmarginratio=1:1,
             vmarginratio=1:1,
-            textwidth=28pc,
+            textwidth=28pc,%1pc=12pt=4.21754mm,118.09112mm
             %headheight=8pt,
             headsep=17pt,
             footskip=22pt,
