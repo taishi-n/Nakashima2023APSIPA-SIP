@@ -259,7 +259,7 @@ Online AuxIVA \cite{Taniguchi:2014:HSCMA} is an extension of AuxIVA \cite{Ono:20
 \begin{align}
   J _{\tframe}(\Demix _{\ft}) &= \sum _{\src = 1} ^{\Src} \demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft} ^{\nohermite} - \logdet{\Demix _{\ft}} ^2, \label{eq:obj} \\
   \cov _{\src,\ft} &= \forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} ^{\nohermite} \Obs _{\ft} ^{\hermite}, \label{eq:cov} \\
-  \var _{\src,\tframe} &= \sqrt{\sum _{\freq=1} ^{\Freq} \lvert \demix ^{\hermite} _{\src,\ft} \Obs ^{\nohermite}_{\ft} \rvert ^2},
+  \var _{\src,\tframe} &= \sqrt{\sum _{\freq=1} ^{\Freq} \lvert \demix ^{\hermite} _{\src,\ft} \Obs ^{\nohermite}_{\ft} \rvert ^2} \label{eq:var},
 \end{align}
 where $\weight\colon \R _{>0} \to \R _{>0}$ is defined as $\weight(\var) = \cont ' (\var) / 2 \var$ ($\cont '(\var)$ denotes the first derivative of $\cont (\var)$ with respect to $\var$),
 $\cont(\var)$ is called a contrast function and derived from the probability density function of source signals,
@@ -276,31 +276,54 @@ We then have the estimated signal by \eqref{eq:bss:sep}.
 The scale of output estimated signal $\Est _{\ft}$ may be contaminated because of scale ambiguity problem.
 To restore the scale ambiguity and get estimated source image at the reference microphone,
 we apply back-projection technique \cite{Murata:2001:NC} as a post-processing.
-\Cref{alg:iva} summarises the online AuxIVA algorithm.
-\begin{algorithm}{Online AuxIVA (OIVA)}{iva}
-  \textbf{Input:} $\{\Obs _{\ft}\} _{\freq},\, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\}_{\src,\freq}$\\
-  % \textbf{Output:} $\Est _{\ft},\, \Demix _{\ft},\, \cov _{\src,\ft}\; (\forall \src,\freq)$
-  \textbf{Output:} $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\}_{\src,\freq},\, \Est _{\ft}$
+\Cref{alg:update:V,alg:update:W,alg:pb,alg:iva} summarises the online AuxIVA algorithm.
+\begin{algorithm}{Covatiance matrix update, \pr{UpdateV}(\Obs _{\ft},\, \cov _{\src,\ft[-1]},\, \forget)}{update:V}
+  % \textbf{Input:} $\Obs _{\ft}$, $\cov _{\src,\ft}$, $\Demix _{\ft}$, $\forget$\\
+  \textbf{Output:} Updated $\cov _{\src,\ft}$
   \begin{pseudo}
-    {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
-    for $\itr = 1,\, \dots,\, \Itr$ \\+
-      \ct{Update demixing matrices} \\
-      for $\src = 1,\, \dots,\, \Src$ \\+
-        {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \\
-        {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{$(\forall \freq)$}\\-
-      for $\src = 1, \dots, \Src$ \\+
-        {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{$(\forall \freq)$}\\
-        {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{$(\forall \freq)$}\\--
-        \ct{Back-projection} \\
-        % {$\Est _{\ft}  $} $\gets$ $\Demix _{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$}\\
-        \nf{$
-          \begin{bmatrix}
-            a _{1,1,\ft} & \dots & a _{1,\Src,\ft} \\
-            \vdots & \ddots & \vdots \\
-            a _{\Src,1,\ft} & \dots & a _{\Src,\Src,\ft}
-          \end{bmatrix} \gets \Demix _{\ft} ^{-1}$} \ct{$(\forall \freq)$} \\
-        % \nf{$\Est _{\ft} \gets \begin{bmatrix} a _{\ell,1,\ft} & \dots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \dots & a _{\ell,\Src,\ft} \end{bmatrix} \Demix _{\ft} \Obs _{\ft}$}
-        \nf{$\Est _{\ft} \gets \diag\left(a _{\ell,1,\ft} \; \dots \; a _{\ell,\Src,\ft}\right) \Demix _{\ft} \Obs _{\ft}$} \ct{$(\forall \freq)$}
+    {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \ct{Auxiliary variable update \eqref{eq:var}} \\
+    for $\freq = 1, \dots, \Freq$ \\+
+      {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{Covariance update \eqref{eq:cov}}
+  \end{pseudo}
+\end{algorithm}
+\begin{algorithm}{Demixing matrix update, \pr{UpdateW}(\cov _{\src,\ft},\, \Demix _{\ft})}{update:W}
+  % \textbf{Input:} $\Obs _{\ft}$, $\cov _{\src,\ft}$, $\Demix _{\ft}$, $\forget$\\
+  \textbf{Output:} Updated $\demix _{\src,\ft}$
+  \begin{pseudo}
+    for $\freq = 1, \dots, \Freq$ \\+
+      {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{Demixing vector update \eqref{eq:ip:proj}} \\
+      {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{Demixing vector normalization \eqref{eq:ip:norm}}
+  \end{pseudo}
+\end{algorithm}
+\begin{algorithm}{Back-projection, \pr{Back-project}(\Demix _{\ft})}{pb}
+  % \textbf{Input:} $\Demix _{\ft}$\\
+  \textbf{Output:} Back-projected $\proj{\Demix} _{\ft}$
+  \begin{pseudo}
+    for $\freq = 1, \dots, \Freq$ \\+
+      \nf{$
+        \begin{bmatrix}
+          \str _{1,1,\ft} & \dots & \str _{1,\Src,\ft} \\
+          \vdots & \ddots & \vdots \\
+          \str _{\Src,1,\ft} & \dots & \str _{\Src,\Src,\ft}
+        \end{bmatrix} \gets \Demix _{\ft} ^{-1}$} \\
+      % \nf{$\Est _{\ft} \gets \begin{bmatrix} a _{\ell,1,\ft} & \dots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \dots & a _{\ell,\Src,\ft} \end{bmatrix} \Demix _{\ft} \Obs _{\ft}$}
+      \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\str _{1,1,\ft} \; \str _{1,2,\ft}\; \dots \; \str _{1,\Src,\ft}\right) \Demix _{\ft}$}
+  \end{pseudo}
+\end{algorithm}
+\begin{algorithm}{Online AuxIVA (OIVA)}{iva}
+  \textbf{Input:} $\{\Obs _{\ft}\} _{\ft}$, $ \{\Demix _{\freq,0}\}_{\freq}$, $ \{\cov _{\src,\freq,0}\}_{\src,\freq}$, $ \forget$\\
+  \textbf{Output:} $\{\Est _{\ft}\} _{\ft}$
+  \begin{pseudo}
+    for $\tframe = 1, \dots, \Tframe$ \\+
+      {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
+
+      for $\itr = 1,\, \dots,\, \Itr$ \\+
+        for $\src = 1,\, \dots,\, \Src$ \\+
+          {$\cov _{\src,\ft}$} $\gets$ $\pr{UpdateV}(\Obs _{\ft},\, \cov _{\src,\ft[-1]},\, \forget)$ \\
+          {$\demix _{\src,\ft}$} $\gets$ $\pr{UpdateW}(\cov _{\src,\ft},\, \Demix _{\ft})$ \\-
+      $\proj{\Demix} _{\ft} \gets \pr{Back-project}(\Demix _{\ft})$ \\-
+
+    {$\Est _{\ft}  $} $\gets$ $\proj{\Demix }_{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$}
   \end{pseudo}
 \end{algorithm}
 
@@ -451,31 +474,43 @@ One drawback of \cref{alg:sfiva-o} is that it virtually changes the microphone p
 As a result, the source image at the rotated position cannot be obtained, which causes problems in practical applications.
 For example, BSS in augmented reality space using a head-mounted display needs to be processed so that the sound can be heard from the position of the source image after rotation.
 \begin{algorithm}{SFI-based Online AuxIVA using Transformation of Latest Observed Signal (\SFIIVAo)}{sfiva-o}
-  \textbf{Input:} $\rotSpat$, $\rotFra$, $\{\Obs _{\ft}\} _{\ft}$ \\
-  \textbf{Output:} $\{\Demix _{\ft}\}_{\ft},\, \{\cov _{\src,\ft}\}_{\src,\ft}$
+  \textbf{Input:} $\{\Obs _{\ft}\} _{\ft}$, $ \{\Demix _{\freq,0}\}_{\freq}$, $\{\cov _{\src,\freq,0}\}_{\src,\freq}$, $\forget$, $\rotSpat$, $\rotFra$ \\
+  \textbf{Output:} $\{\Est _{\ft}\} _{\ft}$
   \begin{pseudo}
-    Initialize $\{\Demix _{\freq,0}\} _{\freq} \, \{\cov _{\src,\freq,0}\} _{\freq,\src}$ \\
-    for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
-      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq}) \\-
-    for $\src = 0, \dots, \Src$ \\+
-      for $\mic = 0, \dots, \Src$ \\+
-        $\rotIdx \gets \src - \mic - \frac{2\pi}{\Src} \rotSpat$ \\
-        $\rotmat _{\src,\mic}(\rotSpat) \gets
+    for $\tframe = 1,\, \dots,\, \rotFra - 1$ \ct{Demixing matrix update before rotation} \\+
+    {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
+      for $\itr = 1,\, \dots,\, \Itr$ \\+
+        for $\src = 1,\, \dots,\, \Src$ \\+
+          {$\cov _{\src,\ft}$} $\gets$ $\pr{UpdateV}(\Obs _{\ft},\, \cov _{\src,\ft[-1]},\, \forget)$ \\
+          {$\demix _{\src,\ft}$} $\gets$ $\pr{UpdateW}(\cov _{\src,\ft},\, \Demix _{\ft})$ \\--
+      $\proj{\Demix} _{\ft} \gets \pr{Back-project}(\Demix _{\ft})$ \\
+      {$\Est _{\ft}  $} $\gets$ $\proj{\Demix }_{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$} \\-
+
+    for $\dum = 0, \dots, \Src - 1$ \ct{Rotation matrix calculation} \\+
+      for $\mic = 0, \dots, \Src - 1$ \\+
+        $\rotIdx \gets \dum - \mic - \frac{2\pi}{\Src} \rotSpat$ \\
+        $\rotmat _{\dum,\mic}(\rotSpat) \gets
           \begin{cases}
             \displaystyle \frac{\sinc{(\rotIdx)}}{\sinc{\left(\rotIdx / \Mic\right)}} \twid ^{\frac{\rotIdx}{2}} & (\nf{\text{$\Mic$ is even}}),\\[1em]
             \displaystyle \frac{\sinc{(\rotIdx)}}{\sinc{\left(\rotIdx / \Mic\right)}} & (\nf{\text{$\Mic$ is odd}}),
           \end{cases}
         $ \ct{\eqref{eq:rot:sinc}} \\--
-    $\nf\rotMat (\rotSpat) \gets
-      \begin{bmatrix}
-        \rotmat _{0, 0}(\rotSpat) & \dots & \rotmat _{0, \Mic - 1}(\rotSpat) \\
-        \vdots & \ddots & \vdots \\
-        \rotmat _{\Mic - 1, 0}(\rotSpat) & \dots & \rotmat _{\Mic - 1, \Mic - 1}(\rotSpat)
-      \end{bmatrix}
-      $ \ct{\eqref{eq:rotmat}} \\
-    for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
+    % $\nf\rotMat (\rotSpat) \gets
+    %   \begin{bmatrix}
+    %     \rotmat _{0, 0}(\rotSpat) & \dots & \rotmat _{0, \Mic - 1}(\rotSpat) \\
+    %     \vdots & \ddots & \vdots \\
+    %     \rotmat _{\Mic - 1, 0}(\rotSpat) & \dots & \rotmat _{\Mic - 1, \Mic - 1}(\rotSpat)
+    %   \end{bmatrix}
+    %   $ \ct{\eqref{eq:rotmat}} \\
+    for $\tframe = \rotFra,\, \dots,\, \Tframe$ \ct{Demixing matrix update after rotation} \\+
       $\refpos{\Obs} _{\ft} \gets \rotMat ^{\hermite} (\rotSpat) \Obs _{\ft}$ \ct{$(\forall \freq)$} \\
-      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\refpos{\Obs} _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq})
+      {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
+      for $\itr = 1,\, \dots,\, \Itr$ \\+
+        for $\src = 1,\, \dots,\, \Src$ \\+
+          {$\cov _{\src,\ft}$} $\gets$ $\pr{UpdateV}(\refpos{\Obs} _{\ft},\, \cov _{\src,\ft[-1]},\, \forget)$ \\
+          {$\demix _{\src,\ft}$} $\gets$ $\pr{UpdateW}(\cov _{\src,\ft},\, \Demix _{\ft})$ \\--
+      $\proj{\Demix} _{\ft} \gets \pr{Back-project}(\Demix _{\ft})$ \\
+      {$\Est _{\ft}  $} $\gets$ $\proj{\Demix }_{\ft} \refpos{\Obs} _{\ft}$ \ct{$(\forall \freq)$}
   \end{pseudo}
 \end{algorithm}
 
@@ -545,32 +580,46 @@ Furthermore, unlike the method of SFI for the observation signal in the previous
 }
 
 \begin{algorithm}{SFI-based Online AuxIVA with Transformation of Pre-update Demixing and Covariance Matrices (\SFIIVAm)}{sfiva-m}
-  \textbf{Input:} $\rotSpat$, $\rotFra$, $\{\Obs _{\ft}\} _{\ft}$ \\
-  \textbf{Output:} $\{\Demix _{\ft}\}_{\ft},\, \{\cov _{\src,\ft}\}_{\src,\ft}$
+  \textbf{Input:} $\{\Obs _{\ft}\} _{\ft}$, $ \{\refpos{\Demix} _{\freq,0}\}_{\freq}$, $\{\refpos{\cov} _{\src,\freq,0}\}_{\src,\freq}$, $\forget$, $\rotSpat$, $\rotFra$ \\
+  \textbf{Output:} $\{\Est _{\ft}\} _{\ft}$
   \begin{pseudo}
-    Initialize $\{\refpos{\Demix} _{\freq,0}\} _{\freq} \, \{\refpos{\cov} _{\src,\freq,0}\} _{\freq,\src}$ \\
-    for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
-      $\{\refpos{\Demix} _{\ft}\}_{\freq},\, \{\refpos{\cov} _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\refpos{\Demix} _{\ft[-1]}\}_{\freq},\, \{\refpos{\cov} _{\src,\ft[-1]}\} _{\src,\freq}) \\-
-    for $\src = 0, \dots, \Src$ \\+
-      for $\mic = 0, \dots, \Src$ \\+
-        $\rotIdx \gets \src - \mic - \frac{2\pi}{\Src} \rotSpat$ \\
-        $\rotmat _{\src,\mic}(\rotSpat) \gets
+    for $\tframe = 1,\, \dots,\, \rotFra - 1$ \ct{Demixing matrix update before rotation} \\+
+      {$\refpos{\Demix} _{\ft}$} $\gets$ $\refpos{\Demix} _{\ft[-1]}$ \ct{$(\forall \freq)$}\\
+      for $\itr = 1,\, \dots,\, \Itr$ \\+
+        for $\src = 1,\, \dots,\, \Src$ \\+
+          {$\refpos{\cov} _{\src,\ft}$} $\gets$ $\pr{UpdateV}(\Obs _{\ft},\, \refpos{\cov} _{\src,\ft[-1]},\, \forget)$ \\
+          {$\refpos{\demix} _{\src,\ft}$} $\gets$ $\pr{UpdateW}(\refpos{\cov} _{\src,\ft},\, \refpos{\Demix} _{\ft})$ \\--
+      $\proj{\Demix} _{\ft} \gets \pr{Back-project}(\refpos{\Demix} _{\ft})$ \\
+      {$\Est _{\ft}  $} $\gets$ $\proj{\Demix}_{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$} \\-
+
+    for $\dum = 0, \dots, \Src - 1$ \ct{Rotation matrix calculation} \\+
+      for $\mic = 0, \dots, \Src - 1$ \\+
+        $\rotIdx \gets \dum - \mic - \frac{2\pi}{\Src} \rotSpat$ \\
+        $\rotmat _{\dum,\mic}(\rotSpat) \gets
           \begin{cases}
             \displaystyle \frac{\sinc{(\rotIdx)}}{\sinc{\left(\rotIdx / \Mic\right)}} \twid ^{\frac{\rotIdx}{2}} & (\nf{\text{$\Mic$ is even}}),\\[1em]
             \displaystyle \frac{\sinc{(\rotIdx)}}{\sinc{\left(\rotIdx / \Mic\right)}} & (\nf{\text{$\Mic$ is odd}}),
           \end{cases}
         $ \ct{\eqref{eq:rot:sinc}} \\--
-    $\nf\rotMat (\rotSpat) \gets
-      \begin{bmatrix}
-        \rotmat _{0, 0}(\rotSpat) & \dots & \rotmat _{0, \Mic - 1}(\rotSpat) \\
-        \vdots & \ddots & \vdots \\
-        \rotmat _{\Mic - 1, 0}(\rotSpat) & \dots & \rotmat _{\Mic - 1, \Mic - 1}(\rotSpat)
-      \end{bmatrix}
-      $ \ct{\eqref{eq:rotmat}} \\
+
+    % $\nf\rotMat (\rotSpat) \gets
+    %   \begin{bmatrix}
+    %     \rotmat _{0, 0}(\rotSpat) & \dots & \rotmat _{0, \Mic - 1}(\rotSpat) \\
+    %     \vdots & \ddots & \vdots \\
+    %     \rotmat _{\Mic - 1, 0}(\rotSpat) & \dots & \rotmat _{\Mic - 1, \Mic - 1}(\rotSpat)
+    %   \end{bmatrix}
+    %   $ \ct{\eqref{eq:rotmat}} \\
     {$\Demix _{\freq,\rotFra - 1}$}    $\gets$ $\refpos{\Demix} _{\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat)$ \ct{$(\forall \freq)$} \\
-    {$\cov _{\src,\freq,\rotFra - 1}$} $\gets$ $\rotMat (\rotSpat) \refpos{\cov} _{\src,\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat)$ \ct{$(\forall \src,\freq)$} \\
-    for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
-      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq})
+    {$\cov _{\src,\freq,\rotFra - 1}$} $\gets$ $\rotMat (\rotSpat) \refpos{\cov} _{\src,\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat)$ \ct{$(\forall \freq)$} \\
+
+    for $\tframe = \rotFra,\, \dots,\, \Tframe$ \ct{Demixing matrix update after rotation} \\+
+      {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
+      for $\itr = 1,\, \dots,\, \Itr$ \\+
+        for $\src = 1,\, \dots,\, \Src$ \\+
+          {$\cov _{\src,\ft}$} $\gets$ $\pr{UpdateV}(\Obs _{\ft},\, \cov _{\src,\ft[-1]},\, \forget)$ \\
+          {$\demix _{\src,\ft}$} $\gets$ $\pr{UpdateW}(\cov _{\src,\ft},\, \Demix _{\ft})$ \\--
+      $\proj{\Demix} _{\ft} \gets \pr{Back-project}(\Demix _{\ft})$ \\
+      {$\Est _{\ft}  $} $\gets$ $\proj{\Demix}_{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$}
   \end{pseudo}
 \end{algorithm}
 
@@ -638,14 +687,30 @@ We compared the following four methods:
   \item[\SFIIVAm] Apply parameter transformation for covariance and demixing matrices after CMA rotation.  (See \Cref{alg:sfiva-m}.)
     % \\ $\rot{\Demix} _{\ft} \gets \Demix _{\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$,\; $\rot{\cov} _{\src,\ft} \gets \rotMat (\rotSpat _{\tframe}) \cov _{\src,\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$
 \end{description}
-\begin{algorithm}{Online AuxIVA with reset (\textbf{Reset})}{reset}
+\begin{algorithm}{Online AuxIVA with reset (\texttt{Reset})}{reset}
+  \textbf{Input:} $\{\Obs _{\ft}\} _{\ft}$, $ \{\Demix _{\freq,0}\}_{\freq}$, $\{\cov _{\src,\freq,0}\}_{\src,\freq}$, $\forget$, $\rotFra$ \\
+  \textbf{Output:} $\{\Est _{\ft}\} _{\ft}$
   \begin{pseudo}
-    for $\tframe = 1,\, \dots,\, \rotFra - 1$ \\+
-      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq}) \\-
-    {$\Demix _{\freq,\rotFra - 1}$} $\gets$ $\Eye$ \ct{$(\forall \freq)$} \\
-    {$\cov _{\src,\freq,\rotFra - 1}$} $\gets$ $\varepsilon \Eye$ \ct{$(\forall \src,\freq)$} \\
-    for $\tframe = \rotFra,\, \dots,\, \Tframe$ \\+
-      $\{\Demix _{\ft}\}_{\freq},\, \{\cov _{\src,\ft}\} _{\src,\freq} \gets$ \pr{OIVA}(\{\Obs _{\ft}\} _{\freq}, \{\Demix _{\ft[-1]}\}_{\freq},\, \{\cov _{\src,\ft[-1]}\} _{\src,\freq})
+    for $\tframe = 1,\, \dots,\, \rotFra - 1$ \ct{Demixing matrix update before rotation} \\+
+      {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \\
+      for $\itr = 1,\, \dots,\, \Itr$ \\+
+        for $\src = 1,\, \dots,\, \Src$ \\+
+          {$\cov _{\src,\ft}$} $\gets$ $\pr{UpdateV}(\Obs _{\ft},\, \cov _{\src,\ft[-1]},\, \forget)$ \\
+          {$\demix _{\src,\ft}$} $\gets$ $\pr{UpdateW}(\cov _{\src,\ft},\, \Demix _{\ft})$ \\--
+      $\proj{\Demix} _{\ft} \gets \pr{Back-project}(\Demix _{\ft})$ \\
+      {$\Est _{\ft}  $} $\gets$ $\proj{\Demix}_{\ft} \Obs _{\ft}$\\-
+
+    {$\Demix _{\freq,\rotFra - 1}$} $\gets$ $\Eye$ \ct{$(\forall \freq)$}\\
+    {$\cov _{\src,\freq,\rotFra - 1}$} $\gets$ $\varepsilon \Eye$ \ct{$(\forall \freq, \src)$} \\
+
+    for $\tframe = \rotFra,\, \dots,\, \Tframe$ \ct{Demixing matrix update after rotation} \\+
+      {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$(\forall \freq)$} \\
+      for $\itr = 1,\, \dots,\, \Itr$ \\+
+        for $\src = 1,\, \dots,\, \Src$ \\+
+          {$\cov _{\src,\ft}$} $\gets$ $\pr{UpdateV}(\Obs _{\ft},\, \cov _{\src,\ft[-1]},\, \forget)$ \\
+          {$\demix _{\src,\ft}$} $\gets$ $\pr{UpdateW}(\cov _{\src,\ft},\, \Demix _{\ft})$ \\--
+      $\proj{\Demix} _{\ft} \gets \pr{Back-project}(\Demix _{\ft})$ \\
+      {$\Est _{\ft}  $} $\gets$ $\proj{\Demix}_{\ft} \Obs _{\ft}$ \ct{$(\forall \freq)$}
   \end{pseudo}
 \end{algorithm}
 
