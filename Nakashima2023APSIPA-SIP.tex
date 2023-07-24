@@ -207,7 +207,7 @@ In this case, each steering vector can be denoted as
 \begin{equation}
   \steer _{\src,\ft} \coloneqq \begin{bmatrix} 1 & \str _{2,\src,\ft} & \dots & \str _{\Mic,\src,\ft} \end{bmatrix} ^{\top}\; (\src = 1, \dots, \Src).
 \end{equation}
-Under the definition, $\str _{\mic,\src,\ft} \; (\mic = 2, \dots, \Mic,\; \forall \src = 1, \dots, \Src)$ corresponds to the relative transfer function from the $\src$th source to the $\mic$th microphone, and thus each source signal $\sig _{1,\ft},\, \dots,\, \sig _{\Src,\ft}$ can be regarded as the \emph{source image} at the reference microphone $\ell = 1$.
+Under the definition, $\str _{\mic,\src,\ft} \; (\mic = 2, \dots, \Mic,\; \forall \src = 1, \dots, \Src)$ corresponds to the relative transfer function from the $\src$th source to the $\mic$th microphone, and thus each source signal $\sig _{1,\ft},\, \dots,\, \sig _{\Src,\ft}$ can be regarded as the \emph{source image} at the reference microphone.
 Note that many BSS methods require a time-invariant mixing system $\steer _{\src,\freq}\; (\forall \src)$,
 whereas, in this paper, steering vectors are time-variant $\steer _{\src,\ft}\; (\forall \src)$ to account for CMA rotations.
 We aim to estimate source images at the reference microphone even if the CMA is rotated.
