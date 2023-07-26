@@ -93,10 +93,10 @@ print(group)
 
 # replace
 methods = {
-    "online-rot": "SFIIVA-M",
-    "online-sfi": "SFIIVA-O",
-    "online-reset": "Reset",
     "online": "Naive",
+    "online-reset": "Reset",
+    "online-sfi": "SFIIVA-O",
+    "online-rot": "SFIIVA-M",
 }
 group.replace(methods, inplace=True)
 print(group)
