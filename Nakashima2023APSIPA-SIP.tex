@@ -277,17 +277,9 @@ The scale of output estimated signal $\Est _{\ft}$ may be contaminated because o
 To restore the scale ambiguity and get estimated source image at the reference microphone,
 we apply the following back-projection technique \cite{Murata:2001:NC} as a post-processing:
 \begin{align}
-  \Demix _{\ft} ^{-1}
-    &\coloneqq
-    \begin{bmatrix}
-      \str _{1,1,\ft} & \dots & \str _{1,\Src,\ft} \\
-      \vdots & \ddots & \vdots \\
-      \str _{\Src,1,\ft} & \dots & \str _{\Src,\Src,\ft}
-    \end{bmatrix}
-    \\
   \proj{\Demix} _{\ft}
     &\gets
-    \diag\left(\str _{1,1,\ft} \; \str _{1,2,\ft}\; \dots \; \str _{1,\Src,\ft}\right) \Demix _{\ft},
+    \diag\left(\eye _{1} ^{\top} \Demix _{\ft} ^{-1} \right) \Demix _{\ft},
     \label{eq:pb:w}
     \\
   \Est _{\ft}
@@ -295,7 +287,7 @@ we apply the following back-projection technique \cite{Murata:2001:NC} as a post
     \proj{\Demix }_{\ft} \Obs _{\ft},
     \label{eq:pb:y}
 \end{align}
-where $\diag(\cdot)$ is an operator to make a diagonal matrix whose each element equals to the corresponding argument.
+where $\diag(\cdot)$ is an operator to construct a diagonal matrix whose each element equals to the corresponding element of the given vector.
 \Cref{alg:iva} summarises the online AuxIVA algorithm.
 \begin{algorithm}{Online AuxIVA (OIVA)}{iva}
   \textbf{Input:} $\{\Obs _{\ft}\} _{\ft}$, $ \{\Demix _{\freq,0}\}_{\freq}$, $ \{\cov _{\src,\freq,0}\}_{\src,\freq}$, $ \forget$\\
@@ -311,13 +303,14 @@ where $\diag(\cdot)$ is an operator to make a diagonal matrix whose each element
           {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{\eqref{eq:ip:proj}, $\forall \freq$} \\
           {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{\eqref{eq:ip:norm}, $\forall \freq$} \\--
 
-      \nf{$
-        \begin{bsmallmatrix}
-          \str _{1,1,\ft} & \dots & \str _{1,\Src,\ft} \\
-          \vdots & \ddots & \vdots \\
-          \str _{\Src,1,\ft} & \dots & \str _{\Src,\Src,\ft}
-        \end{bsmallmatrix} \gets \Demix _{\ft} ^{-1}$} \ct{$\forall \freq$} \\
-      \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\str _{1,1,\ft} \; \str _{1,2,\ft}\; \dots \; \str _{1,\Src,\ft}\right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$}\\
+      % \nf{$
+      %   \begin{bsmallmatrix}
+      %     \str _{1,1,\ft} & \dots & \str _{1,\Src,\ft} \\
+      %     \vdots & \ddots & \vdots \\
+      %     \str _{\Src,1,\ft} & \dots & \str _{\Src,\Src,\ft}
+      %   \end{bsmallmatrix} \gets \Demix _{\ft} ^{-1}$} \ct{$\forall \freq$} \\
+      % \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\str _{1,1,\ft} \; \str _{1,2,\ft}\; \dots \; \str _{1,\Src,\ft}\right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$}\\
+      \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\eye _{1} ^{\top} \Demix _{\ft} ^{-1} \right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$}\\
       {$\Est _{\ft}$} $\gets$ $\proj{\Demix }_{\ft} \Obs _{\ft}$ \ct{\eqref{eq:pb:y}, $\forall \freq$}
   \end{pseudo}
 \end{algorithm}
@@ -336,13 +329,14 @@ where $\diag(\cdot)$ is an operator to make a diagonal matrix whose each element
           {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \ct{\eqref{eq:var}} \\ [hl]
           {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{\eqref{eq:cov}, $\forall \freq$} \\-
 
-      \nf{$
-        \begin{bsmallmatrix}
-          \str _{1,1,\ft} & \dots & \str _{1,\Src,\ft} \\
-          \vdots & \ddots & \vdots \\
-          \str _{\Src,1,\ft} & \dots & \str _{\Src,\Src,\ft}
-        \end{bsmallmatrix} \gets \Demix _{\ft} ^{-1}$} \ct{$\forall \freq$} \\
-      \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\str _{1,1,\ft} \; \str _{1,2,\ft}\; \dots \; \str _{1,\Src,\ft}\right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$}\\
+      % \nf{$
+      %   \begin{bsmallmatrix}
+      %     \str _{1,1,\ft} & \dots & \str _{1,\Src,\ft} \\
+      %     \vdots & \ddots & \vdots \\
+      %     \str _{\Src,1,\ft} & \dots & \str _{\Src,\Src,\ft}
+      %   \end{bsmallmatrix} \gets \Demix _{\ft} ^{-1}$} \ct{$\forall \freq$} \\
+      % \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\str _{1,1,\ft} \; \str _{1,2,\ft}\; \dots \; \str _{1,\Src,\ft}\right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$}\\
+      \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\eye _{1} ^{\top} \Demix _{\ft} ^{-1} \right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$}\\
       {$\Est _{\ft}$} $\gets$ $\proj{\Demix }_{\ft} \Obs _{\ft}$ \ct{\eqref{eq:pb:y}, $\forall \freq$}
   \end{pseudo}
 \end{algorithm}
@@ -509,13 +503,14 @@ For example, BSS in augmented reality space using a head-mounted display needs t
           {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{\eqref{eq:ip:proj}, $\forall \freq$} \\
           {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{\eqref{eq:ip:norm}, $\forall \freq$} \\--
 
-      \nf{$
-        \begin{bsmallmatrix}
-          \str _{1,1,\ft} & \dots & \str _{1,\Src,\ft} \\
-          \vdots & \ddots & \vdots \\
-          \str _{\Src,1,\ft} & \dots & \str _{\Src,\Src,\ft}
-        \end{bsmallmatrix} \gets \Demix _{\ft} ^{-1}$} \ct{$\forall \freq$} \\
-      \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\str _{1,1,\ft} \; \str _{1,2,\ft}\; \dots \; \str _{1,\Src,\ft}\right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$}\\
+      % \nf{$
+      %   \begin{bsmallmatrix}
+      %     \str _{1,1,\ft} & \dots & \str _{1,\Src,\ft} \\
+      %     \vdots & \ddots & \vdots \\
+      %     \str _{\Src,1,\ft} & \dots & \str _{\Src,\Src,\ft}
+      %   \end{bsmallmatrix} \gets \Demix _{\ft} ^{-1}$} \ct{$\forall \freq$} \\
+      % \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\str _{1,1,\ft} \; \str _{1,2,\ft}\; \dots \; \str _{1,\Src,\ft}\right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$}\\
+      \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\eye _{1} ^{\top} \Demix _{\ft} ^{-1} \right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$}\\
       {$\Est _{\ft}$} $\gets$ $\proj{\Demix }_{\ft} \refpos{\Obs} _{\ft}$ \ct{\eqref{eq:pb:y}, $\forall \freq$}
   \end{pseudo}
 \end{algorithm}
@@ -601,13 +596,14 @@ Furthermore, unlike the method of SFI for the observation signal in the previous
           {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{\eqref{eq:ip:proj}, $\forall \freq$} \\
           {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{\eqref{eq:ip:norm}, $\forall \freq$} \\--
 
-      \nf{$
-        \begin{bsmallmatrix}
-          \str _{1,1,\ft} & \dots & \str _{1,\Src,\ft} \\
-          \vdots & \ddots & \vdots \\
-          \str _{\Src,1,\ft} & \dots & \str _{\Src,\Src,\ft}
-        \end{bsmallmatrix} \gets \Demix _{\ft} ^{-1}$} \ct{$\forall \freq$} \\
-      \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\str _{1,1,\ft} \; \str _{1,2,\ft}\; \dots \; \str _{1,\Src,\ft}\right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$} \\
+      % \nf{$
+      %   \begin{bsmallmatrix}
+      %     \str _{1,1,\ft} & \dots & \str _{1,\Src,\ft} \\
+      %     \vdots & \ddots & \vdots \\
+      %     \str _{\Src,1,\ft} & \dots & \str _{\Src,\Src,\ft}
+      %   \end{bsmallmatrix} \gets \Demix _{\ft} ^{-1}$} \ct{$\forall \freq$} \\
+      % \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\str _{1,1,\ft} \; \str _{1,2,\ft}\; \dots \; \str _{1,\Src,\ft}\right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$} \\
+      \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\eye _{1} ^{\top} \Demix _{\ft} ^{-1} \right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$}\\
       {$\Est _{\ft}$} $\gets$ $\proj{\Demix }_{\ft} \Obs _{\ft}$ \ct{\eqref{eq:pb:y}, $\forall \freq$}
   \end{pseudo}
 \end{algorithm}
