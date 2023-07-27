@@ -117,13 +117,13 @@
   % シミュレーション実験の結果は音場補間によりマイクが回転する状況における音源分離の頑健性が向上したことを確認した．
   In this paper, we propose an online blind source separation (BSS) method robust against the self-rotation of microphone arrays.
   Online auxiliary-function-based independent vector analysis (OIVA) is one of the promising methods for real-time BSS.
-  One major issue for real-time BSS is robustness against environmental changes such as the movement of the source or microphone.
-  Parameter re-estimation is generally necessary if environmental changes occur during real-time processing.
+  One major issue for real-time BSS is robustness against the movement of the source or microphone.
+  Parameter re-estimation is necessary if such changes occur during processing.
   OIVA is robust against smooth movement of sources and achieves high separation performance.
   However, OIVA does not perform well against rapid movements of microphones.
   Therefore, in this paper, we employ sound field interpolation (SFI) for circular microphone arrays (CMAs) with OIVA.
   SFI cancels out the rotation of the CMA, enabling us to apply BSS without parameter re-estimation.
-  We propose two methods: a simple method combining SFI as a pre-processing step and a more practical method using parameter transformations. 
+  We propose two methods: a simple method combining SFI as a pre-processing step and a more practical method using parameter transformations.
   Simulation experiments confirmed that SFI improves the robustness of the OIVA in situations where the microphone is rotating.
 \end{abstract}
 
@@ -616,7 +616,7 @@ Frame by frame estimation by maximum likelihood method \cite{Lian:2021:APSIPA}
 
 \section{Experimental Validation}\label{sec:experiment}
 
-Although online AuxIVA can track environmental changes such as microphone rotation, its convergence performance highly depends on the forgetting factor.
+Although online AuxIVA can track microphone movements, its convergence performance highly depends on the forgetting factor.
 Furthermore, ICA-based BSS methods do not change the results even if the observed signals are ``remixed.''
 For example, the same output is obtained by inputting the 2-channel observed signals $x_1$ and $x_2$ as $x_1 + x_2$ and $x_1 - x_2$.
 Since the transformation of the observed signals by the SFI can also be interpreted as a kind of ``remixing,''
