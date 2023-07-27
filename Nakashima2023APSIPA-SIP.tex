@@ -488,13 +488,13 @@ One drawback of \cref{alg:sfiva-o} is that it virtually changes the microphone p
 As a result, the source image at the rotated position cannot be obtained, which causes problems in practical applications.
 For example, BSS in augmented reality space using a head-mounted display needs to be processed so that the sound can be heard from the position of the source image after rotation.
 \begin{algorithm}{SFI-based Online AuxIVA using Transformation of Latest Observed Signal (\SFIIVAo)}{sfiva-o}
-  \textbf{Input:} $\{\Obs _{\ft}\} _{\ft}$, $ \{\Demix _{\freq,\rotFra-1}\}_{\freq}$, $\{\cov _{\src,\freq,\rotFra-1}\}_{\src,\freq}$, $\forget$, $\rotMat(\rotSpat _{\tframe})$ \\
+  \textbf{Input:} $\{\Obs _{\ft}\} _{\ft}$, $ \{\Demix _{\freq,\rotFra-1}\}_{\freq}$, $\{\cov _{\src,\freq,\rotFra-1}\}_{\src,\freq}$, $\forget$, $\rotMat(\rotSpat)$ \\
   \textbf{Output:} $\{\Est _{\ft}\} _{\ft}$
   \begin{pseudo}
     % for $\tframe = 1,\, \dots,\, \rotFra - 1$ \ct{Demixing matrix update before rotation} \\+
     %   \nf{Run \cref{alg:iva}} \\-
     for $\tframe = \rotFra,\, \dots,\, \Tframe$ \ct{Demixing matrix update after rotation} \\+
-      $\refpos{\Obs} _{\ft} \gets \rotMat ^{\hermite} (\rotSpat _ {\tframe}) \Obs _{\ft}$ \ct{$\forall \freq$} \\
+      $\refpos{\Obs} _{\ft} \gets \rotMat ^{\hermite} (\rotSpat) \Obs _{\ft}$ \ct{$\forall \freq$} \\
       {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$\forall \freq$} \\
       for $\itr = 1,\, \dots,\, \Itr$ \\+
         for $\src = 1,\, \dots,\, \Src$ \\+
@@ -568,7 +568,7 @@ Therefore, if we know the rotation angle $\rotSpat$ and its time frame $\rotFra$
 % 以上の結果の近似として，オンラインAuxIVAにおいては次の式を用いて，CMA回転時刻においてパラメータを変換する：
 For online AuxIVA, we perform the following transformation at the rotation time $\rotFra$ as an approximation of the results above:
 \begin{align}
-  \Demix _{\freq,\rotFra - 1} &\gets \refpos{\Demix} _{\freq,\rotFra} \rotMat ^{\hermite} (\rotSpat), \\
+  \Demix _{\freq,\rotFra - 1} &\gets \refpos{\Demix} _{\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat), \\
   \cov _{\src,\freq,\rotFra - 1} &\gets \rotMat (\rotSpat) \refpos{\cov} _{\src,\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat).
 \end{align}
 % この手法は観測信号はマイクが回転した信号を変換せずに扱うことができるため，回転後の位置における音像が推定される．
@@ -581,7 +581,7 @@ Furthermore, unlike the method of SFI for the observation signal in the previous
 }
 
 \begin{algorithm}{SFI-based Online AuxIVA with Transformation of Pre-update Demixing and Covariance Matrices (\SFIIVAm)}{sfiva-m}
-  \textbf{Input:} $\{\Obs _{\ft}\} _{\ft}$, $ \{\refpos{\Demix} _{\freq,\rotFra-1}\}_{\freq}$, $\{\refpos{\cov} _{\src,\freq,\rotFra-1}\}_{\src,\freq}$, $\forget$, $\rotMat(\rotSpat _{\tframe})$ \\
+  \textbf{Input:} $\{\Obs _{\ft}\} _{\ft}$, $ \{\refpos{\Demix} _{\freq,\rotFra-1}\}_{\freq}$, $\{\refpos{\cov} _{\src,\freq,\rotFra-1}\}_{\src,\freq}$, $\forget$, $\rotMat(\rotSpat)$ \\
   \textbf{Output:} $\{\Est _{\ft}\} _{\ft}$
   \begin{pseudo}
     {$\Demix _{\freq,\rotFra - 1}$} $\gets$ $\refpos{\Demix} _{\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat)$ \ct{$\forall \freq$} \\
