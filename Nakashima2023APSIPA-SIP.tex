@@ -430,7 +430,7 @@ By using the expression above, we assume that the observed signal with CMA rotat
 \begin{equation}
   \refpos{\Obs} _{\ft} = \rotMat ^{-1} (\rotSpat _{\tframe}) \Obs _{\ft}.
 \end{equation}
-Note that $\rotSpat _{\tframe}$ is required to be known with inertial measurement unit sensors or estimated by using maximum likelihood estimation proposed in \cite{Lian:2021:APSIPA}.
+Note that $\rotSpat _{\tframe}$ is required to be known with inertial measurement unit sensors or estimated using some methods, such as maximum likelihood estimation \cite{Lian:2021:APSIPA}.
 
 \section{Proposed Method}\label{sec:proposed}
 
@@ -450,7 +450,9 @@ As described earlier, if we know the rotation angle $\rotSpat$ and rotation time
 % CMAの回転後，観測信号に対してSFIを適用し，$\Demix _{\ft}$を再推定せずにオンライン音源分離を行う：
 Suppose that the demixing matrix $\Demix _{\ft}$ is estimated using the observed signal $\{\Obs _{\ft}\} _{\tframe = 1} ^{\rotFra - 1}$ before the rotation of the CMA;
 after the rotation of the CMA, online BSS can be applied without re-estimating $\Demix _{\ft}$ by applying SFI to the observed signal
-$\Obs _{\ft} \gets \left(\rotMat ^{\hermite} (\rotSpat) \Obs _{\ft}\right) \coloneqq \refpos{\Obs} _{\ft}$.
+\begin{equation}
+  \Obs _{\ft} \gets \left(\rotMat ^{\hermite} (\rotSpat) \Obs _{\ft}\right) \coloneqq \refpos{\Obs} _{\ft}.
+\end{equation}
 % \Cref{alg:sfiva-o}に，観測信号に対する音場補間を用いたOnline AuxIVAをまとめる．
 % この手法は，CMAが回転する状況下でのビームフォーミングの適用方法としても提案されている．
 % この処理は仮想的に観測信号のマイク位置を変えるため，回転後の位置におけるsource imageが得られず，実応用に問題が生じる場合がある．
@@ -550,6 +552,7 @@ For online AuxIVA, we perform the following transformation at the rotation time 
 This method can handle the observed signal without transforming the observed signal after the CMA rotation, so the source image at the post-rotated position is estimated.
 Furthermore, unlike the method of SFI for the observation signal in the previous subsection, no transformation is required for every single frame after rotation, and only one transformation at the time of the rotated time frame is needed.
 \todo{%
+角度の測定誤差があるとき，4.1 の手法は誤差が蓄積する，4.2 の方は忘却係数で忘れていくので，間違っていてもその影響は消えていくはず？
 }
 
 \begin{algorithm}{SFI-based Online AuxIVA with Transformation of Pre-update Demixing and Covariance Matrices (\SFIIVAm)}{sfiva-m}
@@ -624,10 +627,7 @@ We compared the following four methods:
 \begin{description}
   \item[\NaiveIVA] Online AuxIVA described in \cref{subsec:oiva} as a baseline in our experiments. (See \Cref{alg:iva}.)
   \item[\ResetIVA] Re-initialize covariance and demixing matrices when the CMA was rotated:
-    \begin{align*}
-      \Demix _{\freq,\rotFra - 1} &\gets \Eye, \\
-      \cov _{\src,\freq,\rotFra - 1} &\gets \varepsilon \Eye.
-    \end{align*}
+      $\Demix _{\freq,\rotFra - 1} \gets \Eye, \; \cov _{\src,\freq,\rotFra - 1} \gets \varepsilon \Eye.$
   \item[\SFIIVAo] Apply SFI for observed signals after the CMA rotation CMA frame by frame. (See \Cref{alg:sfiva-o}.)
     % \\ $\Obs _{\ft} = \rotMat ^{\hermite} (\rotSpat _{\tframe}) \rot{\Obs} _{\ft}$
   \item[\SFIIVAm] Apply parameter transformation for covariance and demixing matrices after CMA rotation.  (See \Cref{alg:sfiva-m}.)
@@ -660,13 +660,13 @@ This may be due to the fact that \SFIIVAo{} estimates the source image at the re
   \label{fig:plots:sisdr}
 \end{figure}
 
-\Cref{fig:plots:bp:pol} shows the beam patterns of demixing matrices calculated by each method.
+\Cref{fig:plots:bp} shows the beam patterns of demixing matrices calculated by each method.
 \Cref{fig:plot:bp:ref} is the result calculated before rotation.
-\Cref{fig:plot:bp:sfiivam} and \cref{fig:plot:bp:sfiivao} are the results with demixing matrices respectively calculated with \SFIIVAo{} and \SFIIVAm{} after rotation.
+\Cref{fig:plot:bp:sfiivao} and \cref{fig:plot:bp:sfiivam} are the results with demixing matrices respectively calculated with \SFIIVAm{} and \SFIIVAo{} after rotation.
 Dark regions in each plot represent nulls in that direction.
 In the case of BSS, the desired result is that the direction of the estimated source is brighter and the others are darker.
 % The white lines in each plot show the true direction of each source signal before and after rotation.
-As shown in \cref{fig:plots:bp:pol}, the results of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivao} were similar each other, and only \cref{fig:plot:bp:sfiivam} was different from others.
+As shown in \cref{fig:plots:bp}, the results of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivao} were similar each other, and only \cref{fig:plot:bp:sfiivam} was different from others.
 The dark areas of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivao} were nearly at the desired directions since \SFIIVAo{} approximately canceled the rotation of CMA and thus updated demixing matrices in the same direction even after the rotation.
 In contrast, the result in \cref{fig:plot:bp:sfiivam} gave the correct direction after the CMA rotation.
 \begin{figure}[t]
@@ -687,7 +687,7 @@ In contrast, the result in \cref{fig:plot:bp:sfiivam} gave the correct direction
     The light and dark colours represent the gain in decibel.
     The five lines in each plot represent the true direction of the source signal.
   }%
-  \label{fig:plots:bp:pol}
+  \label{fig:plots:bp}
 \end{figure}
 
 \section{Conclusion}\label{sec:conclusion}
