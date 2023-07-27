@@ -314,32 +314,6 @@ where $\diag(\cdot)$ is an operator to construct a diagonal matrix whose each el
       {$\Est _{\ft}$} $\gets$ $\proj{\Demix }_{\ft} \Obs _{\ft}$ \ct{\eqref{eq:pb:y}, $\forall \freq$}
   \end{pseudo}
 \end{algorithm}
-\begin{algorithm}{Online AuxIVA (OIVA) \todo{（分離行列の反復更新と比較する用）}}{ivam}
-  \textbf{Input:} $\{\Obs _{\ft}\} _{\ft}$, $ \{\Demix _{\freq,0}\}_{\freq}$, $ \{\cov _{\src,\freq,0}\}_{\src,\freq}$, $ \forget$\\
-  \textbf{Output:} $\{\Est _{\ft}\} _{\ft}$
-  \begin{pseudo}
-    for $\tframe = 1, \dots, \Tframe$ \\+
-      {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$\forall \freq$} \\
-
-      for $\itr = 1,\, \dots,\, \Itr$ \\+ [hl]
-        for $\src = 1,\, \dots,\, \Src$ \\+ [hl]
-          {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\todo{\ft[-1]}}\right) ^{-1} \eye _{\src}$ \ct{\eqref{eq:ip:proj}, $\forall \freq$} \\ [hl]
-          {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\todo{\ft[-1]}} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{\eqref{eq:ip:norm}, $\forall \freq$} \\-- [hl]
-        for $\src = 1,\, \dots,\, \Src$ \\+ [hl]
-          {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \ct{\eqref{eq:var}} \\ [hl]
-          {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{\eqref{eq:cov}, $\forall \freq$} \\-
-
-      % \nf{$
-      %   \begin{bsmallmatrix}
-      %     \str _{1,1,\ft} & \dots & \str _{1,\Src,\ft} \\
-      %     \vdots & \ddots & \vdots \\
-      %     \str _{\Src,1,\ft} & \dots & \str _{\Src,\Src,\ft}
-      %   \end{bsmallmatrix} \gets \Demix _{\ft} ^{-1}$} \ct{$\forall \freq$} \\
-      % \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\str _{1,1,\ft} \; \str _{1,2,\ft}\; \dots \; \str _{1,\Src,\ft}\right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$}\\
-      \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\eye _{1} ^{\top} \Demix _{\ft} ^{-1} \right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$}\\
-      {$\Est _{\ft}$} $\gets$ $\proj{\Demix }_{\ft} \Obs _{\ft}$ \ct{\eqref{eq:pb:y}, $\forall \freq$}
-  \end{pseudo}
-\end{algorithm}
 
 \subsection{Sound Field Interpolation on Circular Microphone Array}
 This subsection briefly reviews the sound field interpolation method on circular microphone array (CMA), which is originally proposed in \cite{Wakabayashi:2021:ICASSP,Wakabayashi:2023:ASLP}.
@@ -576,8 +550,6 @@ For online AuxIVA, we perform the following transformation at the rotation time 
 This method can handle the observed signal without transforming the observed signal after the CMA rotation, so the source image at the post-rotated position is estimated.
 Furthermore, unlike the method of SFI for the observation signal in the previous subsection, no transformation is required for every single frame after rotation, and only one transformation at the time of the rotated time frame is needed.
 \todo{%
-  Good naming for proposed methods...
-  % （良い命名？ロボット工学の用語でワールド座標系，ロボット座標系などがあるが，これをもじる？）
 }
 
 \begin{algorithm}{SFI-based Online AuxIVA with Transformation of Pre-update Demixing and Covariance Matrices (\SFIIVAm)}{sfiva-m}
@@ -607,12 +579,6 @@ Furthermore, unlike the method of SFI for the observation signal in the previous
       {$\Est _{\ft}$} $\gets$ $\proj{\Demix }_{\ft} \Obs _{\ft}$ \ct{\eqref{eq:pb:y}, $\forall \freq$}
   \end{pseudo}
 \end{algorithm}
-
-\subsection{Self-rotation Estimation by Maximum Likelihood Method}
-
-\todo{%
-Frame by frame estimation by maximum likelihood method \cite{Lian:2021:APSIPA}
-}
 
 \section{Experimental Validation}\label{sec:experiment}
 
@@ -651,15 +617,6 @@ The reference signal used for the SI-SDR evaluation was the source image recorde
   \caption{Room layout.}%
   \label{fig:layout}
 \end{figure}
-
-\subsection{Preliminary Experiment}
-\todo{%
-  WORK IN PROGRESS...
-\begin{itemize}
-  \item Error of covariance/demixing matrices between with/without coodinate transformation%座標変換あり・なしの場合の共分散行列・分離行列の誤差
-  \item Experiments with an error between the microphone rotation angle in ground truth and the estimated rotation angle%真のマイク回転角度と推定した回転角度に誤差をつけた場合の実験
-\end{itemize}
-}
 
 \subsection{Source Separation Performance}
 
@@ -732,9 +689,6 @@ In contrast, the result in \cref{fig:plot:bp:sfiivam} gave the correct direction
   }%
   \label{fig:plots:bp:pol}
 \end{figure}
-
-\subsection{Online Rotation Angle Estimation Performance}
-\todo{WORK IN PROGRESS...}
 
 \section{Conclusion}\label{sec:conclusion}
 % 本研究では，円状等間隔マイクロホンアレイにおける音場補間をブラインド音源分離に応用した．
