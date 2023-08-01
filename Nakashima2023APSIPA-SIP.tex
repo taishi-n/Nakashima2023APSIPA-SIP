@@ -690,10 +690,57 @@ In contrast, the result in \cref{fig:plot:bp:sfiivam} gave the correct direction
     Five plots are the beam patterns of the frequency-wise demixing matrices calculated by each method.
     The radial direction of each plot represents the frequency, and the tangential direction represents the angle from the centre of the CMA.
     The light and dark colours represent the gain in decibels.
-    The five lines in each plot represent the true direction of the source signal.
+    The five white lines in each plot represent the true direction of the source signal.
   }%
   \label{fig:plots:bp}
 \end{figure}
+
+\begin{table}[t]
+  \caption{Mean and standard deviation of SI-SDRi before and after CMA rotation.}%
+  \label{tab:sdr}
+  \centering
+  \sisetup{table-format=2.2, table-alignment-mode=format, table-auto-round=true}
+  \begin{tabular}{lllSS}
+    \toprule
+        &    &          & \multicolumn{2}{l}{SI-SDRi (dB)} \\
+        &    &          &         {mean} &        {std} \\
+      Forgetting factor $\forget$ & Time (s) & Method & & \\
+    \midrule
+      0.90 & 30 & Naive    &   0.244856 & 5.000747 \\
+           &    & Reset    &  -4.830337 & 5.555344 \\
+           &    & SFIIVA-M &   5.065312 & 4.200715 \\
+           &    & SFIIVA-O &   5.127707 & 4.291668 \\ \cmidrule{2-5}
+           & 59 & Naive    &   6.371168 & 3.451660 \\
+           &    & Reset    &   6.404149 & 3.460501 \\
+           &    & SFIIVA-M &   6.436108 & 3.435811 \\
+           &    & SFIIVA-O &   6.143079 & 3.535327 \\ \hline
+      0.95 & 30 & Naive    &   2.849818 & 3.579884 \\
+           &    & Reset    &  -7.059805 & 7.959535 \\
+           &    & SFIIVA-M &  13.705048 & 3.696854 \\
+           &    & SFIIVA-O &  13.451307 & 3.680528 \\ \cmidrule{2-5}
+           & 59 & Naive    &  16.652346 & 2.755190 \\
+           &    & Reset    &  16.704147 & 2.742908 \\
+           &    & SFIIVA-M &  16.645762 & 2.753046 \\
+           &    & SFIIVA-O &  15.548719 & 2.507915 \\ \hline
+      0.98 & 30 & Naive    &   4.000305 & 3.203627 \\
+           &    & Reset    & -10.361193 & 8.261436 \\
+           &    & SFIIVA-M &  18.796094 & 3.316340 \\
+           &    & SFIIVA-O &  17.988841 & 3.516160 \\ \cmidrule{2-5}
+           & 59 & Naive    &  25.698304 & 2.652934 \\
+           &    & Reset    &  23.402043 & 2.931695 \\
+           &    & SFIIVA-M &  25.623199 & 2.592745 \\
+           &    & SFIIVA-O &  22.130434 & 3.686233 \\ \hline
+      0.99 & 30 & Naive    &   2.062067 & 4.680030 \\
+           &    & Reset    & -11.815238 & 8.516685 \\
+           &    & SFIIVA-M &  11.242948 & 7.068764 \\
+           &    & SFIIVA-O &  10.706279 & 6.975261 \\ \cmidrule{2-5}
+           & 59 & Naive    &  23.513201 & 4.669065 \\
+           &    & Reset    &  14.089287 & 5.852374 \\
+           &    & SFIIVA-M &  24.893788 & 3.912823 \\
+           &    & SFIIVA-O &  21.706356 & 4.382981 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 \section{Conclusion}\label{sec:conclusion}
 % 本研究では，円状等間隔マイクロホンアレイにおける音場補間をブラインド音源分離に応用した．
