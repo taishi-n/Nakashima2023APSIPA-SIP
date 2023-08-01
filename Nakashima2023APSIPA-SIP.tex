@@ -646,7 +646,7 @@ We ran experiments with varying forgetting factors $\forget = 0.9, 0.95, 0.98, 0
 To increase numerous stability for the implementation of online AuxIVA,
 we applied the following ad-hoc normalization $\cov _{\src,\ft} \gets \cov _{\src,\ft} + 10 ^{-3} \Eye$ after updates by \eqref{eq:cov}.
 
-\Cref{fig:plots:sisdr} shows the SI-SDRi every \SI{1}{\second}.
+\Cref{fig:plot:line} shows the SI-SDRi every \SI{1}{\second}.
 Overall, \NaiveIVA{} and \ResetIVA{} showed a significant performance drop after the CMA rotation and improved again with time.
 Notably, \ResetIVA{} has the lowest performance before CMA rotation among all forgetting factors, which gets worse as the forgetting factor approaches 1.
 In contrast, the proposed \SFIIVAm{} and \SFIIVAo{} methods maintained performance even after the CMA rotation.
@@ -654,24 +654,23 @@ Comparing \SFIIVAm{} and \SFIIVAo{}, \SFIIVAm{} performed slightly better.
 This may be because \SFIIVAo{} estimates the source image at the reference microphone, while the reference signal for SI-SDR evaluation was the source image at the reference position.
 \begin{figure}[t]
   \begin{minipage}[t]{.5\textwidth}
-    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_900.pdf}\subcaption{$\forget = 0.90 $}\label{fig:plot:gauss:900}
-    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:gauss:950}
+    \centering\includegraphics{figures/plots/online/line_900.pdf}\subcaption{$\forget = 0.90 $}\label{fig:plot:line:900}
+    \centering\includegraphics{figures/plots/online/line_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:line:950}
   \end{minipage}
   \begin{minipage}[t]{.5\textwidth}
-    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:gauss:980}
-    \centering\includegraphics{figures/plots/online/Gauss_8000_fft4096_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:gauss:990}
+    \centering\includegraphics{figures/plots/online/line_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:line:980}
+    \centering\includegraphics{figures/plots/online/line_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:line:990}
   \end{minipage}
   \caption{Segmental SI-SDR improvements (SI-SDRi) every \SI{1}{\second} with $\Src = 5$ and $\text{RT}_{60} \approx \SI{100}{\milli\second}$.}%
-  \label{fig:plots:sisdr}
+  \label{fig:plot:line}
 \end{figure}
 
-\Cref{fig:plots:bp} shows the beam patterns of demixing matrices calculated by each method.
+\Cref{fig:plos:beam} shows the beam patterns of demixing matrices calculated by each method.
 \Cref{fig:plot:bp:ref} is the result calculated before rotation.
 \Cref{fig:plot:bp:sfiivao} and \cref{fig:plot:bp:sfiivam} are the results with demixing matrices respectively calculated with \SFIIVAm{} and \SFIIVAo{} after rotation.
 Dark regions in each plot represent nulls in that direction.
 In the case of BSS, the desired result is that the direction of the estimated source is brighter, and the others are darker.
-% The white lines in each plot show the true direction of each source signal before and after rotation.
-As shown in \cref{fig:plots:bp}, the results of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivao} were similar to each other, and only \cref{fig:plot:bp:sfiivam} was different from others.
+As shown in \cref{fig:plot:beam}, the results of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivao} were similar to each other, and only \cref{fig:plot:bp:sfiivam} was different from others.
 The dark areas of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivao} were nearly at the desired directions since \SFIIVAo{} approximately canceled the rotation of CMA and thus updated demixing matrices in the same direction even after the rotation.
 In contrast, the result in \cref{fig:plot:bp:sfiivam} gave the correct direction after the CMA rotation.
 \begin{figure}[t]
@@ -692,7 +691,7 @@ In contrast, the result in \cref{fig:plot:bp:sfiivam} gave the correct direction
     The light and dark colours represent the gain in decibels.
     The five white lines in each plot represent the true direction of the source signal.
   }%
-  \label{fig:plots:bp}
+  \label{fig:plot:beam}
 \end{figure}
 
 \subsection*{\todo{Results for Large Dataset (WORK IN PROGRESS)}}
