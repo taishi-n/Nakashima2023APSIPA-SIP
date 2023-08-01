@@ -191,13 +191,12 @@ We conduct some experiments to show the efficacy of the SFI for online BSS in \c
   \caption{Overview of blind source separation problem with circular microphone array.}%
   \label{fig:bss}
 \end{figure}
-Let us consider the blind source separation problem with a CMA that may be rotated as shown in \cref{fig:bss}.
+Let us consider the blind source separation problem with a CMA that can be rotated in the horizontal plane as shown in \cref{fig:bss}.
 Let $\Src$ and $\Mic$ be the number of sources and microphones, respectively.
-We assume that the observed signal $\Obs _{\ft}$ is modeled as
+We assume that the observed signal $\Obs _{\ft}$ is in the short-time Fourier transform (STFT) domain modeled as
 \begin{equation}
   \Obs _{\ft} = \steer _{1,\ft} \sig _{1,\ft} + \dots + \steer _{\Src,\ft} \sig _{\Src,\ft} = \sum _{\src=1} ^{\Src} \steer _{\src,\ft} \sig _{\src,\ft},\label{eq:mix}
 \end{equation}
-in the short-time Fourier transform (STFT) domain,
 where $\freq = 1, \dots, \Freq$ denotes the frequency bin index,
 $\tframe = 1, \dots, \Tframe$ denotes the time frame index,
 $\sig _{\src,\ft} \in \C\; (\src = 1, \dots, \Src)$ denotes the $\src$th source signal,
@@ -211,6 +210,7 @@ Under the definition, $\str _{\mic,\src,\ft} \; (\mic = 2, \dots, \Mic,\; \foral
 Note that many BSS methods require a time-invariant mixing system $\steer _{\src,\freq}\; (\forall \src)$,
 whereas, in this paper, steering vectors are time-variant $\steer _{\src,\ft}\; (\forall \src)$ to account for CMA rotations.
 We aim to estimate source images at the reference microphone even if the CMA is rotated.
+In the following, we assume that the rotation angle $\theta_t$ at each frame is available by another sensor.
 
 Next, we consider an online BSS problem with the model defined above.
 We henceforth assume that the number of microphones of CMA is equal to that of sources; $\Mic = \Src$.
@@ -255,7 +255,7 @@ ${\{\Obs _{\ft}\}}_{\ft}$ denotes the set of $\Obs _{\ft}$ for all $\freq$ and $
 
 \subsection{Online Auxiliary-Function-Based Independent Vector Analysis}\label{subsec:oiva}
 
-Online AuxIVA \cite{Taniguchi:2014:HSCMA} is an extension of AuxIVA \cite{Ono:2011:WASPAA} and estimates demixing matrices $\{\Demix _{\ft}\} _{\freq}$ for each $\tframe$ by minimizing the following objective function:
+Online AuxIVA \cite{Taniguchi:2014:HSCMA} is an extension of AuxIVA \cite{Ono:2011:WASPAA} to an online algorithm and estimates demixing matrices $\{\Demix _{\ft}\} _{\freq}$ for each $\tframe$ by minimizing the following objective function:
 \begin{align}
   J _{\tframe}(\Demix _{\ft}) &= \sum _{\src = 1} ^{\Src} \demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft} ^{\nohermite} - \logdet{\Demix _{\ft}} ^2, \label{eq:obj} \\
   \cov _{\src,\ft} &= \forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} ^{\nohermite} \Obs _{\ft} ^{\hermite}, \label{eq:cov} \\
@@ -265,7 +265,7 @@ where $\weight\colon \R _{>0} \to \R _{>0}$ is defined as $\weight(\var) = \cont
 $\cont(\var)$ is called a contrast function and derived from the probability density function of source signals,
 and $\forget\; (0 \leq \forget < 1)$ is called a forgetting factor.
 In this paper, we assume that $\weight (\var) = \Freq/{\var ^2}$, which represents the time-varying Gaussian distribution \cite{Ono:2012:APSIPA}.
-Using the recursive update for covariance matrix \eqref{eq:cov}, we can apply efficient update methods proposed for original (batch) AuxIVA algorithms, such as \emph{iterative projection (IP)} \cite{Ono:2011:WASPAA}, to minimize the objective function \eqref{eq:obj}.
+Using the recursive update for a weighted covariance matrix \eqref{eq:cov}, we can apply efficient update methods proposed for original (batch) AuxIVA algorithms, such as \emph{iterative projection (IP)} \cite{Ono:2011:WASPAA}, to minimize the objective function \eqref{eq:obj}.
 IP cyclically updates each \emph{demixing vector} $\demix _{\src,\ft} ^{\hermite}\; (\src = 1, \dots, \Src)$ (row of the demixing matrix $\Demix _{\ft}$) using the following update rule:
 \begin{align}
   \demix _{\src,\ft} &\gets (\Demix _{\ft} \cov _{\src\ft}) ^{-1} \eye _{\src} \label{eq:ip:proj}, \\
@@ -289,6 +289,10 @@ we apply the following back-projection technique \cite{Murata:2001:NC} as a post
 \end{align}
 where $\diag(\cdot)$ is an operator to construct a diagonal matrix whose each element equals to the corresponding element of the given vector.
 \Cref{alg:iva} summarises the online AuxIVA algorithm.
+
+The online updates of $\cov _{\src,\ft}$ in \eqref{eq:cov} enable the online AuxIVA to track the slow movement of sound sources or microphones progressively.
+Nevertheless, it cannot promptly adapt to a swift change, which can happen in head rotation with wearing CMA. This research is motivated by the objective to solve this problem.
+
 \begin{algorithm}{Online AuxIVA (OIVA)}{iva}
   \textbf{Input:} $\{\Obs _{\ft}\} _{\ft}$, $ \{\Demix _{\freq,0}\}_{\freq}$, $ \{\cov _{\src,\freq,0}\}_{\src,\freq}$, $ \forget$\\
   \textbf{Output:} $\{\Est _{\ft}\} _{\ft}$
@@ -433,6 +437,7 @@ By using the expression above, we assume that the observed signal with CMA rotat
 Note that $\rotSpat _{\tframe}$ is required to be known with inertial measurement unit sensors or estimated using some methods, such as maximum likelihood estimation \cite{Lian:2021:APSIPA}.
 
 \section{Proposed Method}\label{sec:proposed}
+
 
 \subsection{SFI-based Online AuxIVA with Transformation of Latest Observation}
 % TODO: 観測信号に対する音場補間，W/Vに対する変換との違いのイメージ図
