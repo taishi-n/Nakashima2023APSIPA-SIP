@@ -695,6 +695,36 @@ In contrast, the result in \cref{fig:plot:bp:sfiivam} gave the correct direction
   \label{fig:plots:bp}
 \end{figure}
 
+\subsection*{\todo{Results for Large Dataset (WORK IN PROGRESS)}}
+\todo{TODO: explanations for \cref{fig:plot:hist}, \cref{fig:plot:box}, and \cref{tab:sdr}.}
+\begin{figure}[t]
+  \begin{minipage}[t]{\textwidth}
+    \centering\includegraphics{figures/plots/online/hist_900.pdf}\subcaption{$\forget = 0.90 $}\label{fig:plot:hist:900}
+  \end{minipage}
+  \begin{minipage}[t]{\textwidth}
+    \centering\includegraphics{figures/plots/online/hist_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:hist:950}
+  \end{minipage}
+  \begin{minipage}[t]{\textwidth}
+    \centering\includegraphics{figures/plots/online/hist_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:hist:980}
+  \end{minipage}
+  \begin{minipage}[t]{\textwidth}
+    \centering\includegraphics{figures/plots/online/hist_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:hist:990}
+  \end{minipage}
+  \caption{Histogram of segmental SI-SDR improvements (SI-SDRi) before and after CMA rotation.}%
+  \label{fig:plot:hist}
+\end{figure}
+\begin{figure}[t]
+  \begin{minipage}[t]{.5\textwidth}
+    \centering\includegraphics{figures/plots/online/box_900.pdf}\subcaption{$\forget = 0.90 $}\label{fig:plot:hist:900}
+    \centering\includegraphics{figures/plots/online/box_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:hist:950}
+  \end{minipage}
+  \begin{minipage}[t]{.5\textwidth}
+    \centering\includegraphics{figures/plots/online/box_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:hist:980}
+    \centering\includegraphics{figures/plots/online/box_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:hist:990}
+  \end{minipage}
+  \caption{Box plot of segmental SI-SDR improvements (SI-SDRi) before and after CMA rotation.}%
+  \label{fig:plot:box}
+\end{figure}
 \begin{table}[t]
   \caption{Mean and standard deviation of SI-SDRi before and after CMA rotation.}%
   \label{tab:sdr}
