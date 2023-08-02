@@ -703,8 +703,19 @@ This may be because \SFIIVAo{} estimates the source image at the reference micro
   \caption{Box plot of SI-SDR improvements (SI-SDRi) before and after CMA rotation.}%
   \label{fig:plot:box}
 \end{figure}
+
+\subsection{Robustness against Estimation Error}
+
+To check the robustness against errors in estimating the angle of CMA rotation, we compared results when the estimated angles used for \SFIIVAo{} and \SFIIVAm{} differed from the true angle.
+As discussed in \cref{fig:plot:bp:sfiivam}, we expected errors to accumulate when there is an error in the estimated angle since \SFIIVAo{} transforms the observed signal every frame.
+In contrast, \SFIIVAm{} performs the transformation only at the CMA rotation, so the effect of the estimation error should decrease with time.
+
+\Cref{tab:sdr} shows the averaged over samples and channels before and after CMA rotation with an estimation error.
+The forgetting factor $\forget$ was fixed to $0.98$ in this experiment.
+As expected, when the estimation angle was \SI{60}{\degree}, the SI-SDRi of both methods dropped by about \SI{8}{\decibel} in the \SI{30}{\second} immediately after the CMA rotation.
+On the other hand, comparing the performance at \SI{59}{\second}, sufficiently after the CMA rotation, the performance of \SFIIVAm{} was about \SI{5}{\decibel} higher than that of \SFIIVAo{}.
 \begin{table}[t]
-  \caption{Mean SI-SDRi before and after CMA rotation.}%
+  \caption{Average SI-SDRi with estimation error of CMA rotation. True angle was \SI{40}{\degree}. Forgetting factor $\forget = 0.98$.}%
   \label{tab:sdr}
   \centering
   \sisetup{%
@@ -716,85 +727,37 @@ This may be because \SFIIVAo{} estimates the source image at the reference micro
   \footnotesize
   \begin{minipage}[t]{.45\linewidth}
     \centering
-    \subcaption{$\forget = 0.9$}%
-    \label{tab:sdr:90}
-    \begin{tabular}{lSS}
-      \toprule
-      Method   & \multicolumn{2}{c}{Time (s)} \\ \cmidrule{2-3}
-               &       {30} &       {59} \\
-               \midrule
-      Naive    &   0.244856 &   6.371168 \\
-      Reset    &  -4.830337 &   6.404149 \\
-      SFIIVA-O &   5.127707 &   6.143079 \\
-      SFIIVA-M &   5.065312 &   6.436108 \\
-      \bottomrule
-    \end{tabular}
-  \end{minipage}
-  \begin{minipage}[t]{.45\linewidth}
-    \centering
-    \subcaption{$\forget = 0.95$}%
-    \label{tab:sdr:95}
-    \begin{tabular}{lSS}
-      \toprule
-      Method   & \multicolumn{2}{c}{Time (s)} \\ \cmidrule{2-3}
-               &       {30} &       {59} \\
-               \midrule
-      Naive    &   2.849818 &  16.652346 \\
-      Reset    &  -7.059805 &  16.704147 \\
-      SFIIVA-O &  13.451307 &  15.548719 \\
-      SFIIVA-M &  13.705048 &  16.645762 \\
-      \bottomrule
-    \end{tabular}
-  \end{minipage}
-  \vspace{1em}
-
-  \begin{minipage}[t]{.45\linewidth}
-    \centering
-    \subcaption{$\forget = 0.98$}%
+    \subcaption{Estimated angle of \SI{40}{\degree}, which is equal to the ground truth.}%
     \label{tab:sdr:98}
     \begin{tabular}{lSS}
       \toprule
-      Method   & \multicolumn{2}{c}{Time (s)} \\ \cmidrule{2-3}
-               &       {30} &       {59} \\
-               \midrule
-      Naive    &   4.000305 &  25.698304 \\
-      Reset    & -10.361193 &  23.402043 \\
-      SFIIVA-O &  17.988841 &  22.130434 \\ \rowcolor[gray]{0.8}
-      SFIIVA-M &  18.796094 & \bfseries  25.623199 \\
+        Method   & \multicolumn{2}{c}{Time (s)} \\ \cmidrule{2-3}
+                 &       {30} &       {59} \\
+      \midrule
+        SFIIVA-O &  17.988841 &  22.130434 \\ \rowcolor[gray]{0.8}
+        SFIIVA-M &  18.796094 & \bfseries  25.623199 \\
       \bottomrule
     \end{tabular}
   \end{minipage}
   \begin{minipage}[t]{.45\linewidth}
     \centering
-    \subcaption{$\forget = 0.99$}%
-    \label{tab:sdr:99}
+    \subcaption{Estimated angle of \SI{60}{\degree}.\\~}%
+    \label{tab:sdr:98}
     \begin{tabular}{lSS}
       \toprule
-      Method   & \multicolumn{2}{c}{Time (s)} \\ \cmidrule{2-3}
-               &       {30} &       {59} \\
-               \midrule
-      Naive    &   2.062067 &  23.513201 \\
-      Reset    & -11.815238 &  14.089287 \\
-      SFIIVA-O &  10.706279 &  21.706356 \\ \rowcolor[gray]{0.8}
-      SFIIVA-M &  11.242948 &  \bfseries 24.893788 \\
+        Method   & \multicolumn{2}{c}{Time (s)} \\ \cmidrule{2-3}
+                 &       {30} &       {59} \\
+      \midrule
+        SFIIVA-O &   9.922167 &  20.262950 \\ \rowcolor[gray]{0.8}
+        SFIIVA-M &   9.980653 &  \bfseries 25.626287 \\
       \bottomrule
     \end{tabular}
   \end{minipage}
 \end{table}
-\begin{figure}[t]
-  \begin{minipage}[t]{.45\textwidth}
-    \centering\includegraphics{figures/plots/online/box_980.pdf}\subcaption{Estimated angle \SI{40}{\degree}, which is equal to the ground truth.}\label{fig:plot:box:980}
-  \end{minipage}
-  \begin{minipage}[t]{.45\textwidth}
-    \centering\includegraphics{figures/plots/online/box_980_err.pdf}\subcaption{Estimated angle \SI{60}{\degree}}\label{fig:plot:box:980:deg60}
-  \end{minipage}
-  \caption{Average SI-SDRi with estimation error of CMA rotation. True angle was \SI{40}{\degree}. Forgetting factor $\forget = 0.98$.}%
-  \label{fig:plot:box:err}
-\end{figure}
 
 \subsection{Difference of Beam Patterns}
 
-In this subsection, we investigate the difference between two proposed methods \SFIIVAo{} and \SFIIVAo{}.
+In this subsection, we picked one example to focus on the difference between two proposed methods \SFIIVAo{} and \SFIIVAo{}.
 \Cref{fig:plot:beam} shows the beam patterns of demixing matrices calculated by each method.
 \Cref{fig:plot:bp:ref} is the result calculated before rotation.
 \Cref{fig:plot:bp:sfiivao} and \cref{fig:plot:bp:sfiivam} are the results with demixing matrices respectively calculated with \SFIIVAm{} and \SFIIVAo{} after rotation.
