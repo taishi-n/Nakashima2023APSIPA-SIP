@@ -600,37 +600,53 @@ In this section, we experimentally confirm how much SFI contributes to BSS and d
 
 \subsection{Setup}
 
-To evaluate the performance of blind source separation in a rotating circular array environment.
-Five speech sounds from the JNAS dataset \cite{Itou:1999:AST}, two male and three female speakers, were processed to a length of \SI{60}{\second} and used as the source signals.
-The sampling frequency of the source signals was \SI{16}{\kilo\hertz}.
-These signals were simulated using the image source method \cite{Allen:1979:JASA} to generate a sound image.
+Simulation experiments with large random synthesized datasets were conducted to evaluate the performance of BSS under a situation where CMA rotates.
+The synthesized datasets consisted of 100 samples, and each sample simulated observed signals with five source signals with 5-channel CMA using the image source method \cite{Allen:1979:JASA}.
+As the source signal, we used the speech signals of five people (\texttt{jvs001}, \texttt{jvs002,} $\hdots$, \texttt{jvs005}) from the JVS dataset \cite{Takamichi:2019:arxiv}.
+In this experiment, the utterances included in \texttt{parallel100} were randomly concatenated for each speaker.
+The length was \SI{60}{\second}, and the sampling frequency was resampled from \SI{24}{\kilo\hertz} to \SI{16}{\kilo\hertz}.
 The parameters were set so that the reverberation time was approximately \SI{100}{\milli\second}.
 A circular microphone array with $\Src = 5$ channels and a radius of \SI{2}{\centi\metre} was placed in the center of the room.
-\Cref{fig:layout} shows the arrangement of the sound sources and microphones.
-To simulate the rotation of the microphone array, the sound images were generated when the circular array was rotated \SI{40}{\degree} counter-clockwise from the horizontal axis in \cref{fig:layout} 1 and was stitched together in the 0--30\si{\second} and 30--60\si{\second} intervals, respectively.
+Each source was randomly placed at least \SI{1}{\metre} from the centre of the CMA and within an angle ranging from $\frac{360}{\Src} \src$ to $\frac{360\si{\degree}}{\Src} (\src - 1) + \frac{180\si{\degree}}{\Src}\; (\src = 1, \dots, \Src)$.
+%   0,  36
+%  72, 108
+% 144, 180
+% 216, 252
+% 288, 324
+\Cref{fig:layout:range} and \cref{fig:layout:exp}, respectively, illustrate the range of the sources' placement and its example.
+To simulate the rotation of the CMA, the sound images were generated when the CMA was rotated \SI{40}{\degree} counter-clockwise from the horizontal axis and was stitched together in the 0--30\si{\second} and 30--60\si{\second} intervals, respectively.
 Note that the rotation angle and time are given oracle-manner to focus on improving the robustness of the sound field interpolation.
-A short-time Fourier transform with a frame length of 4096 points, a shift length of 2048 points, and a Hamming window was performed on the obtained observed signals.
-The scale of the output signal was restored by the back-projection shown in \cref{alg:iva}, with the reference microphone as microphone 1 in \cref{fig:layout}.
-The separation performance was evaluated by averaging the scale-invariant signal-to-distortion ratio (SI-SDR) \cite{LeRoux:2019:ICASSP} and its improvement (SI-SDR improvements; SI-SDRi) per channel.
-The reference signal for the SI-SDR evaluation was the source image recorded with a rotated CMA.
+STFT was performed on the observed signals with a frame length of 4096 points, a shift length of 2048 points, and a Hamming window.
+The scale of the output signal was restored by the back-projection shown in \cref{alg:iva}, with the reference microphone as microphone 1 in \cref{fig:layout:exp}.
+The separation performance was evaluated by the scale-invariant signal-to-distortion ratio (SI-SDR) \cite{LeRoux:2019:ICASSP} and its improvement (SI-SDR improvements; SI-SDRi).
+The reference signal for the SI-SDR was the source image recorded with a rotated CMA.
 \begin{figure}[t]
   \centering
-  % \includegraphics{figures/room_layout.pdf}
-  \begin{minipage}[t]{.45\linewidth}
-    \centering\includegraphics{figures/room_layout_000.pdf}\subcaption{Room layout before rotation.}\label{fig:room:ref}
+  \begin{minipage}[t]{.32\linewidth}
+    \centering
+    \includegraphics[width=\columnwidth]{figures/room_layout_range.pdf}
+    \subcaption{Description of source placement. The orange shaded area indicates the range where the sources are randomly placed.}%
+    \label{fig:layout:range}
   \end{minipage}
-  \begin{minipage}[t]{.45\linewidth}
-    \centering\includegraphics{figures/room_layout_040.pdf}\subcaption{Room layout before rotation.}\label{fig:room:rot}
+  \begin{minipage}[t]{.32\linewidth}
+    \centering
+    \includegraphics[width=\columnwidth]{figures/room_layout_000.pdf}
+    \subcaption{Example room layout before rotation.}%
+    \label{fig:layout:ref}
+  \end{minipage}
+  \begin{minipage}[t]{.32\linewidth}
+    \centering
+    \includegraphics[width=\columnwidth]{figures/room_layout_040.pdf}
+    \subcaption{Example room layout after rotation.}%
+    \label{fig:layout:rot}
   \end{minipage}
   \caption{Room layout.}%
-  \label{fig:layout}
+  \label{fig:layout:exp}
 \end{figure}
-
-\subsection{Source Separation Performance}
 
 We compared the following four methods:
 \begin{description}
-  \item[\NaiveIVA] Online AuxIVA described in \cref{subsec:oiva} as a baseline in our experiments. (See \Cref{alg:iva}.)
+  \item[\NaiveIVA] Online AuxIVA described in \cref{subsec:oiva} as a baseline.
   \item[\ResetIVA] Re-initialize covariance and demixing matrices when the CMA was rotated:
       $\Demix _{\freq,\rotFra - 1} \gets \Eye, \; \cov _{\src,\freq,\rotFra - 1} \gets \varepsilon \Eye.$
   \item[\SFIIVAo] Apply SFI for observed signals after the CMA rotation CMA frame by frame. (See \Cref{alg:sfiva-o}.)
@@ -638,7 +654,6 @@ We compared the following four methods:
   \item[\SFIIVAm] Apply parameter transformation for covariance and demixing matrices after CMA rotation.  (See \Cref{alg:sfiva-m}.)
     % \\ $\rot{\Demix} _{\ft} \gets \Demix _{\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$,\; $\rot{\cov} _{\src,\ft} \gets \rotMat (\rotSpat _{\tframe}) \cov _{\src,\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$
 \end{description}
-
 The initial values for demixing and covariance matrices were
 $\Demix _{\freq,0} = \Eye\; (\forall \freq)$, $\cov _{\src,\freq,0} = 10^{-3}\times\Eye\; (\forall \src, \freq)$, respectively.
 We set the number of iterations in each time frame in \cref{alg:iva} $\Itr$ to 5.
@@ -646,26 +661,153 @@ We ran experiments with varying forgetting factors $\forget = 0.9, 0.95, 0.98, 0
 To increase numerous stability for the implementation of online AuxIVA,
 we applied the following ad-hoc normalization $\cov _{\src,\ft} \gets \cov _{\src,\ft} + 10 ^{-3} \Eye$ after updates by \eqref{eq:cov}.
 
-\Cref{fig:plot:line} shows the SI-SDRi every \SI{1}{\second}.
-Overall, \NaiveIVA{} and \ResetIVA{} showed a significant performance drop after the CMA rotation and improved again with time.
-Notably, \ResetIVA{} has the lowest performance before CMA rotation among all forgetting factors, which gets worse as the forgetting factor approaches 1.
-In contrast, the proposed \SFIIVAm{} and \SFIIVAo{} methods maintained performance even after the CMA rotation.
+\subsection{Source Separation Performance}
+
+\Cref{fig:plot:line} shows the SI-SDRi every \SI{1}{\second} averaged over samples and channels.
+Overall, \NaiveIVA{} and \ResetIVA{} showed a performance drop after the CMA rotation and improved again with time.
+\ResetIVA{} has the lowest performance before CMA rotation among all forgetting factors, which gets worse as the forgetting factor approaches 1.
+In contrast, the proposed \SFIIVAm{} and \SFIIVAo{} methods maintained better performance after the CMA rotation than the others.
 Comparing \SFIIVAm{} and \SFIIVAo{}, \SFIIVAm{} performed slightly better.
 This may be because \SFIIVAo{} estimates the source image at the reference microphone, while the reference signal for SI-SDR evaluation was the source image at the reference position.
 \begin{figure}[t]
-  \begin{minipage}[t]{.5\textwidth}
+  \begin{minipage}[t]{.45\textwidth}
     \centering\includegraphics{figures/plots/online/line_900.pdf}\subcaption{$\forget = 0.90 $}\label{fig:plot:line:900}
+  \end{minipage}
+  \begin{minipage}[t]{.45\textwidth}
     \centering\includegraphics{figures/plots/online/line_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:line:950}
   \end{minipage}
-  \begin{minipage}[t]{.5\textwidth}
+  \vspace{.5em}
+
+  \begin{minipage}[t]{.45\textwidth}
     \centering\includegraphics{figures/plots/online/line_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:line:980}
+  \end{minipage}
+  \begin{minipage}[t]{.45\textwidth}
     \centering\includegraphics{figures/plots/online/line_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:line:990}
   \end{minipage}
-  \caption{Segmental SI-SDR improvements (SI-SDRi) every \SI{1}{\second} with $\Src = 5$ and $\text{RT}_{60} \approx \SI{100}{\milli\second}$.}%
+  \caption{SI-SDR improvements (SI-SDRi) every \SI{1}{\second}}%
   \label{fig:plot:line}
 \end{figure}
 
-\Cref{fig:plos:beam} shows the beam patterns of demixing matrices calculated by each method.
+\Cref{fig:plot:box} and \cref{tab:sdr} show the SI-SDRi averaged over samples and channels before and after CMA rotation.
+\todo{Explanation...}
+\begin{figure}[t]
+  \begin{minipage}[t]{.45\textwidth}
+    \centering\includegraphics{figures/plots/online/box_900.pdf}\subcaption{$\forget = 0.90 $}\label{fig:plot:hist:900}
+  \end{minipage}
+  \begin{minipage}[t]{.45\textwidth}
+    \centering\includegraphics{figures/plots/online/box_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:hist:950}
+  \end{minipage}
+  \vspace{.5em}
+
+  \begin{minipage}[t]{.45\textwidth}
+    \centering\includegraphics{figures/plots/online/box_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:hist:980}
+  \end{minipage}
+  \begin{minipage}[t]{.45\textwidth}
+    \centering\includegraphics{figures/plots/online/box_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:hist:990}
+  \end{minipage}
+  \caption{Box plot of SI-SDR improvements (SI-SDRi) before and after CMA rotation.}%
+  \label{fig:plot:box}
+\end{figure}
+\begin{table}[t]
+  \caption{Mean SI-SDRi before and after CMA rotation.}%
+  \label{tab:sdr}
+  \centering
+  \sisetup{%
+    table-format=2.2,
+    table-alignment-mode=format,
+    table-auto-round=true,
+    detect-weight=true,
+  }
+  \footnotesize
+  \begin{minipage}[t]{.45\linewidth}
+    \centering
+    \subcaption{$\forget = 0.9$}%
+    \label{tab:sdr:90}
+    \begin{tabular}{lSS}
+      \toprule
+      Method   & \multicolumn{2}{c}{Time (s)} \\ \cmidrule{2-3}
+               &       {30} &       {59} \\
+               \midrule
+      Naive    &   0.244856 &   6.371168 \\
+      Reset    &  -4.830337 &   6.404149 \\
+      SFIIVA-O &   5.127707 &   6.143079 \\
+      SFIIVA-M &   5.065312 &   6.436108 \\
+      \bottomrule
+    \end{tabular}
+  \end{minipage}
+  \begin{minipage}[t]{.45\linewidth}
+    \centering
+    \subcaption{$\forget = 0.95$}%
+    \label{tab:sdr:95}
+    \begin{tabular}{lSS}
+      \toprule
+      Method   & \multicolumn{2}{c}{Time (s)} \\ \cmidrule{2-3}
+               &       {30} &       {59} \\
+               \midrule
+      Naive    &   2.849818 &  16.652346 \\
+      Reset    &  -7.059805 &  16.704147 \\
+      SFIIVA-O &  13.451307 &  15.548719 \\
+      SFIIVA-M &  13.705048 &  16.645762 \\
+      \bottomrule
+    \end{tabular}
+  \end{minipage}
+  \vspace{1em}
+
+  \begin{minipage}[t]{.45\linewidth}
+    \centering
+    \subcaption{$\forget = 0.98$}%
+    \label{tab:sdr:98}
+    \begin{tabular}{lSS}
+      \toprule
+      Method   & \multicolumn{2}{c}{Time (s)} \\ \cmidrule{2-3}
+               &       {30} &       {59} \\
+               \midrule
+      Naive    &   4.000305 &  25.698304 \\
+      Reset    & -10.361193 &  23.402043 \\
+      SFIIVA-O &  17.988841 &  22.130434 \\ \rowcolor[gray]{0.8}
+      SFIIVA-M &  18.796094 & \bfseries  25.623199 \\
+      \bottomrule
+    \end{tabular}
+  \end{minipage}
+  \begin{minipage}[t]{.45\linewidth}
+    \centering
+    \subcaption{$\forget = 0.99$}%
+    \label{tab:sdr:99}
+    \begin{tabular}{lSS}
+      \toprule
+      Method   & \multicolumn{2}{c}{Time (s)} \\ \cmidrule{2-3}
+               &       {30} &       {59} \\
+               \midrule
+      Naive    &   2.062067 &  23.513201 \\
+      Reset    & -11.815238 &  14.089287 \\
+      SFIIVA-O &  10.706279 &  21.706356 \\ \rowcolor[gray]{0.8}
+      SFIIVA-M &  11.242948 &  \bfseries 24.893788 \\
+      \bottomrule
+    \end{tabular}
+  \end{minipage}
+\end{table}
+
+\begin{figure}[t]
+  \begin{minipage}[t]{\textwidth}
+    \centering\includegraphics{figures/plots/online/hist_900.pdf}\subcaption{$\forget = 0.90 $}\label{fig:plot:hist:900}
+  \end{minipage}
+  \begin{minipage}[t]{\textwidth}
+    \centering\includegraphics{figures/plots/online/hist_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:hist:950}
+  \end{minipage}
+  \begin{minipage}[t]{\textwidth}
+    \centering\includegraphics{figures/plots/online/hist_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:hist:980}
+  \end{minipage}
+  \begin{minipage}[t]{\textwidth}
+    \centering\includegraphics{figures/plots/online/hist_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:hist:990}
+  \end{minipage}
+  \caption{Histogram of SI-SDR improvements (SI-SDRi) before and after CMA rotation.}%
+  \label{fig:plot:hist}
+\end{figure}
+
+\subsection{Difference of Beam Patterns}
+
+In this subsection, we investigate the difference between two proposed methods \SFIIVAo{} and \SFIIVAo{}.
+\Cref{fig:plot:beam} shows the beam patterns of demixing matrices calculated by each method.
 \Cref{fig:plot:bp:ref} is the result calculated before rotation.
 \Cref{fig:plot:bp:sfiivao} and \cref{fig:plot:bp:sfiivam} are the results with demixing matrices respectively calculated with \SFIIVAm{} and \SFIIVAo{} after rotation.
 Dark regions in each plot represent nulls in that direction.
@@ -693,83 +835,6 @@ In contrast, the result in \cref{fig:plot:bp:sfiivam} gave the correct direction
   }%
   \label{fig:plot:beam}
 \end{figure}
-
-\subsection*{\todo{Results for Large Dataset (WORK IN PROGRESS)}}
-\todo{TODO: explanations for \cref{fig:plot:hist}, \cref{fig:plot:box}, and \cref{tab:sdr}.}
-\begin{figure}[t]
-  \begin{minipage}[t]{\textwidth}
-    \centering\includegraphics{figures/plots/online/hist_900.pdf}\subcaption{$\forget = 0.90 $}\label{fig:plot:hist:900}
-  \end{minipage}
-  \begin{minipage}[t]{\textwidth}
-    \centering\includegraphics{figures/plots/online/hist_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:hist:950}
-  \end{minipage}
-  \begin{minipage}[t]{\textwidth}
-    \centering\includegraphics{figures/plots/online/hist_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:hist:980}
-  \end{minipage}
-  \begin{minipage}[t]{\textwidth}
-    \centering\includegraphics{figures/plots/online/hist_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:hist:990}
-  \end{minipage}
-  \caption{Histogram of segmental SI-SDR improvements (SI-SDRi) before and after CMA rotation.}%
-  \label{fig:plot:hist}
-\end{figure}
-\begin{figure}[t]
-  \begin{minipage}[t]{.5\textwidth}
-    \centering\includegraphics{figures/plots/online/box_900.pdf}\subcaption{$\forget = 0.90 $}\label{fig:plot:hist:900}
-    \centering\includegraphics{figures/plots/online/box_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:hist:950}
-  \end{minipage}
-  \begin{minipage}[t]{.5\textwidth}
-    \centering\includegraphics{figures/plots/online/box_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:hist:980}
-    \centering\includegraphics{figures/plots/online/box_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:hist:990}
-  \end{minipage}
-  \caption{Box plot of segmental SI-SDR improvements (SI-SDRi) before and after CMA rotation.}%
-  \label{fig:plot:box}
-\end{figure}
-\begin{table}[t]
-  \caption{Mean and standard deviation of SI-SDRi before and after CMA rotation.}%
-  \label{tab:sdr}
-  \centering
-  \sisetup{table-format=2.2, table-alignment-mode=format, table-auto-round=true}
-  \begin{tabular}{lllSS}
-    \toprule
-        &    &          & \multicolumn{2}{l}{SI-SDRi (dB)} \\
-        &    &          &         {mean} &        {std} \\
-      Forgetting factor $\forget$ & Time (s) & Method & & \\
-    \midrule
-      0.90 & 30 & Naive    &   0.244856 & 5.000747 \\
-           &    & Reset    &  -4.830337 & 5.555344 \\
-           &    & SFIIVA-M &   5.065312 & 4.200715 \\
-           &    & SFIIVA-O &   5.127707 & 4.291668 \\ \cmidrule{2-5}
-           & 59 & Naive    &   6.371168 & 3.451660 \\
-           &    & Reset    &   6.404149 & 3.460501 \\
-           &    & SFIIVA-M &   6.436108 & 3.435811 \\
-           &    & SFIIVA-O &   6.143079 & 3.535327 \\ \hline
-      0.95 & 30 & Naive    &   2.849818 & 3.579884 \\
-           &    & Reset    &  -7.059805 & 7.959535 \\
-           &    & SFIIVA-M &  13.705048 & 3.696854 \\
-           &    & SFIIVA-O &  13.451307 & 3.680528 \\ \cmidrule{2-5}
-           & 59 & Naive    &  16.652346 & 2.755190 \\
-           &    & Reset    &  16.704147 & 2.742908 \\
-           &    & SFIIVA-M &  16.645762 & 2.753046 \\
-           &    & SFIIVA-O &  15.548719 & 2.507915 \\ \hline
-      0.98 & 30 & Naive    &   4.000305 & 3.203627 \\
-           &    & Reset    & -10.361193 & 8.261436 \\
-           &    & SFIIVA-M &  18.796094 & 3.316340 \\
-           &    & SFIIVA-O &  17.988841 & 3.516160 \\ \cmidrule{2-5}
-           & 59 & Naive    &  25.698304 & 2.652934 \\
-           &    & Reset    &  23.402043 & 2.931695 \\
-           &    & SFIIVA-M &  25.623199 & 2.592745 \\
-           &    & SFIIVA-O &  22.130434 & 3.686233 \\ \hline
-      0.99 & 30 & Naive    &   2.062067 & 4.680030 \\
-           &    & Reset    & -11.815238 & 8.516685 \\
-           &    & SFIIVA-M &  11.242948 & 7.068764 \\
-           &    & SFIIVA-O &  10.706279 & 6.975261 \\ \cmidrule{2-5}
-           & 59 & Naive    &  23.513201 & 4.669065 \\
-           &    & Reset    &  14.089287 & 5.852374 \\
-           &    & SFIIVA-M &  24.893788 & 3.912823 \\
-           &    & SFIIVA-O &  21.706356 & 4.382981 \\
-    \bottomrule
-  \end{tabular}
-\end{table}
 
 \section{Conclusion}\label{sec:conclusion}
 % 本研究では，円状等間隔マイクロホンアレイにおける音場補間をブラインド音源分離に応用した．
