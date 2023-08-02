@@ -785,6 +785,16 @@ This may be because \SFIIVAo{} estimates the source image at the reference micro
     \end{tabular}
   \end{minipage}
 \end{table}
+\begin{figure}[t]
+  \begin{minipage}[t]{.45\textwidth}
+    \centering\includegraphics{figures/plots/online/box_980.pdf}\subcaption{Estimated angle \SI{40}{\degree}, which is equal to the ground truth.}\label{fig:plot:box:980}
+  \end{minipage}
+  \begin{minipage}[t]{.45\textwidth}
+    \centering\includegraphics{figures/plots/online/box_980_err.pdf}\subcaption{Estimated angle \SI{60}{\degree}}\label{fig:plot:box:980:deg60}
+  \end{minipage}
+  \caption{Average SI-SDRi with estimation error of CMA rotation. True angle was \SI{40}{\degree}. Forgetting factor $\forget = 0.98$.}%
+  \label{fig:plot:box:err}
+\end{figure}
 
 \subsection{Difference of Beam Patterns}
 
