@@ -586,9 +586,6 @@ Furthermore, unlike the method of SFI for the observation signal in the previous
 \end{algorithm}
 
 \section{Experimental Validation}\label{sec:experiment}
-% 以下では，CMAが時間フレーム$\rotFra$で角度$\rotSpat$瞬時に回転したとする．
-% Henceforth, we assume that CMA was instantaneously rotated at an angle $\rotSpat$ at time frame $\rotFra$.
-
 Although online AuxIVA can track microphone movements, its convergence performance highly depends on the forgetting factor.
 Furthermore, ICA-based BSS methods do not change the results even if the observed signals are ``remixed.''
 For example, the same output is obtained by inputting the 2-channel observed signals $x_1$ and $x_2$ as $x_1 + x_2$ and $x_1 - x_2$.
@@ -596,6 +593,7 @@ Since the transformation of the observed signals by the SFI can also be interpre
 the separation performance is expected to remain the same regardless of whether or not the SFI is performed before or after the CMA rotation.
 However, it has been reported that SFI improves the separation performance \cite{Nakashima:2022:ASJ:A}.
 In this section, we experimentally confirm how much SFI contributes to BSS and discuss the difference in the location of the source image due to the SFI.
+Henceforth, we assume that CMA was instantaneously rotated at an angle $\rotSpat$ at time frame $\rotFra$.
 
 \subsection{Setup}
 
@@ -663,6 +661,7 @@ we applied the following ad-hoc normalization $\cov _{\src,\ft} \gets \cov _{\sr
 \subsection{Source Separation Performance}
 
 \Cref{fig:plot:line} shows the SI-SDRi every \SI{1}{\second} averaged over samples and channels.
+\Cref{fig:plot:box} and \cref{tab:sdr} show the SI-SDRi averaged over samples and channels before and after CMA rotation.
 Overall, \NaiveIVA{} and \ResetIVA{} showed a performance drop after the CMA rotation and improved again with time.
 \ResetIVA{} has the lowest performance before CMA rotation among all forgetting factors, which gets worse as the forgetting factor approaches 1.
 In contrast, the proposed \SFIIVAm{} and \SFIIVAo{} methods maintained better performance after the CMA rotation than the others.
@@ -686,23 +685,20 @@ This may be because \SFIIVAo{} estimates the source image at the reference micro
   \caption{SI-SDR improvements (SI-SDRi) every \SI{1}{\second}}%
   \label{fig:plot:line}
 \end{figure}
-
-\Cref{fig:plot:box} and \cref{tab:sdr} show the SI-SDRi averaged over samples and channels before and after CMA rotation.
-\todo{Explanation...}
 \begin{figure}[t]
   \begin{minipage}[t]{.45\textwidth}
-    \centering\includegraphics{figures/plots/online/box_900.pdf}\subcaption{$\forget = 0.90 $}\label{fig:plot:hist:900}
+    \centering\includegraphics{figures/plots/online/box_900.pdf}\subcaption{$\forget = 0.90 $}\label{fig:plot:box:900}
   \end{minipage}
   \begin{minipage}[t]{.45\textwidth}
-    \centering\includegraphics{figures/plots/online/box_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:hist:950}
+    \centering\includegraphics{figures/plots/online/box_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:box:950}
   \end{minipage}
   \vspace{.5em}
 
   \begin{minipage}[t]{.45\textwidth}
-    \centering\includegraphics{figures/plots/online/box_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:hist:980}
+    \centering\includegraphics{figures/plots/online/box_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:box:980}
   \end{minipage}
   \begin{minipage}[t]{.45\textwidth}
-    \centering\includegraphics{figures/plots/online/box_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:hist:990}
+    \centering\includegraphics{figures/plots/online/box_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:box:990}
   \end{minipage}
   \caption{Box plot of SI-SDR improvements (SI-SDRi) before and after CMA rotation.}%
   \label{fig:plot:box}
