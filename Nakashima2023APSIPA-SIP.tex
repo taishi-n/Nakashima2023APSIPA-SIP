@@ -443,21 +443,15 @@ Note that $\rotSpat _{\tframe}$ must be known with inertial measurement unit sen
 % TODO: 観測信号に対する音場補間，W/Vに対する変換との違いのイメージ図
 
 % 本節では，CMAの回転に頑健なonline BSSを提案するために，BSSと文献1で提案されたSFIを組み合わせることを考える．
-% 以下では，CMAが時間フレーム$\rotFra$で角度$\rotSpat$瞬時に回転したとする．
-% この場合，通常のOnline AuxIVAでは回転前後で分離行列を推定し直す必要がある．
+% 通常のOnline AuxIVAでは回転前後で分離行列を推定し直す必要がある．
 % 前述したように，CMAの回転角度と回転時刻が得られていれば，SFIによってCMAの回転をキャンセルできため，分離行列を推定し直すことなく音源分離できる．
-In this section, we first consider the combined method of online BSS and SFI \cite{Wakabayashi:2023:ASLP} to propose a robust online BSS method against the rotation of CMA.
-Henceforth, we assume that CMA was instantaneously rotated at an angle $\rotSpat$ at time frame $\rotFra$.
-Conventional online AuxIVA requires re-estimating demixing matrices under such a situation.
-As described earlier, if we know the rotation angle $\rotSpat$ and rotation time frame $\rotFra$ of the CMA, the SFI cancels the rotation of the CMA, thus enabling BSS without re-estimating the demixing matrix.
-
-% CMAが回転する前の観測信号$\{\Obs _{\ft}\} _{\tframe = 1} ^{\rotFra - 1}$を用いて分離行列$\Demix _{\ft}$が推定できていたとする．
-% CMAの回転後，観測信号に対してSFIを適用し，$\Demix _{\ft}$を再推定せずにオンライン音源分離を行う：
-Suppose that the demixing matrix $\Demix _{\ft}$ is estimated using the observed signal $\{\Obs _{\ft}\} _{\tframe = 1} ^{\rotFra - 1}$ before the rotation of the CMA;
-after the rotation of the CMA, online BSS can be applied without re-estimating $\Demix _{\ft}$ by applying SFI to the observed signal
-\begin{equation}
-  \Obs _{\ft} \gets \left(\rotMat ^{\hermite} (\rotSpat) \Obs _{\ft}\right) \coloneqq \refpos{\Obs} _{\ft}.
-\end{equation}
+In this subsection, we consider the combined method of online BSS and SFI \cite{Wakabayashi:2023:ASLP} to propose a robust online BSS method against the rotation of CMA.
+Conventional online AuxIVA requires re-estimating demixing matrices.
+As described earlier, if we know the rotation angle of the CMA $\rotSpat _{\tframe}$, the SFI cancels the rotation of the CMA and thus enables us to apply BSS without re-estimating the demixing matrix by applying SFI to the observed signal
+\begin{align}
+  \varDelta \rotSpat _{\tframe} &\gets \rotSpat _{\tframe} - \rotSpat _{\tframe - 1}, \\
+  \Obs _{\ft} &\gets \left(\rotMat ^{\hermite} (\rotSpat _{\tframe}) \Obs _{\ft}\right) \coloneqq \refpos{\Obs} _{\ft}.
+\end{align}
 % \Cref{alg:sfiva-o}に，観測信号に対する音場補間を用いたOnline AuxIVAをまとめる．
 % この手法は，CMAが回転する状況下でのビームフォーミングの適用方法としても提案されている．
 % この処理は仮想的に観測信号のマイク位置を変えるため，回転後の位置におけるsource imageが得られず，実応用に問題が生じる場合がある．
@@ -520,28 +514,20 @@ From this, we have the estimated signal $\Est _{\ft}$ as:
 % 同様に，$\refpos{\Obs} _{\ft}$を用いて推定された時不変な共分散行列 $\refpos{\cov} _{\src,\freq}$ は次で計算される：
 where $\refpos{\Demix} _{\freq}$ is a time-invariant demixing matrix estimated using the observed signal at the reference position.
 Similarly, the time-invariant covariance matrix $\refpos{\cov} _{\src,\freq}$ estimated using $\refpos{\Obs} _{\ft}$ is calculated by:
-\begin{align}
-  \refpos{\cov} _{\src,\freq} &= \expct  _{\tframe} \left[\weight (\refpos{\var} _{\src,\tframe}) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite}\right], \\
-  \weight (\refpos{\var} _{\src,\tframe}) &= \frac{1}{\Freq} \sum _{\freq = 1} ^{\Freq} \lvert \refpos{\demix} _{\src,\freq} ^{\hermite} \refpos{\Obs} _{\ft} \rvert ^2,
-\end{align}
+\begin{equation}
+  \refpos{\cov} _{\src,\freq} = \expct  _{\tframe} \left[\weight (\var _{\src,\tframe}) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite}\right],
+  % \weight (\var _{\src,\tframe}) &= \frac{1}{\Freq} \sum _{\freq = 1} ^{\Freq} \lvert \refpos{\demix} _{\src,\freq} ^{\hermite} \refpos{\Obs} _{\ft} \rvert ^2,
+\end{equation}
 % ただし，$\expct _{\tframe}\left[\bm{A} _{\tframe}\right]$は，ある確率変数行列$\bm{A}_{\tframe}$の時間フレーム$\tframe$に対する期待値演算である．
 % $\Obs _{\ft}$の共分散行列${\cov} _{\src,\freq}$を，$\refpos{\cov} _{\src,\freq}$を用いて表すことを考える．
 % $\refpos{\Demix} _{\freq} = \Demix _{\freq} \rotMat (\rotSpat)$より，その各行ベクトルは$\refpos{\demix} _{\src,\freq} ^{\hermite} = \demix _{\src,\freq} ^{\hermite} \rotMat (\rotSpat)$であるので，
 % 重み関数$\weight(\var _{\src,\tframe})$は，
 where $\expct _{\tframe}\left[\bm{A} _{\tframe}\right]$ is the expectation operation for a random variable matrix $\bm{A}_{\tframe}$ with respect to time frame $\tframe$.
-We rewrite the covariance matrix ${\cov} _{\src,\freq}$ of $\Obs _{\ft}$ using $\refpos{\cov} _{\src,\freq}$.
-From $\refpos{\Demix} _{\freq} = \Demix _{\freq} \rotMat (\rotSpat)$, each row vector is $\refpos{\demix} _{\src,\freq} ^{\hermite} = \demix _{\src,\freq} ^{\hermite} \rotMat (\rotSpat)$.
-We then have the weight function $\weight(\var _{\src,\tframe})$ as
-\begin{align}
-  \weight (\var _{\src,\tframe}) &= \frac{1}{\Freq} \sum _{\freq = 1} ^{\Freq} \lvert \demix _{\src,\freq} ^{\hermite} \Obs _{\ft} \rvert ^2, \\
-                                 &= \frac{1}{\Freq} \sum _{\freq = 1} ^{\Freq} \lvert \demix _{\src,\freq} ^{\hermite} \rotMat (\rotSpat) \refpos{\Obs} _{\ft} \rvert ^2, \\
-                                 &= \frac{1}{\Freq} \sum _{\freq = 1} ^{\Freq} \lvert \refpos{\demix} _{\src,\freq} ^{\hermite} \refpos{\Obs} _{\ft} \rvert ^2 = \weight (\refpos{\var} _{\src,\tframe}).
-\end{align}
-Also, we have the covariance matrix as:
+We rewrite the covariance matrix ${\cov} _{\src,\freq}$ of $\Obs _{\ft}$ using $\refpos{\cov} _{\src,\freq}$ as:
 \begin{align}
   \cov _{\src,\freq} &= \expct  _{\tframe} \left[\weight (\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}\right], \\
-                     &= \expct  _{\tframe} \left[\weight (\refpos{\var} _{\src,\tframe}) \rotMat (\rotSpat) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite} \rotMat ^{\hermite} (\rotSpat)\right], \\
-                     &= \rotMat (\rotSpat)\; \expct  _{\tframe} \left[\weight (\refpos{\var} _{\src,\tframe}) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite} \right] \rotMat ^{\hermite} (\rotSpat), \\
+                     &= \expct  _{\tframe} \left[\weight (\var _{\src,\tframe}) \rotMat (\rotSpat) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite} \rotMat ^{\hermite} (\rotSpat)\right], \\
+                     &= \rotMat (\rotSpat)\; \expct  _{\tframe} \left[\weight (\var _{\src,\tframe}) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite} \right] \rotMat ^{\hermite} (\rotSpat), \\
                      &= \rotMat (\rotSpat) \refpos{\cov} _{\src,\freq} \rotMat ^{\hermite} (\rotSpat). \label{eq:rt:cov:batch}
 \end{align}
 % したがって，CMAの回転角度$\rotSpat$とその時刻$\rotFra$を知っていれば，その時刻において\eqref{eq:rt:demix:batch}, \eqref{eq:rt:cov:batch}の変換を行うことで前節と同じ結果を得ることができる．
@@ -558,7 +544,23 @@ For online AuxIVA, we perform the following transformation at the rotation time 
 This method can handle the observed signal without transforming the observed signal after the CMA rotation, so the source image at the post-rotated position is estimated.
 Furthermore, unlike the method of SFI for the observation signal in the previous subsection, no transformation is required for every single frame after rotation, and only one transformation at the time of the rotated time frame is needed.
 \todo{%
-角度の測定誤差があるとき，4.1 の手法は誤差が蓄積する，4.2 の方は忘却係数で忘れていくので，間違っていてもその影響は消えていくはず？
+}
+
+\todo{%
+  \paragraph{TODO}
+  \begin{itemize}
+    \item 回転角度は時間インデクスを含めて一般的に$\rotSpat _{\tframe}$で表し，4.2の時不変の話を出さずに書きたい
+    \begin{itemize}
+      \item[$\Rightarrow$] \eqref{eq:rt:cov:batch}の変換をどう正当化するか？
+      \item[$\Rightarrow$] SFIIVA-Mの利点として当初主張していた「回転した瞬間だけ計算すればよい」が言えなくなる，むしろ計算量が大きくなってしまう…
+      \item[$\Rightarrow$] 現状の実験結果は回転1回なので，5章で結局，回転角度はある時刻$\rotFra$で一回だけ回転という話に戻す必要がある
+    \end{itemize}
+  \item 角度の測定誤差があるときの利点
+    \begin{itemize}
+      \item SFIIVA-Oは誤差が蓄積する
+      \item SFIIVA-Mはオンライン更新で忘れていくので，推定角度が間違っていても収束するはず
+    \end{itemize}
+\end{itemize}
 }
 
 \begin{algorithm}{SFI-based Online AuxIVA with Transformation of Pre-update Demixing and Covariance Matrices (\SFIIVAm)}{sfiva-m}
@@ -584,6 +586,8 @@ Furthermore, unlike the method of SFI for the observation signal in the previous
 \end{algorithm}
 
 \section{Experimental Validation}\label{sec:experiment}
+% 以下では，CMAが時間フレーム$\rotFra$で角度$\rotSpat$瞬時に回転したとする．
+% Henceforth, we assume that CMA was instantaneously rotated at an angle $\rotSpat$ at time frame $\rotFra$.
 
 Although online AuxIVA can track microphone movements, its convergence performance highly depends on the forgetting factor.
 Furthermore, ICA-based BSS methods do not change the results even if the observed signals are ``remixed.''
