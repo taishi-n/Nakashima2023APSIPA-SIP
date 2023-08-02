@@ -491,7 +491,7 @@ For example, BSS in augmented reality space using a head-mounted display needs t
   \end{pseudo}
 \end{algorithm}
 
-\subsection{SFI-based Online AuxIVA with Transformation of Pre-update Demixing and Covariance Matrices}
+\subsection{SFI-based Online AuxIVA with Transformation of Pre-update Demixing and Weighted Covariance Matrices}
 
 % 前節の問題を解決するために，マイクの位置を保ったままCMA回転に頑健なonline BSSを提案する．
 % 観測信号のかわりにパラメータを変換することで，CMAが回転した後の位置におけるsource imageを得る手順を示す．
@@ -500,7 +500,7 @@ For example, BSS in augmented reality space using a head-mounted display needs t
 To solve the problem in the previous section, we propose an online BSS robust against CMA rotation while preserving the microphone position.
 We present a procedure to obtain the source image at the position after the CMA rotation by transforming the parameters instead of the observed signal.
 First, for simplicity, we discuss the parameter transformation in a \emph{time-invariant} case.
-In this case, demixing matrices $\Demix _{\freq}$ and covariance matrices $\cov _{\src,\freq}$ are independent on time frame $\tframe$.
+In this case, demixing matrices $\Demix _{\freq}$ and weighted covariance matrices $\cov _{\src,\freq}$ are independent on time frame $\tframe$.
 We assume that the observed signal recorded by a CMA rotated by an angle $\rotSpat$ strictly holds the following relation:
 \begin{equation}
   \Obs _{\ft} = \rotMat (\rotSpat) \refpos{\Obs} _{\ft}.
@@ -513,7 +513,7 @@ From this, we have the estimated signal $\Est _{\ft}$ as:
 % $\refpos{\Demix} _{\freq}$は，reference positionにおける観測信号を用いて推定された時不変な分離行列とみなせる．
 % 同様に，$\refpos{\Obs} _{\ft}$を用いて推定された時不変な共分散行列 $\refpos{\cov} _{\src,\freq}$ は次で計算される：
 where $\refpos{\Demix} _{\freq}$ is a time-invariant demixing matrix estimated using the observed signal at the reference position.
-Similarly, the time-invariant covariance matrix $\refpos{\cov} _{\src,\freq}$ estimated using $\refpos{\Obs} _{\ft}$ is calculated by:
+Similarly, the time-invariant weighted covariance matrix $\refpos{\cov} _{\src,\freq}$ estimated using $\refpos{\Obs} _{\ft}$ is calculated by:
 \begin{equation}
   \refpos{\cov} _{\src,\freq} = \expct  _{\tframe} \left[\weight (\var _{\src,\tframe}) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite}\right],
   % \weight (\var _{\src,\tframe}) &= \frac{1}{\Freq} \sum _{\freq = 1} ^{\Freq} \lvert \refpos{\demix} _{\src,\freq} ^{\hermite} \refpos{\Obs} _{\ft} \rvert ^2,
@@ -523,7 +523,7 @@ Similarly, the time-invariant covariance matrix $\refpos{\cov} _{\src,\freq}$ es
 % $\refpos{\Demix} _{\freq} = \Demix _{\freq} \rotMat (\rotSpat)$より，その各行ベクトルは$\refpos{\demix} _{\src,\freq} ^{\hermite} = \demix _{\src,\freq} ^{\hermite} \rotMat (\rotSpat)$であるので，
 % 重み関数$\weight(\var _{\src,\tframe})$は，
 where $\expct _{\tframe}\left[\bm{A} _{\tframe}\right]$ is the expectation operation for a random variable matrix $\bm{A}_{\tframe}$ with respect to time frame $\tframe$.
-We rewrite the covariance matrix ${\cov} _{\src,\freq}$ of $\Obs _{\ft}$ using $\refpos{\cov} _{\src,\freq}$ as:
+We rewrite the weighted covariance matrix ${\cov} _{\src,\freq}$ of $\Obs _{\ft}$ using $\refpos{\cov} _{\src,\freq}$ as:
 \begin{align}
   \cov _{\src,\freq} &= \expct  _{\tframe} \left[\weight (\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}\right], \\
                      &= \expct  _{\tframe} \left[\weight (\var _{\src,\tframe}) \rotMat (\rotSpat) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite} \rotMat ^{\hermite} (\rotSpat)\right], \\
@@ -563,7 +563,7 @@ Furthermore, unlike the method of SFI for the observation signal in the previous
 \end{itemize}
 }
 
-\begin{algorithm}{SFI-based Online AuxIVA with Transformation of Pre-update Demixing and Covariance Matrices (\SFIIVAm)}{sfiva-m}
+\begin{algorithm}{SFI-based Online AuxIVA with Transformation of Pre-update Demixing and Weighted Covariance Matrices (\SFIIVAm)}{sfiva-m}
   \textbf{Input:} $\{\Obs _{\ft}\} _{\ft}$, $ \{\Demix _{\freq,0}\}_{\freq}$, $\{\cov _{\src,\freq,0}\}_{\src,\freq}$, $\forget$, $\rotSpat _{\tframe}$ \\
   \textbf{Output:} $\{\Est _{\ft}\} _{\ft}$
   \begin{pseudo}
@@ -644,14 +644,14 @@ The reference signal for the SI-SDR was the source image recorded with a rotated
 We compared the following four methods:
 \begin{description}
   \item[\NaiveIVA] Online AuxIVA described in \cref{subsec:oiva} as a baseline.
-  \item[\ResetIVA] Re-initialize covariance and demixing matrices when the CMA was rotated:
+  \item[\ResetIVA] Re-initialize weighted covariance and demixing matrices when the CMA was rotated:
       $\Demix _{\freq,\rotFra - 1} \gets \Eye, \; \cov _{\src,\freq,\rotFra - 1} \gets \varepsilon \Eye.$
   \item[\SFIIVAo] Apply SFI for observed signals after the CMA rotation CMA frame by frame. (See \Cref{alg:sfiva-o}.)
     % \\ $\Obs _{\ft} = \rotMat ^{\hermite} (\rotSpat _{\tframe}) \rot{\Obs} _{\ft}$
-  \item[\SFIIVAm] Apply parameter transformation for covariance and demixing matrices after CMA rotation.  (See \Cref{alg:sfiva-m}.)
+  \item[\SFIIVAm] Apply parameter transformation for weighted covariance and demixing matrices after CMA rotation.  (See \Cref{alg:sfiva-m}.)
     % \\ $\rot{\Demix} _{\ft} \gets \Demix _{\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$,\; $\rot{\cov} _{\src,\ft} \gets \rotMat (\rotSpat _{\tframe}) \cov _{\src,\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$
 \end{description}
-The initial values for demixing and covariance matrices were
+The initial values for demixing and weighted covariance matrices were
 $\Demix _{\freq,0} = \Eye\; (\forall \freq)$, $\cov _{\src,\freq,0} = 10^{-3}\times\Eye\; (\forall \src, \freq)$, respectively.
 We set the number of iterations in each time frame in \cref{alg:iva} $\Itr$ to 5.
 We ran experiments with varying forgetting factors $\forget = 0.9, 0.95, 0.98, 0.99$, which were chosen so that the approximate number of frames $\frac{1}{1 - \forget} = 10, 20, 50, 100$.
