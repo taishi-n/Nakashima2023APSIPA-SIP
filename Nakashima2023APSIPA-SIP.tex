@@ -315,10 +315,10 @@ Nevertheless, it cannot promptly adapt to a swift change, which can happen in he
 
       for $\itr = 1,\, \dots,\, \Itr$ \\+
         for $\src = 1,\, \dots,\, \Src$ \\+
-          {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \ct{\eqref{eq:var}} \\
+          {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq = 1} ^{\Freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \ct{\eqref{eq:var}} \\
           {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{\eqref{eq:cov}, $\forall \freq$} \\
           {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{\eqref{eq:ip:proj}, $\forall \freq$} \\
-          {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{\eqref{eq:ip:norm}, $\forall \freq$} \\--
+          {$\demix _{\src,\ft}$} $\gets$ $\frac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{\eqref{eq:ip:norm}, $\forall \freq$} \\--
 
       % \nf{$
       %   \begin{bsmallmatrix}
@@ -487,10 +487,10 @@ For example, BSS in augmented reality space using a head-mounted display needs t
       {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$\forall \freq$} \\
       for $\itr = 1,\, \dots,\, \Itr$ \\+
         for $\src = 1,\, \dots,\, \Src$ \\+
-          {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \refpos{\Obs} _{\ft}} ^2}$ \ct{\eqref{eq:var}} \\
+          {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq = 1} ^{\Freq} \abs{\demix _{\src,\ft} ^{\hermite} \refpos{\Obs} _{\ft}} ^2}$ \ct{\eqref{eq:var}} \\
           {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite}$ \ct{\eqref{eq:cov}, $\forall \freq$} \\
           {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{\eqref{eq:ip:proj}, $\forall \freq$} \\
-          {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{\eqref{eq:ip:norm}, $\forall \freq$} \\--
+          {$\demix _{\src,\ft}$} $\gets$ $\frac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{\eqref{eq:ip:norm}, $\forall \freq$} \\--
 
       % \nf{$
       %   \begin{bsmallmatrix}
@@ -588,10 +588,10 @@ Furthermore, unlike the method of SFI for the observation signal in the previous
         {$\cov _{\src,\ft[-1]}$} $\gets$ $\rotMat (\varDelta\rotSpat _{\tframe}) \cov _{\src,\ft[-1]} \rotMat ^{\hermite} (\varDelta \rotSpat _{\tframe})$ \ct{$\forall \freq$} \\-
       for $\itr = 1,\, \dots,\, \Itr$ \\+
         for $\src = 1,\, \dots,\, \Src$ \\+
-          {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \ct{\eqref{eq:var}} \\
+          {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq = 1} ^{\Freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \ct{\eqref{eq:var}} \\
           {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{\eqref{eq:cov}, $\forall \freq$} \\
           {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{\eqref{eq:ip:proj}, $\forall \freq$} \\
-          {$\demix _{\src,\ft}$} $\gets$ $\dfrac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{\eqref{eq:ip:norm}, $\forall \freq$} \\--
+          {$\demix _{\src,\ft}$} $\gets$ $\frac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{\eqref{eq:ip:norm}, $\forall \freq$} \\--
 
       \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\eye _{1} ^{\top} \Demix _{\ft} ^{-1} \right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$}\\
       {$\Est _{\ft}$} $\gets$ $\proj{\Demix }_{\ft} \Obs _{\ft}$ \ct{\eqref{eq:pb:y}, $\forall \freq$}
@@ -635,19 +635,19 @@ The reference signal for the SI-SDR was the source image recorded with a rotated
   \begin{minipage}[t]{.32\linewidth}
     \centering
     \includegraphics[width=\columnwidth]{figures/room_layout_range.pdf}
-    \subcaption{Description of source placement. The orange shaded area indicates the range where the sources are randomly placed.}%
+    \subcaption{Sources are randomly placed in orange shaded area.}%
     \label{fig:layout:range}
   \end{minipage}
   \begin{minipage}[t]{.32\linewidth}
     \centering
     \includegraphics[width=\columnwidth]{figures/room_layout_000.pdf}
-    \subcaption{Example room layout before rotation.}%
+    \subcaption{Example before rotation.}%
     \label{fig:layout:ref}
   \end{minipage}
   \begin{minipage}[t]{.32\linewidth}
     \centering
     \includegraphics[width=\columnwidth]{figures/room_layout_040.pdf}
-    \subcaption{Example room layout after rotation.}%
+    \subcaption{Example after rotation.}%
     \label{fig:layout:rot}
   \end{minipage}
   \caption{Room layout.}%
