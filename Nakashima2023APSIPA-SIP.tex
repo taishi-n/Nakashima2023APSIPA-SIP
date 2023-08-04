@@ -427,7 +427,7 @@ By derivation, $\rotMat (\rotSpat)$ is a unitary matrix; $\rotMat ^{-1} (\rotSpa
 Next, let $\bm{\Sfcma}$ be its DFT defined as $\begin{bmatrix} \Sfcma _{0} & \dots & \Sfcma _{\Mic - 1}\end{bmatrix} ^{\top} = \bm{F} \bm{\sfcma}$, where $\bm{F}$ is a DFT matrix.
 By using these expression, $\rotMat (\rotSpat)$ can be diagonarized as $\bm{F}^{\hermite} \rotMat (\rotSpat) \bm{F}$ since $\rotMat (\rotSpat)$ is a unitary matrix.
 Therefore, the relationship between $\bm{\Sfcma}$ and $\bm{\Sfcma} _{\rotSmpl}$ can be expressed as $\bm{X} _{\rotSmpl} = \rotMat (\rotSpat) \bm{X}$,
-bacause $\bm{\sfcma} _{\rotSmpl} = \bm{F}^{\hermite} \rotMat (\rotSpat) \bm{F} \bm{\sfcma}$.
+because $\bm{\sfcma} _{\rotSmpl} = \bm{F}^{\hermite} \rotMat (\rotSpat) \bm{F} \bm{\sfcma}$.
 
 In the STFT domain, we consider a situation where CMA is rotated of degree $\rotSpat _{\tframe}$ at time frame $\tframe$ and let $\refpos{\Obs} _{\ft}$ be the observed signal recorded without CMA rotation (\emph{reference position}).
 By using the expression above, we assume that the observed signal with CMA rotation $\Obs _{\ft}$ is expressed as the following linear approximation:
