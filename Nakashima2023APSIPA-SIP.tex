@@ -255,23 +255,41 @@ ${\{\Obs _{\ft}\}}_{\ft}$ denotes the set of $\Obs _{\ft}$ for all $\freq$ and $
 
 \subsection{Online Auxiliary-Function-Based Independent Vector Analysis}\label{subsec:oiva}
 
-Online AuxIVA \cite{Taniguchi:2014:HSCMA} is an extension of AuxIVA \cite{Ono:2011:WASPAA} to an online algorithm and estimates demixing matrices $\{\Demix _{\ft}\} _{\freq}$ for each $\tframe$ by minimizing the following objective function:
+Online AuxIVA \cite{Taniguchi:2014:HSCMA} is an extension of AuxIVA \cite{Ono:2011:WASPAA} to an online algorithm.
+As the basis of our work, we first summarise the (batch) AuxIVA.
+In AuxIVA, we estimate \emph{time-invariant} demixing matrices $\{\Demix _{\freq}\} _{\freq}$ using all the time frames $\tframe = 1, \dots, \Tframe$ by minimizing the following objective function:
+\begin{equation}
+  J _{\freq}(\Demix _{\freq}) = \sum _{\src = 1} ^{\Src} \demix _{\src,\freq} ^{\hermite} \cov _{\src,\freq} \demix _{\src,\freq} ^{\nohermite} - \logdet{\Demix _{\freq}} ^2. \label{eq:obj:batch}
+\end{equation}
+$\cov _{\src,\freq}$ is the \emph{weighted covariance matrix} of the observed signals defined as:
 \begin{align}
-  J _{\tframe}(\Demix _{\ft}) &= \sum _{\src = 1} ^{\Src} \demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft} ^{\nohermite} - \logdet{\Demix _{\ft}} ^2, \label{eq:obj} \\
+  \cov _{\src,\freq} &= \frac{1}{\Tframe} \sum _{\tframe = 1} ^{\Tframe} \weight(\var _{\src,\tframe}) \Obs _{\ft} ^{\nohermite} \Obs _{\ft} ^{\hermite}, \label{eq:cov:batch} \\
+  \var _{\src,\tframe} &= \sqrt{\sum _{\freq=1} ^{\Freq} \lvert \demix ^{\hermite} _{\src,\freq} \Obs ^{\nohermite}_{\ft} \rvert ^2} \label{eq:var:batch},
+\end{align}
+where
+$\weight\colon \R _{>0} \to \R _{>0}$ is defined as $\weight(\var) = \cont ' (\var) / 2 \var$ ($\cont '(\var)$ denotes the first derivative of $\cont (\var)$ with respect to $\var$),
+and $\cont(\var)$ is called a contrast function and is derived from the probability density function of source signals.
+In this paper, we assume that $\weight (\var) = \Freq/{\var ^2}$, which represents the time-varying Gaussian distribution \cite{Ono:2012:APSIPA}.
+One popular approach to minimize the objective function \eqref{eq:obj:batch} with respect to $\Demix _{\freq}$ includes \emph{iterative projection (IP)} \cite{Ono:2011:WASPAA}.
+IP cyclically updates each row vector of the demixing matrix (\emph{demixing vector}) $\demix _{\src,\ft} ^{\hermite}\; (\src = 1, \dots, \Src)$ using the following update rule:
+\begin{align}
+  \demix _{\src,\freq} &\gets (\Demix _{\freq} \cov _{\src,\freq}) ^{-1} \eye _{\src} \label{eq:ip:proj:batch}, \\
+  \demix _{\src,\freq} &\gets \frac{{\demix _{\src,\freq}}}{{\sqrt{\demix _{\src,\freq} ^{\hermite} \cov _{\src,\freq} \demix _{\src,\freq}}}} \label{eq:ip:norm:batch},
+\end{align}
+where $\eye _{\src} \in \R ^{\Src}$ is the canonical basis vector with the $\src$th element unity.
+The estimated signal is estimated as $\Est _{\ft} = \Demix _{\freq} \Obs _{\ft}$.
+
+As for online AuxIVA, the weighted covariance matrices are updated with the following incremental update rule as an approximation of \eqref{eq:cov:batch}:
+\begin{align}
   \cov _{\src,\ft} &= \forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} ^{\nohermite} \Obs _{\ft} ^{\hermite}, \label{eq:cov} \\
   \var _{\src,\tframe} &= \sqrt{\sum _{\freq=1} ^{\Freq} \lvert \demix ^{\hermite} _{\src,\ft} \Obs ^{\nohermite}_{\ft} \rvert ^2} \label{eq:var},
 \end{align}
-where $\weight\colon \R _{>0} \to \R _{>0}$ is defined as $\weight(\var) = \cont ' (\var) / 2 \var$ ($\cont '(\var)$ denotes the first derivative of $\cont (\var)$ with respect to $\var$),
-$\cont(\var)$ is called a contrast function and is derived from the probability density function of source signals,
-and $\forget\; (0 \leq \forget < 1)$ is called a forgetting factor.
-In this paper, we assume that $\weight (\var) = \Freq/{\var ^2}$, which represents the time-varying Gaussian distribution \cite{Ono:2012:APSIPA}.
-Using the recursive update for a weighted covariance matrix \eqref{eq:cov}, we can apply efficient update methods proposed for original (batch) AuxIVA algorithms, such as \emph{iterative projection (IP)} \cite{Ono:2011:WASPAA}, to minimize the objective function \eqref{eq:obj}.
-IP cyclically updates each \emph{demixing vector} $\demix _{\src,\ft} ^{\hermite}\; (\src = 1, \dots, \Src)$ (row of the demixing matrix $\Demix _{\ft}$) using the following update rule:
+where $\forget\; (0 \leq \forget < 1)$ is called a forgetting factor.
+Thanks to this incremental update rule, we can directly IP to estimate time-varying demixing matrices $\{\Demix _{\ft}\} _{\freq}$ at each time frame $\tframe$:
 \begin{align}
   \demix _{\src,\ft} &\gets (\Demix _{\ft} \cov _{\src\ft}) ^{-1} \eye _{\src} \label{eq:ip:proj}, \\
   \demix _{\src,\ft} &\gets \frac{{\demix _{\src,\ft}}}{{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}} \label{eq:ip:norm},
 \end{align}
-where $\eye _{\src} \in \R ^{\Src}$ is the canonical basis vector with the $\src$th element unity.
 We then have the estimated signal by \eqref{eq:bss:sep}.
 The scale of output estimated signal $\Est _{\ft}$ may be contaminated because of the scale ambiguity problem.
 To restore the scale ambiguity and get an estimated source image at the reference microphone,
