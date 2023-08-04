@@ -138,23 +138,23 @@ Popular approaches for BSS include independent vector analysis (IVA) \cite{Kim:2
 These methods assume a time-invariant acoustic transfer system (ATS).
 On the other hand, it is necessary to consider time variations of the ATS, such as microphone or source movements, for practical applications.
 
-% 近年，動的な環境下における音声処理を題材としたチャレンジが多数開催されている．
+% 近年，動的な環境を考慮したマルチチャネル音響信号処理が注目されている．
+% これまでに，recursiveなパラメータ更新を用いた beamforming, doa estimation, speaker tracking などが提案されてきた．
+% さらに，動的な環境下における音声処理を題材としたコンペティションも開催され，データセットの整備も進められている．
 % Clarity Challengeは補聴器の音声明瞭度向上のためのチャレンジであり，聴取者の頭の動きのデータも含まれている．
 % SPEAR challengeでは，頭部装着型のヒアラブルデバイスのための音声強調チャレンジであり，話者や頭の動きのデータを含んだ広範なデータセットが配布されている．
-% このように，動的な環境においても頑健にに動作するマルチチャネル音響信号処理の需要がますます高まっている．
-Several challenges have been held regarding speech processing under dynamic environments in recent years.
+Multi-channel acoustic signal processing techniques that consider the dynamic environment have attracted much attention in recent years.
+Several methods using recursive parameter updates have been proposed, such as beamforming \cite{Higuchi:2017:ASLP}, DOA tracking \cite{Weisberg:2019:ICASSP} and speaker tracking \cite{Schwartz:2021:ASMP}.
+Furthermore, competitions have been organised and datasets developed on the subject of speech processing in dynamic scenarios.
 Clarity Challenge \cite{Akeroyd:2023:ICASSP} aims to improve speech intelligibility in hearing aids and includes data on the listeners' head movements.
-SPEAR challenge \cite{Guiraud:2022:IWAENC} is a speech enhancement challenge for head-worn hearable devices, and extensive datasets called EasyCom \cite{Donley:2021:arxiv} have been distributed that include a speaker and head movement data.
-Thus, there is an increasing demand for speech enhancement and BSS methods that can perform robustly in dynamic environments.
+SPEAR Challenge \cite{Guiraud:2022:IWAENC} is a speech enhancement challenge for head-worn hearable devices, and extensive datasets called EasyCom \cite{Donley:2021:arxiv} have been distributed that include a speaker and head movement data.
 
-% TODO: 先に，マイクアレイ信号処理 (noise reduction, beamforming, source localization, dereverberation) のためのオンライン処理が活発に研究されていることを引用
-%   - Gannot 先生らのグループの論文，NTT CS研の論文をいくつか引用できそう
 % ブロックバッチの手法やオンラインの手法が考えられる．
 % 特に，オンライン独立ベクトル分析は実時間で動作し，高い性能を示した．
 % オンラインAuxIVA は補聴器への応用，残響除去との組み合わせ，高速なステアリングベクトル更新など最近活発に研究されている．
 % オンラインAuxIVA ではフレームごとに分離行列を推定し，音響伝達系のゆるやかな時間変化に対応できる．
 % しかし，新たな音源の出現やマイクの移動など，音響伝達系の突発的な変化が起こった場合には推定が難しくなり性能が著しく低下する．
-Many BSS methods have been proposed based on block batch \cite{Koldovsky:2019:ICASSP,Koldovsky:2021:SP,Jansky:2022:ASMP} or online processing \cite{Kim:2010:CASI,Taniguchi:2014:HSCMA} to account for environmental changes.
+In the context of BSS, many methods have been proposed based on block batch \cite{Koldovsky:2019:ICASSP,Koldovsky:2021:SP,Jansky:2022:ASMP} or online processing \cite{Kim:2010:CASI,Taniguchi:2014:HSCMA} to account for environmental changes.
 In particular, online AuxIVA shows high separation performance in real-time scenarios \cite{Taniguchi:2014:HSCMA}.
 It also has been actively researched recently for applications in hearing aids \cite{Sunohara:2017:ICASSP}, joint optimization with dereverberation \cite{Ueda:2021:ICASSP}, and computationally efficient optimization \cite{Nakashima:2023:ICASSP}.
 Online AuxIVA estimates demixing matrices frame-by-frame manner and can track smooth environmental changes in ATS, such as slow movement of sources.
@@ -175,7 +175,7 @@ We expect the combination of online BSS and SFI to improve the robustness agains
 
 In this paper, we address BSS in situations where a CMA rotates.
 SFI cancels out the effect of the rotation, and BSS is applied in the latter stage.
-As described in \cref{sec:proposed}, simply applying SFI to online BSS is computationally expensive since SFI is required for the observed signal every time frame.
+As described in \cref{sec:proposed}, naive combination of SFI and online AuxIVA has a problem for practical applications.
 In contrast, this study introduces a more straightforward method than that and demonstrates its effectiveness through experiments.
 Experiments show that our proposed scheme is significantly better than the conventional online AuxIVA.
 
