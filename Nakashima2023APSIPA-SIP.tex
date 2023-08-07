@@ -255,9 +255,7 @@ ${\{\Obs _{\ft}\}}_{\ft}$ denotes the set of $\Obs _{\ft}$ for all $\freq$ and $
 
 \section{Conventional Methods}\label{sec:conventional}
 
-\subsection{Online Auxiliary-Function-Based Independent Vector Analysis}\label{subsec:oiva}
-
-Online AuxIVA \cite{Taniguchi:2014:HSCMA} is an extension of AuxIVA \cite{Ono:2011:WASPAA} to an online algorithm.
+\subsection{Batch Auxiliary-Function-Based Independent Vector Analysis}
 As the basis of our work, we first summarise the (batch) AuxIVA.
 In AuxIVA, we estimate \emph{time-invariant} demixing matrices ${\{\Demix _{\freq}\}} _{\freq}$ using all the time frames $\tframe = 1, \dots, \Tframe$ by minimizing the following objective function:
 \begin{align}
@@ -279,6 +277,9 @@ IP cyclically updates each row vector of the demixing matrix (\emph{demixing vec
 where $\eye _{\src} \in \R ^{\Src}$ is the canonical basis vector with the $\src$th element unity.
 The estimated signal is estimated as $\Est _{\ft} = \Demix _{\freq} \Obs _{\ft}$.
 
+\subsection{Online Auxiliary-Function-Based Independent Vector Analysis}\label{subsec:oiva}
+
+Online AuxIVA \cite{Taniguchi:2014:HSCMA} is an extension of AuxIVA \cite{Ono:2011:WASPAA} to an online algorithm.
 As for online AuxIVA, the weighted covariance matrices are updated with the following incremental update rule as an approximation of \eqref{eq:cov:batch}:
 \begin{align}
   \cov _{\src,\ft} &= \forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} ^{\nohermite} \Obs _{\ft} ^{\hermite}, \label{eq:cov} \\
@@ -286,6 +287,7 @@ As for online AuxIVA, the weighted covariance matrices are updated with the foll
 \end{align}
 where $\forget\; (0 \leq \forget < 1)$ is called a forgetting factor.
 Thanks to this incremental update rule, we can directly apply IP to estimate time-varying demixing matrices $\{\Demix _{\ft}\} _{\freq}$ at each time frame $\tframe$ simply by replacing $\demix _{\src,\freq},\, \cov _{\src,\freq}$ in \eqref{eq:ip:proj}, \eqref{eq:ip:norm} with $\demix _{\src,\ft},\, \cov _{\src,\ft}$.
+
 We then have the estimated signal by \eqref{eq:bss:sep}.
 The scale of output estimated signal $\Est _{\ft}$ may be contaminated because of the scale ambiguity problem.
 To restore the scale ambiguity and get an estimated source image at the reference microphone,
@@ -335,7 +337,7 @@ Nevertheless, it cannot promptly adapt to a swift change, which can happen in he
 \subsection{Sound Field Interpolation on Circular Microphone Array}
 This subsection briefly reviews the sound field interpolation method on CMA, originally proposed in \cite{Wakabayashi:2021:ICASSP,Wakabayashi:2023:ASLP}.
 Let $\sfcma (\rotCoor)$ be a continuous sound pressure on the circumference of a circle at a spatial angle $\rotCoor \in \interval[open right,soft open fences]{0}{2\pi}$, as shown in \cref{fig:sfi}.
-We assume that the spatial sampling frequency is satisfied, \emph{i.e.}, $\sfcma (\rotCoor)$ contains no frequency components higher than half of the sampling frequency on the circumference of the circle.
+%We assume that the spatial sampling frequency is satisfied, \emph{i.e.}, $\sfcma (\rotCoor)$ contains no frequency components higher than half of the sampling frequency on the circumference of the circle.
 Then we observe a sound field with $\Mic$ microphones on the circle at even intervals.
 The $\mic$th observed signal is denoted as
 \begin{equation}
@@ -343,6 +345,7 @@ The $\mic$th observed signal is denoted as
   \label{eq:sfi:model}
 \end{equation}
 In other words, we regard observations of the sound field with a CMA as discretizations of that along an angle on the circumference $\rotCoor$.
+We assume this spatial sampling by the CMA satisfies Shanon's sampling theorem, \emph{i.e.}, $\sfcma (\rotCoor)$ contains no frequency components higher than half of the sampling frequency on the circumference of the circle.
 If the CMA is rotated by a spatial angle $\rotSpat \in \R$, we can regard its observation as the $\rotSmpl$-sample shift of $\sfcma _{\mic}$ where $\rotSmpl = \frac{\Mic}{2\pi} \rotSpat$;
 \begin{equation}
   \sfcma \left(\frac{2\pi}{\Mic} \mic + \rotSpat \right)%
@@ -447,7 +450,11 @@ By using the expression above, we assume that the observed signal with CMA rotat
 \begin{equation}
   \refpos{\Obs} _{\ft} = \rotMat ^{-1} (\rotSpat _{\tframe}) \Obs _{\ft}.
 \end{equation}
-Note that $\rotSpat _{\tframe}$ must be known with inertial measurement unit sensors or estimated using some methods, such as maximum likelihood estimation \cite{Lian:2021:APSIPA}.
+Note that $\rotSpat _{\tframe}$ must be known with another sensor, such as an angular acceleration sensor,
+%inertial measurement unit sensors 
+or estimated from acoustic observation itself
+%using some methods, such as maximum likelihood estimation 
+\cite{Lian:2021:APSIPA}.
 
 \section{Proposed Method}\label{sec:proposed}
 
