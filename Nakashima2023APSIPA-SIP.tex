@@ -511,7 +511,7 @@ For example, BSS in augmented reality space using a head-mounted display needs t
   \end{pseudo}
 \end{algorithm}
 
-\subsection{SFI-based Online AuxIVA with Transformation of Pre-update Demixing and Weighted Covariance Matrices}
+\subsection{SFI-based Online AuxIVA with Transformation of Pre-update Demixing and Weighted Covariance Matrices}\label{subsec:proposed:sfiivam}
 
 % 前節の問題を解決するために，マイクの位置を保ったままCMA回転に頑健なonline BSSを提案する．
 % 観測信号のかわりにパラメータを変換することで，CMAが回転した後の位置におけるsource imageを得る手順を示す．
@@ -579,6 +579,9 @@ Furthermore, unlike the method of SFI for the observation signal in the previous
     \begin{itemize}
       \item SFIIVA-Oは誤差が蓄積する
       \item SFIIVA-Mはオンライン更新で忘れていくので，推定角度が間違っていても収束するはず
+        \begin{itemize}
+          \item 大きなメリットといえる (by 若林先生)，わかりやすく主張しておきたい
+        \end{itemize}
     \end{itemize}
 \end{itemize}
 }
@@ -727,15 +730,15 @@ This may be because \SFIIVAo{} estimates the source image at the reference micro
 \subsection{Robustness against Estimation Error}
 
 To check the robustness against errors in estimating the angle of CMA rotation, we compared results when the estimated angles used for \SFIIVAo{} and \SFIIVAm{} differed from the true angle.
-As discussed in \cref{fig:plot:bp:sfiivam}, we expected errors to accumulate when there is an error in the estimated angle since \SFIIVAo{} transforms the observed signal every frame.
+As discussed in \cref{subsec:proposed:sfiivam}, we expected errors to accumulate when there is an error in the estimated angle since \SFIIVAo{} transforms the observed signal every frame.
 In contrast, \SFIIVAm{} performs the transformation only at the CMA rotation, so the effect of the estimation error should decrease with time.
 
 \Cref{tab:sdr} shows the averaged over samples and channels before and after CMA rotation with an estimation error.
 The forgetting factor $\forget$ was fixed to $0.98$ in this experiment.
-As expected, when the estimation angle was \SI{60}{\degree}, the SI-SDRi of both methods dropped by about \SI{8}{\decibel} in the \SI{30}{\second} immediately after the CMA rotation.
+As expected, the SI-SDRi of both methods dropped by about \SI{8}{\decibel} at \SI{30}{\second} immediately after the CMA rotation, when the estimation angle was \SI{60}{\degree} which is different from the true angle of \SI{40}{\degree}.
 On the other hand, comparing the performance at \SI{59}{\second}, sufficiently after the CMA rotation, the performance of \SFIIVAm{} was about \SI{5}{\decibel} higher than that of \SFIIVAo{}.
 \begin{table}[t]
-  \caption{Average SI-SDRi with estimation error of CMA rotation. True angle was \SI{40}{\degree}. Forgetting factor $\forget = 0.98$.}%
+  \caption{Average SI-SDRi before and after CMA rotation with estimation error. True angle was \SI{40}{\degree}. Length of simulated speech signals is \SI{60}{\second} long, and CMA was instananeously rotated at \SI{30}{\second}. Forgetting factor $\forget = 0.98$.}%
   \label{tab:sdr}
   \centering
   \sisetup{%
@@ -751,22 +754,23 @@ On the other hand, comparing the performance at \SI{59}{\second}, sufficiently a
     \label{tab:sdr:98}
     \begin{tabular}{lSS}
       \toprule
-        Method   & \multicolumn{2}{c}{Time (s)} \\ \cmidrule{2-3}
-                 &       {30} &       {59} \\
+        Method   & \multicolumn{2}{c}{CMA rotation} \\ \cmidrule{2-3}
+                 &       {Before} &       {After} \\
       \midrule
         SFIIVA-O &  17.988841 &  22.130434 \\ \rowcolor[gray]{0.8}
         SFIIVA-M &  18.796094 & \bfseries  25.623199 \\
       \bottomrule
     \end{tabular}
   \end{minipage}
+  \hspace{.05\linewidth}
   \begin{minipage}[t]{.45\linewidth}
     \centering
-    \subcaption{Estimated angle of \SI{60}{\degree}.\\~}%
+    \subcaption{Estimated angle of \SI{60}{\degree}, which is differ from the true angle of \SI{40}{\degree}.}%
     \label{tab:sdr:98}
     \begin{tabular}{lSS}
       \toprule
-        Method   & \multicolumn{2}{c}{Time (s)} \\ \cmidrule{2-3}
-                 &       {30} &       {59} \\
+        Method   & \multicolumn{2}{c}{CMA rotation} \\ \cmidrule{2-3}
+                 &       {Before} &       {After} \\
       \midrule
         SFIIVA-O &   9.922167 &  20.262950 \\ \rowcolor[gray]{0.8}
         SFIIVA-M &   9.980653 &  \bfseries 25.626287 \\
@@ -785,7 +789,8 @@ Dark regions in each plot represent nulls in that direction.
 In the case of BSS, the desired result is that the direction of the estimated source is brighter, and the others are darker.
 As shown in \cref{fig:plot:beam}, the results of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivao} were similar to each other, and only \cref{fig:plot:bp:sfiivam} was different from others.
 The dark areas of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivao} were nearly at the desired directions since \SFIIVAo{} approximately canceled the rotation of CMA and thus updated demixing matrices in the same direction even after the rotation.
-In contrast, the result in \cref{fig:plot:bp:sfiivam} gave the correct direction after the CMA rotation.
+For \SFIIVAm{}, the bright areas should be in the direction viewed from the position after the rotation, i.e. \SI{40}{\degree} less anti-clockwise than the previous result in this case.
+The result in \cref{fig:plot:bp:sfiivam} gave the expected direction after the CMA rotation.
 \begin{figure}[t]
   \centering
   \begin{minipage}[t]{\linewidth}
