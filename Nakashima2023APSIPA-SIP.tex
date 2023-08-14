@@ -485,8 +485,7 @@ For example, BSS in augmented reality space using a head-mounted display needs t
     % for $\tframe = 1,\, \dots,\, \rotFra - 1$ \ct{Demixing matrix update before rotation} \\+
     %   \nf{Run \cref{alg:iva}} \\-
     for $\tframe = 1,\, \dots,\, \Tframe$ \\+
-    $\varDelta \rotSpat _{\tframe} \gets \rotSpat _{\tframe} - \rotSpat _{\tframe - 1}$ \\
-    $\refpos{\Obs} _{\ft} \gets \rotMat ^{\hermite} (\varDelta \rotSpat _{\tframe}) \Obs _{\ft}$ \ct{$\forall \freq$} \\
+    $\refpos{\Obs} _{\ft} \gets \rotMat ^{\hermite} (\rotSpat _{\tframe}) \Obs _{\ft}$ \ct{$\forall \freq$} \\
       {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$\forall \freq$} \\
       for $\itr = 1,\, \dots,\, \Itr$ \\+
         for $\src = 1,\, \dots,\, \Src$ \\+
