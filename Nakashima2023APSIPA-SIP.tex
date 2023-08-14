@@ -120,8 +120,8 @@
   One major issue for real-time BSS is robustness against the movement of the source or microphone.
   Parameter re-estimation is necessary if such changes occur during processing.
   OIVA is robust against smooth movement of sources and achieves high separation performance.
-  However, OIVA does not perform well against rapid movements of microphones.
-  In this paper, we exploit a sound field interpolation (SFI) for circular microphone arrays (CMAs) with OIVA.
+  However, OIVA could perform better against rapid movements of microphones.
+  This paper exploits sound field interpolation (SFI) for circular microphone arrays (CMAs) with OIVA.
   SFI cancels out the rotation of the CMA, enabling us to apply BSS without parameter re-estimation.
   We propose two methods; a combination of SFI and OIVA as a pre-processing and a method using parameter transformations for practical applications.
   Simulation experiments confirmed that SFI improves the robustness of the OIVA in situations where the microphone is rotating.
@@ -136,16 +136,16 @@
 Blind source separation (BSS) \cite{Makino:2018:ASS} is a technique to extract the source signals from their observed mixture.
 Popular approaches for BSS include independent vector analysis (IVA) \cite{Kim:2006:ASLP,Hiroe:2006:ICA}, auxiliary-function-based IVA (AuxIVA) \cite{Ono:2011:WASPAA}, and its extensions \cite{Kitamura:2016:ASLP,Nugraha:2020:SPL,Brendel:2020:SP}.
 These methods assume a time-invariant acoustic transfer system (ATS).
-However, in practical applications it is necessary to consider time variations of the ATS, such as microphone movements.
+However, in practical applications, considering time variations of the ATS, such as microphone movements, is necessary.
 
 % 近年，動的な環境を考慮したマルチチャネル音響信号処理が注目されている．
 % これまでに，recursiveなパラメータ更新を用いた beamforming, doa estimation, speaker tracking などが提案されてきた．
 % さらに，動的な環境下における音声処理を題材としたコンペティションも開催され，データセットの整備も進められている．
 % Clarity Challengeは補聴器の音声明瞭度向上のためのチャレンジであり，聴取者の頭の動きのデータも含まれている．
 % SPEAR challengeでは，頭部装着型のヒアラブルデバイスのための音声強調チャレンジであり，話者や頭の動きのデータを含んだ広範なデータセットが配布されている．
-Multi-channel acoustic signal processing techniques that consider the dynamic environment have attracted much attention in recent years.
-Several methods using recursive parameter updates have been proposed, such as beamforming \cite{Higuchi:2017:ASLP}, DOA tracking \cite{Weisberg:2019:ICASSP} and speaker tracking \cite{Schwartz:2021:ASMP}.
-Furthermore, competitions have been organised and datasets developed on the subject of speech processing in dynamic scenarios.
+Multi-channel acoustic signal processing techniques considering the dynamic environment have attracted much attention recently.
+Several methods using recursive parameter updates have been proposed, such as beamforming \cite{Higuchi:2017:ASLP}, DOA tracking \cite{Weisberg:2019:ICASSP}, and speaker tracking \cite{Schwartz:2021:ASMP}.
+Furthermore, competitions have been organized, and datasets developed on speech processing in dynamic scenarios.
 Clarity Challenge \cite{Akeroyd:2023:ICASSP} aims to improve speech intelligibility in hearing aids and includes data on the listeners' head movements.
 SPEAR Challenge \cite{Guiraud:2022:IWAENC} is a speech enhancement challenge for head-worn hearable devices, and extensive datasets called EasyCom \cite{Donley:2021:arxiv} have been distributed that include a speaker and head movement data.
 
@@ -157,7 +157,7 @@ SPEAR Challenge \cite{Guiraud:2022:IWAENC} is a speech enhancement challenge for
 In the context of BSS, many methods have been proposed based on block batch \cite{Koldovsky:2019:ICASSP,Koldovsky:2021:SP,Jansky:2022:ASMP} or online processing \cite{Kim:2010:CASI,Taniguchi:2014:HSCMA} to account for environmental changes.
 In particular, online AuxIVA (OIVA) shows high separation performance in real-time scenarios \cite{Taniguchi:2014:HSCMA}.
 It also has been actively researched recently for applications in hearing aids \cite{Sunohara:2017:ICASSP}, joint optimization with dereverberation \cite{Ueda:2021:ICASSP}, and computationally efficient optimization \cite{Nakashima:2023:ICASSP}.
-OIVA estimates demixing matrices frame-by-frame manner and can track smooth environmental changes in ATS, such as slow movement of sources.
+OIVA estimates demixing matrices frame-by-frame manner and can track smooth environmental changes in ATS, such as slow movements of sources.
 However, rapid changes in ATS, such as the emergence of new sources or microphone movement, make online BSS difficult and thus degrade separation performance.
 
 % 音響伝達系の突発的な変化に対応するための音響信号処理手法がいくつか提案されている．
@@ -175,7 +175,7 @@ We expect the combination of OIVA and SFI to improve the robustness against the 
 
 In this paper, we address BSS in situations where a CMA rotates.
 SFI cancels out the effect of the rotation, and BSS is applied in the latter stage.
-As described in \cref{sec:proposed}, naive combination of SFI and OIVA has a problem for practical applications.
+As described in \cref{sec:proposed}, a naive combination of SFI and OIVA has a problem for practical applications.
 In contrast, this study introduces a more straightforward method than that and demonstrates its effectiveness through experiments.
 Experiments show that our proposed scheme is significantly better than the conventional OIVA.
 
@@ -193,7 +193,7 @@ We conduct some experiments to show the efficacy of the SFI for online BSS in \c
   \caption{Overview of blind source separation problem with a circular microphone array.}%
   \label{fig:bss}
 \end{figure}
-Let us consider the BSS problem with a CMA that can be rotated horizontally as shown in \cref{fig:bss}.
+Let us consider the BSS problem with a CMA that can be horizontally rotated as shown in \cref{fig:bss}.
 Let $\Src$ and $\Mic$ be the number of sources and microphones, respectively.
 We assume that the observed signal $\Obs _{\ft}$ is in the short-time Fourier transform (STFT) domain modeled as
 \begin{equation}
@@ -264,7 +264,7 @@ In AuxIVA, we estimate \emph{time-invariant} demixing matrices ${\{\Demix _{\fre
   \var _{\src,\tframe} &= \textstyle\sqrt{\sum _{\freq=1} ^{\Freq} \lvert \demix ^{\hermite} _{\src,\freq} \Obs ^{\nohermite}_{\ft} \rvert ^2} \label{eq:var:batch},
 \end{align}
 where
-$\weight\colon \R _{>0} \to \R _{>0}$ is defined as $\weight(\var) = \cont ' (\var) / 2 \var$ ($\cont '(\var)$ denotes the first derivative of $\cont (\var)$ with respect to $\var$),
+$\weight\colon \R _{>0} \to \R _{>0}$ is defined as $\weight(\var) = \cont ' (\var) / 2 \var$ ($\cont '(\var)$ denotes the first derivative of $\cont (\var)$ for $\var$),
 and $\cont(\var)$ is called a contrast function and is derived from the probability density function of source signals.
 In this paper, we assume that $\weight (\var) = \Freq/{\var ^2}$, which represents the time-varying Gaussian distribution \cite{Ono:2012:APSIPA}.
 $\cov _{\src,\freq}$ is called a \emph{weighted covariance matrix} of the observed signals.
@@ -289,7 +289,7 @@ where $\forget\; (0 \leq \forget < 1)$ is called a forgetting factor.
 Thanks to this incremental update rule, we can directly apply IP to estimate time-varying demixing matrices ${\{\Demix _{\ft}\}} _{\freq}$ at each time frame $\tframe$ simply by replacing $\demix _{\src,\freq},\, \cov _{\src,\freq}$ in \eqref{eq:ip:proj}, \eqref{eq:ip:norm} with $\demix _{\src,\ft},\, \cov _{\src,\ft}$.
 
 We then have the estimated signal by \eqref{eq:bss:sep}.
-The scale of output estimated signal $\Est _{\ft}$ may be contaminated because of the scale ambiguity problem.
+The scale of output estimated signal $\Est _{\ft}$ may be contaminated by the scale ambiguity problem.
 To restore the scale ambiguity and get an estimated source image at the reference microphone,
 we apply the following back-projection \cite{Murata:2001:NC} as a post-processing:
 \begin{align}
@@ -305,7 +305,7 @@ we apply the following back-projection \cite{Murata:2001:NC} as a post-processin
 \end{align}
 where $\diag(\cdot)$ is an operator to construct a diagonal matrix whose each element equals the corresponding element of the given vector.
 \Cref{alg:iva} summarises the OIVA algorithm.
-The online updates of $\cov _{\src,\ft}$ \eqref{eq:cov} enable the OIVA to progressively track the slow movement of sound sources or microphones.
+The online updates of $\cov _{\src,\ft}$ \eqref{eq:cov} enable the OIVA to track the slow movement of sound sources or microphones progressively..
 Nevertheless, it cannot promptly adapt to a swift change, which can happen in head rotation with wearing CMA. This research is motivated by the objective of solving this problem.
 
 \begin{algorithm}{Online AuxIVA (OIVA)}{iva}
@@ -335,7 +335,7 @@ Nevertheless, it cannot promptly adapt to a swift change, which can happen in he
 \end{algorithm}
 
 \subsection{Sound Field Interpolation on Circular Microphone Array}
-This subsection briefly reviews the sound field interpolation method on CMA, originally proposed in \cite{Wakabayashi:2021:ICASSP,Wakabayashi:2023:ASLP}.
+This subsection briefly reviews the sound field interpolation method on CMA, initially proposed in \cite{Wakabayashi:2021:ICASSP,Wakabayashi:2023:ASLP}.
 Let $\sfcma (\rotCoor)$ be a continuous sound pressure on the circumference of a circle at a spatial angle $\rotCoor \in \interval[open right,soft open fences]{0}{2\pi}$, as shown in \cref{fig:sfi}.
 %We assume that the spatial sampling frequency is satisfied, \emph{i.e.}, $\sfcma (\rotCoor)$ contains no frequency components higher than half of the sampling frequency on the circumference of the circle.
 Then we observe a sound field with $\Mic$ microphones on the circle at even intervals.
@@ -361,7 +361,7 @@ If the CMA is rotated by a spatial angle $\rotSpat \in \R$, we can regard its ob
     The left figure depicts the CMA in a continuous sound field (six microphones in this example).
     Each black dot is a microphone at the reference position, and each gray dot is a microphone at the rotated position.
     Background colors indicate the sound pressure of a plane wave.
-    The right figure depicts the sound pressure along the circumference.
+    The right side depicts the sound pressure along the circumference.
   }%
   \label{fig:sfi}
 \end{figure}
@@ -382,7 +382,7 @@ and $\SRC$ is a index set defined as%{\small\todo{（和の範囲を次のよう
     \left\{-\frac{\Src - 1}{2}, -\frac{\Src - 1}{2} + 1, \dots, \frac{\Src - 1}{2}\right\} & \text{($\Src$ is odd)}
   \end{cases}
 \end{align}
-As is well known the shift theorem of DFT, the following equation is satisfied for any integers $d$;
+As is well known, the shift theorem of DFT, the following equation is satisfied for any integers $d$;
 \begin{equation}
   \dft _{\Src} [\sfcma _{\mic + d}] = \Sfcma _{\src} \twid ^{d \src}.%
   \label{eq:sfi:shift:int}
@@ -514,7 +514,7 @@ For example, BSS in augmented reality space using a head-mounted display needs t
 % 角度$\rotSpat$回転したCMAで録音された観測信号が，次の関係を厳密に満たしていると仮定する：
 To solve the problem in the previous section, we propose an online BSS robust against CMA rotation while preserving the microphone position.
 We present a procedure to obtain the source image at the position after the CMA rotation by transforming the parameters instead of the observed signal.
-First, for simplicity, we discuss the parameter transformation in a \emph{time-invariant} case.
+First, we discuss the parameter transformation in a \emph{time-invariant} case for simplicity.
 In this case, demixing matrices $\Demix _{\freq}$ and weighted covariance matrices $\cov _{\src,\freq}$ are independent on time frame $\tframe$.
 We assume that the observed signal recorded by a CMA rotated by an angle $\rotSpat$ holds the following relation:
 \begin{equation}
@@ -622,7 +622,7 @@ In this experiment, the utterances included in \texttt{parallel100} were randoml
 The length was \SI{60}{\second}, and the sampling frequency was resampled from \SI{24}{\kilo\hertz} to \SI{16}{\kilo\hertz}.
 The reverberation time was approximately \SI{100}{\milli\second}.
 A CMA with $\Src = 5$ channels and a radius of \SI{2}{\centi\metre} was placed in the center of the room.
-Each source was randomly placed at least \SI{1}{\metre} from the centre of the CMA and within an angle ranging from $\frac{360}{\Src} \src$ to $\frac{360\si{\degree}}{\Src} (\src - 1) + \frac{180\si{\degree}}{\Src}\; (\src = 1, \dots, \Src)$.
+Each source was randomly placed at least \SI{1}{\metre} from the center of the CMA and within an angle ranging from $\frac{360}{\Src} \src$ to $\frac{360\si{\degree}}{\Src} (\src - 1) + \frac{180\si{\degree}}{\Src}\; (\src = 1, \dots, \Src)$.
 %   0,  36
 %  72, 108
 % 144, 180
@@ -640,7 +640,7 @@ The reference signal for the SI-SDR was the source image recorded with a rotated
   \begin{minipage}[t]{.32\linewidth}
     \centering
     \includegraphics[width=\columnwidth]{figures/room_layout_range.pdf}
-    \subcaption{Sources are randomly placed in orange shaded area.}%
+    \subcaption{Sources are randomly placed in the orange shaded area.}%
     \label{fig:layout:range}
   \end{minipage}
   \begin{minipage}[t]{.32\linewidth}
@@ -681,10 +681,10 @@ we applied the following ad-hoc normalization $\cov _{\src,\ft} \gets \cov _{\sr
 \Cref{fig:plot:line} shows the SI-SDRi every \SI{1}{\second} averaged over samples and channels.
 \Cref{fig:plot:box} and \cref{tab:sdr} show the SI-SDRi averaged over samples and channels before and after CMA rotation.
 Overall, \NaiveIVA{} and \ResetIVA{} showed a performance drop after the CMA rotation and improved again with time.
-\ResetIVA{} has the lowest performance before CMA rotation among all forgetting factors, which gets worse as the forgetting factor approaches 1.
-In contrast, the proposed \SFIIVAm{} and \SFIIVAo{} methods maintained better performance after the CMA rotation than the others.
+\ResetIVA{} has the lowest performance before CMA rotation among all forgetting factors, which worsens as the forgetting factor approaches 1.
+In contrast, the proposed \SFIIVAm{} and \SFIIVAo{} methods performed better performance after the CMA rotation than the others.
 Comparing \SFIIVAm{} and \SFIIVAo{}, \SFIIVAm{} performed slightly better.
-This may be because \SFIIVAo{} estimates the source image at the reference microphone, while the reference signal for SI-SDR evaluation was the source image at the reference position.
+This result may be because \SFIIVAo{} estimates the source image at the reference microphone, while the reference signal for SI-SDR evaluation was the source image at the reference position.
 \begin{figure}[t]
   \begin{minipage}[t]{.45\textwidth}
     \centering\includegraphics{figures/plots/online/line_900.pdf}\subcaption{$\forget = 0.90 $}\label{fig:plot:line:900}
@@ -733,7 +733,12 @@ The forgetting factor $\forget$ was fixed to $0.98$ in this experiment.
 As expected, the SI-SDRi of both methods dropped by about \SI{8}{\decibel} at \SI{30}{\second} immediately after the CMA rotation, when the estimation angle was \SI{60}{\degree} which is different from the true angle of \SI{40}{\degree}.
 On the other hand, comparing the performance at \SI{59}{\second}, sufficiently after the CMA rotation, the performance of \SFIIVAm{} was about \SI{5}{\decibel} higher than that of \SFIIVAo{}.
 \begin{table}[t]
-  \caption{Average SI-SDRi before and after CMA rotation with estimation error. True angle was \SI{40}{\degree}. Length of simulated speech signals is \SI{60}{\second} long, and CMA was instananeously rotated at \SI{30}{\second}. Forgetting factor $\forget = 0.98$.}%
+  \caption{%
+    Average SI-SDRi before and after CMA rotation with estimation error.
+    True angle was \SI{40}{\degree}.
+    The length of simulated speech signals is \SI{60}{\second} long, and CMA was instantaneously rotated at \SI{30}{\second}.
+    Forgetting factor $\forget = 0.98$.
+  }%
   \label{tab:sdr}
   \centering
   \sisetup{%
@@ -782,9 +787,9 @@ In this subsection, we picked one example to focus on the difference between two
 \Cref{fig:plot:bp:sfiivao} and \cref{fig:plot:bp:sfiivam} are the results with demixing matrices respectively calculated with \SFIIVAm{} and \SFIIVAo{} after rotation.
 Dark regions in each plot represent nulls in that direction.
 In the case of BSS, the desired result is that the direction of the estimated source is brighter, and the others are darker.
-As shown in \cref{fig:plot:beam}, the results of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivao} were similar to each other, and only \cref{fig:plot:bp:sfiivam} was different from others.
+As shown in \cref{fig:plot:beam}, the results of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivao} were similar to each other, and only \cref{fig:plot:bp:sfiivam} was different from the others.
 The dark areas of \cref{fig:plot:bp:ref} and \cref{fig:plot:bp:sfiivao} were nearly at the desired directions since \SFIIVAo{} approximately canceled the rotation of CMA and thus updated demixing matrices in the same direction even after the rotation.
-For \SFIIVAm{}, the bright areas should be in the direction viewed from the position after the rotation, i.e. \SI{40}{\degree} less anti-clockwise than the previous result in this case.
+For \SFIIVAm{}, the bright areas should be in the direction viewed from the position after the rotation, i.e., \SI{40}{\degree} less anti-clockwise than the previous result in this case.
 The result in \cref{fig:plot:bp:sfiivam} gave the expected direction after the CMA rotation.
 \begin{figure}[t]
   \centering
@@ -800,8 +805,8 @@ The result in \cref{fig:plot:bp:sfiivam} gave the expected direction after the C
   \caption{%
     Beam patterns of demixing matrices.
     Five plots are the beam patterns of the frequency-wise demixing matrices calculated by each method.
-    The radial direction of each plot represents the frequency, and the tangential direction represents the angle from the centre of the CMA.
-    The light and dark colours represent the gain in decibels.
+    The radial direction of each plot represents the frequency, and the tangential direction represents the angle from the center of the CMA.
+    The light and dark colors represent the gain in decibels.
     The five white lines in each plot represent the true direction of the source signal.
   }%
   \label{fig:plot:beam}
@@ -814,7 +819,7 @@ The result in \cref{fig:plot:bp:sfiivam} gave the expected direction after the C
 % 今後は本手法の自己回転角度推定 \cite{Lian:2021:APSIPA} との組み合わせや，実時間処理への拡張などに取り組む．
 In this study, sound field interpolation (SFI) for an equally spaced circular microphone array (CMA) was applied to online auxiliary-function-based independent vector analysis (OIVA).
 We have proposed two new methods; the first is a simple combination of SFI and OIVA, and the second is a practical method based on parameter transformations.
-Simulation experiments have confirmed that SFI improved robustness of OIVA against the rotation of CMA.
+Simulation experiments have confirmed that SFI improved the robustness of OIVA against the rotation of CMA.
 Future work includes combining this method with self-rotation angle estimation \cite{Lian:2021:APSIPA} and extending it to real-time processing.
 
 \section*{Biographies}
