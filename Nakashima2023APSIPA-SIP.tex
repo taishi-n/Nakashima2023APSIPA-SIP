@@ -461,20 +461,32 @@ Note that $\rotSpat _{\tframe}$ must be known with another sensor, such as an an
 % 本節では，CMAの回転に頑健なonline BSSを提案するために，BSSと文献1で提案されたSFIを組み合わせることを考える．
 % 通常のOnline AuxIVAでは回転前後で分離行列を推定し直す必要がある．
 % 前述したように，CMAの回転角度と回転時刻が得られていれば，SFIによってCMAの回転をキャンセルできため，分離行列を推定し直すことなく音源分離できる．
-In this subsection, we consider the combined method of online BSS and SFI \cite{Wakabayashi:2023:ASLP} to propose a robust online BSS method against the rotation of CMA.
-Conventional OIVA requires re-estimating demixing matrices.
-As described earlier, if we know the rotation angle of the CMA $\rotSpat _{\tframe}$, the SFI cancels the rotation of the CMA and thus enables us to apply BSS without re-estimating the demixing matrix by applying SFI to the observed signal
-\begin{align}
-  \varDelta \rotSpat _{\tframe} &\gets \rotSpat _{\tframe} - \rotSpat _{\tframe - 1}, \\
-  \Obs _{\ft} &\gets \left(\rotMat ^{\hermite} (\rotSpat _{\tframe}) \Obs _{\ft}\right) \coloneqq \refpos{\Obs} _{\ft}.
-\end{align}
+In the self-rotation-robust beamforming proposed in \cite{Wakabayashi:2023:ASLP},
+the signals observed by the CMA with angle $\theta_t$ are transformed frame by frame to what would have been observed at the reference position, namely at angle $\theta=0$, using the sound field interpolation, and then beamforming is applied to the transformed signals. In this subsection, we apply a similar approach to OIVA.
+%to propose a robust online BSS method against the rotation of CMA.
+%Conventional OIVA requires re-estimating demixing matrices.
+%As described earlier, if we know the rotation angle of the CMA $\rotSpat _{\tframe}$, the SFI cancels the rotation of the CMA and thus enables us to apply BSS without re-estimating the demixing matrix by applying SFI to the observed signal
+%\begin{align}
+%  \varDelta \rotSpat %_{\tframe} &\gets \rotSpat %_{\tframe} - \rotSpat %_{\tframe - 1}, \\
+%  \Obs _{\ft} &\gets %\left(\rotMat ^{\hermite} 
+%(\rotSpat _{\tframe}) \Obs %_{\ft}\right) \coloneqq %\refpos{\Obs} _{\ft}.
+%\end{align}
 % \Cref{alg:sfiva-o}に，観測信号に対する音場補間を用いたOnline AuxIVAをまとめる．
 % この手法は，CMAが回転する状況下でのビームフォーミングの適用方法としても提案されている．
 % この処理は仮想的に観測信号のマイク位置を変えるため，回転後の位置におけるsource imageが得られず，実応用に問題が生じる場合がある．
 % 例えば，head mounted displayを用いた拡張現実空間での音源分離は，回転した後のsource imageの位置から音が聞こえるように処理する必要がある．
-\Cref{alg:sfiva-o} summarises OIVA using SFI.
-In this method, SFI was simply applied as a pre-processing for OIVA.
-A similar scheme which is for beamforming has been proposed in \cite{Wakabayashi:2023:ASLP}.
+
+\Cref{alg:sfiva-o} summarises OIVA using this approach.
+In this method, the transformation using SFT:
+\begin{align}
+  \refpos{\Obs} _{\ft}
+   &\gets \rotMat ^{\hermite} (\rotSpat _{\tframe}) \Obs _{\ft}.
+\end{align}
+is simply applied as a pre-processing for OIVA
+and the online update of the weighted covariance matrix $V_{k,f,t}$ is performed by the transformed signal $\refpos{\Obs} _{\ft}$.
+
+
+%A similar scheme which is for beamforming has been proposed in \cite{Wakabayashi:2023:ASLP}.
 One drawback of \cref{alg:sfiva-o} is that it virtually changes the microphone position of the observed signal.
 As a result, the source image at the rotated position cannot be obtained, which causes problems in practical applications.
 For example, BSS in augmented reality space using a head-mounted display needs to be processed so that the sound can be heard from the position of the source image after rotation.
