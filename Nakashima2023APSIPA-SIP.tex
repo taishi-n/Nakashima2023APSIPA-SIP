@@ -461,20 +461,33 @@ Note that $\rotSpat _{\tframe}$ must be known with another sensor, such as an an
 % 本節では，CMAの回転に頑健なonline BSSを提案するために，BSSと文献1で提案されたSFIを組み合わせることを考える．
 % 通常のOnline AuxIVAでは回転前後で分離行列を推定し直す必要がある．
 % 前述したように，CMAの回転角度と回転時刻が得られていれば，SFIによってCMAの回転をキャンセルできため，分離行列を推定し直すことなく音源分離できる．
-In the self-rotation-robust beamforming proposed in \cite{Wakabayashi:2023:ASLP}, the signals observed by the CMA with angle $\theta_t$ are transformed frame by frame to what would have been observed at the reference position, namely at angle $\theta=0$, using the sound field interpolation, and then beamforming is applied to the transformed signals.
-In this subsection, we apply a similar approach to OIVA.
-\Cref{alg:sfiva-o} summarises OIVA using this approach.
-In this method, the transformation using SFT:
+In the beamforming robust against the self-rotation proposed in \cite{Wakabayashi:2023:ASLP}, the signals observed by the CMA with angle $\theta_t$ are transformed frame by frame to what would have been observed at the reference position, namely at angle $\theta=0$, using SFI, and then the beamforming is applied to the transformed signals.
+
+To make the OIVA robust against self-rotation, we first consider a similar approach to \cite{Wakabayashi:2023:ASLP} in this subsection.
+In this method, we simply apply the transformation using SFI to the latest observation:
 \begin{align}
-  \refpos{\Obs} _{\ft} &\gets \rotMat ^{\hermite} (\rotSpat _{\tframe}) \Obs _{\ft}.
+  \refpos{\Obs} _{\ft} &\gets \rotMat ^{\hermite} (\rotSpat _{\tframe}) \Obs _{\ft},
 \end{align}
-is simply applied as a pre-processing for OIVA and the online update of the weighted covariance matrix $\cov _{\src,\ft}$ is performed by the transformed signal $\refpos{\Obs} _{\ft}$.
+and the online update of the weighted covariance matrix $\cov _{\src,\ft}$ is performed by the transformed signal $\refpos{\Obs} _{\ft}$ such as
+\begin{align}
+  \cov _{\src,\ft}\gets \forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite}.
+  \label{eq:cov:rot}
+\end{align}
+The demixing matrices $\Demix _{\ft}$ are estimated by using these weighted covariance matrices $\cov _{\src,\ft}$ in the OIVA manner. \Cref{alg:sfiva-o} summarizes OIVA using this approach.
+
+Assuming that the microphone array rotates only once at a specific time frame $\tframe$, we analyze how the proposed method, as given in \cref{eq:cov:rot}, differs from the original formula in \cref{eq:cov}.
+In \cref{eq:cov}, the value of $\cov _{\src,\ft}$ is updated online.
+However, since the angles of the microphone array differ between time frames $\tframe - 1$ and $\tframe$, the amalgamation of $\cov _{\src,\ft}$, which holds information before the rotation, and $\Obs _{\ft}$, which holds information after the rotation, leads to an inaccurate estimation of the demixing matrix $\Demix _{\ft}$.
+If the microphone array does not rotate after time frame $\tframe$, the observation information before the rotation is gradually diminished, and $\cov _{\src,\ft}$ and $\Demix _{\ft}$ are expected to slowly converge to their values at the post-rotation position of the microphone array.
+However, this convergence is expected to be a time-consuming process.
+Conversely, in \cref{eq:cov:rot}, all observed signals are translated into observations at the reference position.
+Thus, even if the microphone array rotates at time $\tframe$, there is no substantial discrepancy between $\cov _{\src,\ft}$ and $\Obs _{\ft}$, and the influence of rotation on the estimation of the demixing matrix $\Demix _{\ft}$ is expected to be reduced.
 
 %A similar scheme which is for beamforming has been proposed in \cite{Wakabayashi:2023:ASLP}.
-One drawback of \cref{alg:sfiva-o} is that it virtually changes the microphone position of the observed signal.
+Note that \cref{alg:sfiva-o} virtually changes the microphone position of the observed signal.
 As a result, the source image at the rotated position cannot be obtained, which causes problems in practical applications.
 For example, BSS in augmented reality space using a head-mounted display needs to be processed so that the sound can be heard from the position of the source image after rotation.
-\begin{algorithm}{SFI-based Online AuxIVA using Transformation of Latest Observed Signal (\SFIIVAo)}{sfiva-o}
+\begin{algorithm}{SFI-based Online AuxIVA using Transformation of Latest Observation (\SFIIVAo)}{sfiva-o}
   \textbf{Input:} ${\{\Obs _{\ft}\}} _{\ft}$, ${\{\Demix _{\freq,0}\}} _{\freq}$, ${\{\cov _{\src,\freq,0}\}} _{\src,\freq}$, $\forget$, ${\{\rotSpat _{\tframe}\}} _{\tframe}$ \\
   \textbf{Output:} ${\{\Est _{\ft}\}} _{\ft}$
   \begin{pseudo}
@@ -625,8 +638,8 @@ Each source was randomly placed at least \SI{1}{\metre} from the center of the C
 % 216, 252
 % 288, 324
 \Cref{fig:layout:exp} illustrates the range of the sources' placement and its example.
-To simulate the rotation of the CMA, the source images were generated when the CMA was rotated \SI{40}{\degree} counter-clockwise from the horizontal axis and was stitched together in the 0--30\si{\second} and 30--60\si{\second} intervals, respectively.
-Note that the rotation angle and time are given oracle-manner to focus on improving the robustness of the sound field interpolation.
+To simulate the rotation of the CMA instantaneously, the source images were generated when the CMA was rotated \SI{40}{\degree} counter-clockwise from the horizontal axis and was stitched together in the 0--30\si{\second} and 30--60\si{\second} intervals, respectively.
+Note that the rotation angle and time are given oracle-manner.
 STFT was performed on the observed signals with a frame length of 4096 points, a shift length of 2048 points, and a Hamming window.
 The scale of the output signal was restored by the back-projection shown in \cref{alg:iva}, with the reference microphone as microphone 1.
 The separation performance was evaluated by the scale-invariant signal-to-distortion ratio (SI-SDR) \cite{LeRoux:2019:ICASSP} and its improvement (SI-SDR improvements; SI-SDRi).
@@ -720,17 +733,17 @@ This result may be because \SFIIVAo{} estimates the source image at the referenc
 
 \subsection{Robustness against Estimation Error}
 
-To check the robustness against errors in estimating the angle of CMA rotation, we compared results when the estimated angles used for \SFIIVAo{} and \SFIIVAm{} differed from the true angle.
-As discussed in \cref{subsec:proposed:sfiivam}, we expected errors to accumulate when there is an error in the estimated angle since \SFIIVAo{} transforms the observed signal every frame.
-In contrast, \SFIIVAm{} performs the transformation only at the CMA rotation, so the effect of the estimation error should decrease with time.
+To check the robustness against errors in measuring the angle of CMA rotation, we compared results when the measured angles used for \SFIIVAo{} and \SFIIVAm{} differed from the true angle.
+As discussed in \cref{subsec:proposed:sfiivam}, we expected errors to accumulate when there is an error in the measured angle since \SFIIVAo{} transforms the observed signal every frame.
+In contrast, \SFIIVAm{} performs the transformation only at the CMA rotation, so the effect of the measuring error should decrease with time.
 
-\Cref{tab:sdr} shows the averaged over samples and channels before and after CMA rotation with an estimation error.
+\Cref{tab:sdr} shows the averaged over samples and channels before and after CMA rotation with a measuring error.
 The forgetting factor $\forget$ was fixed to $0.98$ in this experiment.
-As expected, the SI-SDRi of both methods dropped by about \SI{8}{\decibel} at \SI{30}{\second} immediately after the CMA rotation, when the estimation angle was \SI{60}{\degree} which is different from the true angle of \SI{40}{\degree}.
+As expected, the SI-SDRi of both methods dropped by about \SI{8}{\decibel} at \SI{30}{\second} immediately after the CMA rotation, when the measured angle was \SI{60}{\degree} which is different from the true angle of \SI{40}{\degree}.
 On the other hand, comparing the performance at \SI{59}{\second}, sufficiently after the CMA rotation, the performance of \SFIIVAm{} was about \SI{5}{\decibel} higher than that of \SFIIVAo{}.
 \begin{table}[t]
   \caption{%
-    Average SI-SDRi before and after CMA rotation with estimation error.
+    Average SI-SDRi in decibels before and after CMA rotation with measuring error.
     True angle was \SI{40}{\degree}.
     The length of simulated speech signals is \SI{60}{\second} long, and CMA was instantaneously rotated at \SI{30}{\second}.
     Forgetting factor $\forget = 0.98$.
@@ -746,12 +759,12 @@ On the other hand, comparing the performance at \SI{59}{\second}, sufficiently a
   \footnotesize
   \begin{minipage}[t]{.45\linewidth}
     \centering
-    \subcaption{Estimated angle of \SI{40}{\degree}, which is equal to the ground truth.}%
+    \subcaption{Measured angle of \SI{40}{\degree}, which is equal to the ground truth.}%
     \label{tab:sdr:98}
     \begin{tabular}{lSS}
       \toprule
-        Method   & \multicolumn{2}{c}{CMA rotation} \\ \cmidrule{2-3}
-                 &       {Before} &       {After} \\
+        Method   & \multicolumn{2}{c}{Time (s)} \\ \cmidrule{2-3}
+                 &       {30} &       {59} \\
       \midrule
         SFIIVA-O &  17.988841 &  22.130434 \\ \rowcolor[gray]{0.8}
         SFIIVA-M &  18.796094 & \bfseries  25.623199 \\
@@ -761,12 +774,12 @@ On the other hand, comparing the performance at \SI{59}{\second}, sufficiently a
   \hspace{.05\linewidth}
   \begin{minipage}[t]{.45\linewidth}
     \centering
-    \subcaption{Estimated angle of \SI{60}{\degree}, which is differ from the true angle of \SI{40}{\degree}.}%
+    \subcaption{Measured angle of \SI{60}{\degree}, which is differ from the true angle of \SI{40}{\degree}.}%
     \label{tab:sdr:98}
     \begin{tabular}{lSS}
       \toprule
-        Method   & \multicolumn{2}{c}{CMA rotation} \\ \cmidrule{2-3}
-                 &       {Before} &       {After} \\
+        Method   & \multicolumn{2}{c}{Time (s)} \\ \cmidrule{2-3}
+                 &       {30} &       {59} \\
       \midrule
         SFIIVA-O &   9.922167 &  20.262950 \\ \rowcolor[gray]{0.8}
         SFIIVA-M &   9.980653 &  \bfseries 25.626287 \\
