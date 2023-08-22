@@ -313,14 +313,16 @@ Nevertheless, it cannot promptly adapt to a swift change, which can happen in he
   \textbf{Output:} ${\{\Est _{\ft}\}} _{\ft}$
   \begin{pseudo}
     for $\tframe = 1, \dots, \Tframe$ \\+
-      {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$\forall \freq$} \\
+      for $\freq = 1, \dots, \Freq$ \\+
+        {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \\-
 
       for $\itr = 1,\, \dots,\, \Itr$ \\+
         for $\src = 1,\, \dots,\, \Src$ \\+
           {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq = 1} ^{\Freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \ct{\eqref{eq:var}} \\
-          {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{\eqref{eq:cov}, $\forall \freq$} \\
-          {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{\eqref{eq:ip:proj}, $\forall \freq$} \\
-          {$\demix _{\src,\ft}$} $\gets$ $\frac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{\eqref{eq:ip:norm}, $\forall \freq$} \\--
+          for $\freq = 1, \dots, \Freq$ \\+
+            {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{\eqref{eq:cov}} \\
+            {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{\eqref{eq:ip:proj}} \\
+            {$\demix _{\src,\ft}$} $\gets$ $\frac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{\eqref{eq:ip:norm}} \\---
 
       % \nf{$
       %   \begin{bsmallmatrix}
@@ -329,8 +331,9 @@ Nevertheless, it cannot promptly adapt to a swift change, which can happen in he
       %     \str _{\Src,1,\ft} & \dots & \str _{\Src,\Src,\ft}
       %   \end{bsmallmatrix} \gets \Demix _{\ft} ^{-1}$} \ct{$\forall \freq$} \\
       % \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\str _{1,1,\ft} \; \str _{1,2,\ft}\; \dots \; \str _{1,\Src,\ft}\right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$}\\
-      \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\eye _{1} ^{\top} \Demix _{\ft} ^{-1} \right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$}\\
-      {$\Est _{\ft}$} $\gets$ $\proj{\Demix }_{\ft} \Obs _{\ft}$ \ct{\eqref{eq:pb:y}, $\forall \freq$}
+      for $\freq = 1, \dots, \Freq$ \\+
+        \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\eye _{1} ^{\top} \Demix _{\ft} ^{-1} \right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}}\\
+        {$\Est _{\ft}$} $\gets$ $\proj{\Demix }_{\ft} \Obs _{\ft}$ \ct{\eqref{eq:pb:y}}
   \end{pseudo}
 \end{algorithm}
 
@@ -467,6 +470,7 @@ To make the OIVA robust against self-rotation, we first consider a similar appro
 In this method, we simply apply the transformation using SFI to the latest observation:
 \begin{align}
   \refpos{\Obs} _{\ft} &\gets \rotMat ^{\hermite} (\rotSpat _{\tframe}) \Obs _{\ft},
+  \label{eq:sfi:obs}
 \end{align}
 and the online update of the weighted covariance matrix $\cov _{\src,\ft}$ is performed by the transformed signal $\refpos{\Obs} _{\ft}$ such as
 \begin{align}
@@ -494,14 +498,16 @@ For example, BSS in augmented reality space using a head-mounted display needs t
     % for $\tframe = 1,\, \dots,\, \rotFra - 1$ \ct{Demixing matrix update before rotation} \\+
     %   \nf{Run \cref{alg:iva}} \\-
     for $\tframe = 1,\, \dots,\, \Tframe$ \\+
-    $\refpos{\Obs} _{\ft} \gets \rotMat ^{\hermite} (\rotSpat _{\tframe}) \Obs _{\ft}$ \ct{$\forall \freq$} \\
-      {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \ct{$\forall \freq$} \\
+      for $\freq = 1, \dots, \Freq$ \\+
+        $\refpos{\Obs} _{\ft} \gets \rotMat ^{\hermite} (\rotSpat _{\tframe}) \Obs _{\ft}$ \ct{\eqref{eq:sfi:obs}} \\
+        {$\Demix _{\ft}$} $\gets$ $\Demix _{\ft[-1]}$ \\-
       for $\itr = 1,\, \dots,\, \Itr$ \\+
         for $\src = 1,\, \dots,\, \Src$ \\+
           {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq = 1} ^{\Freq} \abs{\demix _{\src,\ft} ^{\hermite} \refpos{\Obs} _{\ft}} ^2}$ \ct{\eqref{eq:var}} \\
-          {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite}$ \ct{\eqref{eq:cov}, $\forall \freq$} \\
-          {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{\eqref{eq:ip:proj}, $\forall \freq$} \\
-          {$\demix _{\src,\ft}$} $\gets$ $\frac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{\eqref{eq:ip:norm}, $\forall \freq$} \\--
+          for $\freq = 1, \dots, \Freq$ \\+
+            {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite}$ \ct{\eqref{eq:cov:rot}} \\
+            {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{\eqref{eq:ip:proj}} \\
+            {$\demix _{\src,\ft}$} $\gets$ $\frac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{\eqref{eq:ip:norm}} \\---
 
       % \nf{$
       %   \begin{bsmallmatrix}
@@ -509,9 +515,10 @@ For example, BSS in augmented reality space using a head-mounted display needs t
       %     \vdots & \ddots & \vdots \\
       %     \str _{\Src,1,\ft} & \dots & \str _{\Src,\Src,\ft}
       %   \end{bsmallmatrix} \gets \Demix _{\ft} ^{-1}$} \ct{$\forall \freq$} \\
-      % \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\str _{1,1,\ft} \; \str _{1,2,\ft}\; \dots \; \str _{1,\Src,\ft}\right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$}\\
-      \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\eye _{1} ^{\top} \Demix _{\ft} ^{-1} \right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$}\\
-      {$\Est _{\ft}$} $\gets$ $\proj{\Demix }_{\ft} \refpos{\Obs} _{\ft}$ \ct{\eqref{eq:pb:y}, $\forall \freq$}
+      % \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\str _{1,1,\ft} \; \str _{1,2,\ft}\; \dots \; \str _{1,\Src,\ft}\right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}}\\
+      for $\freq = 1, \dots, \Freq$ \\+
+        \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\eye _{1} ^{\top} \Demix _{\ft} ^{-1} \right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}}\\
+        {$\Est _{\ft}$} $\gets$ $\proj{\Demix }_{\ft} \refpos{\Obs} _{\ft}$ \ct{\eqref{eq:pb:y}}
   \end{pseudo}
 \end{algorithm}
 
@@ -560,8 +567,8 @@ Therefore, if we know the rotation angle $\rotSpat$ and its time frame $\rotFra$
 % 以上の結果の近似として，オンラインAuxIVAにおいては次の式を用いて，CMA回転時刻においてパラメータを変換する：
 For OIVA, we perform the following transformation at the rotation time $\rotFra$ as an approximation of the results above:
 \begin{align}
-  \Demix _{\freq,\rotFra - 1} &\gets \refpos{\Demix} _{\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat), \\
-  \cov _{\src,\freq,\rotFra - 1} &\gets \rotMat (\rotSpat) \refpos{\cov} _{\src,\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat).
+  \Demix _{\freq,\rotFra - 1} &\gets \refpos{\Demix} _{\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat), \label{eq:sfiiva:demix} \\
+  \cov _{\src,\freq,\rotFra - 1} &\gets \rotMat (\rotSpat) \refpos{\cov} _{\src,\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat). \label{eq:sfiiva:cov}
 \end{align}
 % この手法は観測信号はマイクが回転した信号を変換せずに扱うことができるため，回転後の位置における音像が推定される．
 % さらに，前節の観測信号に対して音場補間する手法とは異なり，回転後の毎フレームに対して変換が必要なく，回転した時間フレーム時点の１回だけ変換を行えばよい．
@@ -597,18 +604,21 @@ Furthermore, unlike the method of SFI for the observation signal in the previous
 
     for $\tframe = 1,\, \dots,\, \Tframe$ \\+
       $\varDelta \rotSpat _{\tframe} \gets \rotSpat _{\tframe} - \rotSpat _{\tframe - 1}$ \\
-      {$\Demix _{\freq,\tframe}$} $\gets$ $\Demix _{\freq,\tframe - 1} \rotMat ^{\hermite} (\varDelta\rotSpat _{\tframe})$ \ct{$\forall \freq$} \\
-      for $\src = 1,\, \dots,\, \Src$ \\+
-        {$\cov _{\src,\ft[-1]}$} $\gets$ $\rotMat (\varDelta\rotSpat _{\tframe}) \cov _{\src,\ft[-1]} \rotMat ^{\hermite} (\varDelta \rotSpat _{\tframe})$ \ct{$\forall \freq$} \\-
+      for $\freq = 1, \dots, \Freq$ \\+
+        {$\Demix _{\freq,\tframe}$} $\gets$ $\Demix _{\freq,\tframe - 1} \rotMat ^{\hermite} (\varDelta\rotSpat _{\tframe})$ \ct{\eqref{eq:sfiiva:demix}} \\
+        for $\src = 1,\, \dots,\, \Src$ \\+
+          {$\cov _{\src,\ft[-1]}$} $\gets$ $\rotMat (\varDelta\rotSpat _{\tframe}) \cov _{\src,\ft[-1]} \rotMat ^{\hermite} (\varDelta \rotSpat _{\tframe})$ \ct{\eqref{eq:sfiiva:cov}}\\--
       for $\itr = 1,\, \dots,\, \Itr$ \\+
         for $\src = 1,\, \dots,\, \Src$ \\+
           {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq = 1} ^{\Freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \ct{\eqref{eq:var}} \\
-          {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{\eqref{eq:cov}, $\forall \freq$} \\
-          {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{\eqref{eq:ip:proj}, $\forall \freq$} \\
-          {$\demix _{\src,\ft}$} $\gets$ $\frac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{\eqref{eq:ip:norm}, $\forall \freq$} \\--
+          for $\freq = 1, \dots, \Freq$ \\+
+            {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{\eqref{eq:cov}} \\
+            {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{\eqref{eq:ip:proj}} \\
+            {$\demix _{\src,\ft}$} $\gets$ $\frac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{\eqref{eq:ip:norm}} \\---
 
-      \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\eye _{1} ^{\top} \Demix _{\ft} ^{-1} \right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}, $\forall \freq$}\\
-      {$\Est _{\ft}$} $\gets$ $\proj{\Demix }_{\ft} \Obs _{\ft}$ \ct{\eqref{eq:pb:y}, $\forall \freq$}
+      for $\freq = 1, \dots, \Freq$ \\+
+        \nf{$\proj{\Demix} _{\ft} \gets \diag\left(\eye _{1} ^{\top} \Demix _{\ft} ^{-1} \right) \Demix _{\ft}$} \ct{\eqref{eq:pb:w}}\\
+        {$\Est _{\ft}$} $\gets$ $\proj{\Demix }_{\ft} \Obs _{\ft}$ \ct{\eqref{eq:pb:y}}
   \end{pseudo}
 \end{algorithm}
 
