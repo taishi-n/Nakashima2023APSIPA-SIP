@@ -56,7 +56,7 @@
    indent-mark-color=gray,
    indent-mark-shift=.5em,
    indent-length=1.5em,
-   line-height=1.5,
+   line-height=1.2,
    ct-left=\hfill\texttt{//}~,
    ct-right=,
    % label=\textcircled{\ttfamily\scriptsize\arabic*},
@@ -479,18 +479,24 @@ and the online update of the weighted covariance matrix $\cov _{\src,\ft}$ is pe
 \end{align}
 The demixing matrices $\Demix _{\ft}$ are estimated by using these weighted covariance matrices $\cov _{\src,\ft}$ in the OIVA manner. \Cref{alg:sfiva-o} summarizes OIVA using this approach.
 
-Assuming that the microphone array rotates only once at a specific time frame $\tframe$, we analyze how the proposed method, as given in \cref{eq:cov:rot}, differs from the original formula in \cref{eq:cov}.
+Assuming that CMA rotates only once at a specific time frame $\tframe$, we analyze how the proposed method, as given in \cref{eq:cov:rot}, differs from the original formula in \cref{eq:cov}.
 In \cref{eq:cov}, the value of $\cov _{\src,\ft}$ is updated online.
-However, since the angles of the microphone array differ between time frames $\tframe - 1$ and $\tframe$, the amalgamation of $\cov _{\src,\ft}$, which holds information before the rotation, and $\Obs _{\ft}$, which holds information after the rotation, leads to an inaccurate estimation of the demixing matrix $\Demix _{\ft}$.
-If the microphone array does not rotate after time frame $\tframe$, the observation information before the rotation is gradually diminished, and $\cov _{\src,\ft}$ and $\Demix _{\ft}$ are expected to slowly converge to their values at the post-rotation position of the microphone array.
-However, this convergence is expected to be a time-consuming process.
-Conversely, in \cref{eq:cov:rot}, all observed signals are translated into observations at the reference position.
-Thus, even if the microphone array rotates at time $\tframe$, there is no substantial discrepancy between $\cov _{\src,\ft}$ and $\Obs _{\ft}$, and the influence of rotation on the estimation of the demixing matrix $\Demix _{\ft}$ is expected to be reduced.
+However, since the angles of CMA differ between time frames $\tframe - 1$ and $\tframe$, the blending of $\cov _{\src,\ft[-1]}$, which holds information before the rotation, and $\Obs _{\ft}$, which holds information after the rotation, leads to an inaccurate estimation of the demixing matrix $\Demix _{\ft}$.
+If CMA does not rotate further after time frame $\tframe$, 
+the observation information before the rotation is gradually diminished, and 
+$\cov _{\src,\ft}$ and $\Demix _{\ft}$ are expected to slowly converge to their values 
+associated with the post-rotation position of CMA.
+However, this convergence is expected to take time.
+On the contrary, in \cref{eq:cov:rot}, all observed signals are translated into observation at the reference position.
+Thus, even if CMA rotates at time frame $\tframe$, there is no substantial discrepancy between $\cov _{\src,\ft[-1]}$ and $\refpos{\Obs} _{\ft}$, and the influence of rotation on the estimation of the demixing matrix $\Demix _{\ft}$ is expected to be much reduced.
 
-%A similar scheme which is for beamforming has been proposed in \cite{Wakabayashi:2023:ASLP}.
-Note that \cref{alg:sfiva-o} virtually changes the microphone position of the observed signal.
-As a result, the source image at the rotated position cannot be obtained, which causes problems in practical applications.
-For example, BSS in augmented reality space using a head-mounted display needs to be processed so that the sound can be heard from the position of the source image after rotation.
+Note that  the separated signals obtained by this approach are the source images at the reference microphone of CMA with the reference angle, regardless of the CMA rotation.
+%As a result, the source image at the rotated position cannot be obtained, 
+It causes problems in some practical applications.
+%BSS in augmented reality space using a head-mounted display needs to be processed so that the sound can be heard from the position of the source image after rotation.
+For example, in hearing aid applications or virtual/augmented reality (VR/AR) applications with a head-mounted display, it is desired to present a separated signal with the source localization sensation.
+For this purpose, we need to estimate the source images on the reference microphone of the CMA rotated together with a head.
+
 \begin{algorithm}{SFI-based Online AuxIVA using Transformation of Latest Observation (\SFIIVAo)}{sfiva-o}
   \textbf{Input:} ${\{\Obs _{\ft}\}} _{\ft}$, ${\{\Demix _{\freq,0}\}} _{\freq}$, ${\{\cov _{\src,\freq,0}\}} _{\src,\freq}$, $\forget$, ${\{\rotSpat _{\tframe}\}} _{\tframe}$ \\
   \textbf{Output:} ${\{\Est _{\ft}\}} _{\ft}$
@@ -528,25 +534,37 @@ For example, BSS in augmented reality space using a head-mounted display needs t
 % 観測信号のかわりにパラメータを変換することで，CMAが回転した後の位置におけるsource imageを得る手順を示す．
 % まず，簡単のために，時不変な環境におけるパラメータ変換を議論する．
 % 角度$\rotSpat$回転したCMAで録音された観測信号が，次の関係を厳密に満たしていると仮定する：
-To solve the problem in the previous section, we propose an online BSS robust against CMA rotation while preserving the microphone position.
-We present a procedure to obtain the source image at the position after the CMA rotation by transforming the parameters instead of the observed signal.
+
+In this subsection, we propose another online BSS which is robust against CMA rotation and outputs the source image at the latest microphone position.
+As discussed in the previous section, the mismatch between $\cov _{\src,\ft[-1]}$ and $\Obs _{\ft}$ causes a problem.
+In the previous approach, we transform $\Obs _{\ft}$ to what it should be at the reference position of CMA.
+In this subsection, we consider another approach: transforming $\cov _{\src,\ft[-1]}$ to what it should be at the latest position of CMA.
+
+%We present a procedure to obtain the source image at the position after the CMA rotation by transforming the parameters instead of the observed signal.
 First, we discuss the parameter transformation in a \emph{time-invariant} case for simplicity.
 In this case, demixing matrices $\Demix _{\freq}$ and weighted covariance matrices $\cov _{\src,\freq}$ are independent on time frame $\tframe$.
-We assume that the observed signal recorded by a CMA rotated by an angle $\rotSpat$ holds the following relation:
+Let $\Obs _{\ft}$ and $\refpos{\Obs}_{\ft}$ are observations if the angle of CMA is fixed at $\rotSpat _1$ and $\rotSpat _2$, respectively.
+If the approximation of SFI is satisfied, $\Obs _{\ft}$ and $\refpos{\Obs} _{\ft}$ hold the following relation:
 \begin{equation}
-  \Obs _{\ft} = \rotMat (\rotSpat) \refpos{\Obs} _{\ft}.
+  \refpos{\Obs} _{\ft} = \rotMat (\Delta\rotSpat)\Obs _{\ft},
 \end{equation}
+where $\Delta\rotSpat = \rotSpat _2 - \rotSpat _1$.
 From this, we have the estimated signal $\Est _{\ft}$ as:
 \begin{align}
   \Est _{\ft} &= \Demix _{\freq} \Obs _{\ft}, \\
-              &= \Demix _{\freq} \rotMat (\rotSpat) \refpos{\Obs} _{\ft} \coloneqq \refpos{\Demix} _{\freq} \refpos{\Obs} _{\ft}, \label{eq:rt:demix:batch}
+              &= \Demix _{\freq} \rotMat ^{\hermite} (\Delta\rotSpat) \refpos{\Obs} _{\ft} \coloneqq \refpos{\Demix} _{\freq} \refpos{\Obs} _{\ft}, \label{eq:rt:demix:batch}
 \end{align}
 % $\refpos{\Demix} _{\freq}$は，reference positionにおける観測信号を用いて推定された時不変な分離行列とみなせる．
 % 同様に，$\refpos{\Obs} _{\ft}$を用いて推定された時不変な共分散行列 $\refpos{\cov} _{\src,\freq}$ は次で計算される：
-where $\refpos{\Demix} _{\freq}$ is a time-invariant demixing matrix estimated using the observed signal at the reference position.
-Similarly, the time-invariant weighted covariance matrix $\refpos{\cov} _{\src,\freq}$ estimated using $\refpos{\Obs} _{\ft}$ is calculated by:
+where $\Demix_{\freq}$ and $\refpos{\Demix} _{\freq}$ are time-invariant demixing matrices
+for $\Obs _{\ft}$ and $\refpos{\Obs} _{\ft}$, respectively.
+Therefore,
+\begin{align}
+  \refpos{\Demix} _{\freq} = \Demix _{\freq} \rotMat ^{\hermite} (\Delta\rotSpat). \label{eq:demix:refpos}
+\end{align}
+Similarly, the time-invariant weighted covariance matrix $\cov_{\src,\freq}$ estimated using $\Obs_{\ft}$ is calculated by:
 \begin{equation}
-  \refpos{\cov} _{\src,\freq} = \expct  _{\tframe} \left[\weight (\var _{\src,\tframe}) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite}\right],
+  \cov _{\src,\freq} = \expct  _{\tframe} \left[\weight (\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}\right],
   % \weight (\var _{\src,\tframe}) &= \frac{1}{\Freq} \sum _{\freq = 1} ^{\Freq} \lvert \refpos{\demix} _{\src,\freq} ^{\hermite} \refpos{\Obs} _{\ft} \rvert ^2,
 \end{equation}
 % ただし，$\expct _{\tframe}\left[\bm{A} _{\tframe}\right]$は，ある確率変数行列$\bm{A}_{\tframe}$の時間フレーム$\tframe$に対する期待値演算である．
@@ -556,46 +574,53 @@ Similarly, the time-invariant weighted covariance matrix $\refpos{\cov} _{\src,\
 where $\expct _{\tframe}\left[\bm{A} _{\tframe}\right]$ is the expectation operation for a random variable matrix $\bm{A}_{\tframe}$ with respect to time frame $\tframe$.
 We rewrite the weighted covariance matrix ${\cov} _{\src,\freq}$ of $\Obs _{\ft}$ using $\refpos{\cov} _{\src,\freq}$ as:
 \begin{align}
-  \cov _{\src,\freq} &= \expct  _{\tframe} \left[\weight (\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}\right], \\
-                     &= \expct  _{\tframe} \left[\weight (\var _{\src,\tframe}) \rotMat (\rotSpat) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite} \rotMat ^{\hermite} (\rotSpat)\right], \\
-                     &= \rotMat (\rotSpat)\; \expct  _{\tframe} \left[\weight (\var _{\src,\tframe}) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite} \right] \rotMat ^{\hermite} (\rotSpat), \\
-                     &= \rotMat (\rotSpat) \refpos{\cov} _{\src,\freq} \rotMat ^{\hermite} (\rotSpat). \label{eq:rt:cov:batch}
+  \refpos{\cov} _{\src,\freq} &= \expct  _{\tframe} \left[\weight (\var _{\src,\tframe}) \refpos{\Obs} _{\ft} \refpos{\Obs} _{\ft} ^{\hermite}\right], \\
+                     &= \expct  _{\tframe} \left[\weight (\var _{\src,\tframe}) \rotMat (\Delta\rotSpat) {\Obs} _{\ft} {\Obs} _{\ft} ^{\hermite} \rotMat ^{\hermite} (\Delta\rotSpat)\right], \\
+                     &= \rotMat (\Delta\rotSpat)\; \expct  _{\tframe} \left[\weight (\var _{\src,\tframe}) {\Obs} _{\ft} {\Obs} _{\ft} ^{\hermite} \right] \rotMat ^{\hermite} (\Delta\rotSpat), \\
+                     &= \rotMat (\Delta\rotSpat) {\cov} _{\src,\freq} \rotMat ^{\hermite} (\Delta\rotSpat). \label{eq:cov:refpos:batch}
 \end{align}
 % したがって，CMAの回転角度$\rotSpat$とその時刻$\rotFra$を知っていれば，その時刻において\eqref{eq:rt:demix:batch}, \eqref{eq:rt:cov:batch}の変換を行うことで前節と同じ結果を得ることができる．
-Therefore, if we know the rotation angle $\rotSpat$ and its time frame $\rotFra$, we can get the same result as the previous subsection by performing the transformations \eqref{eq:rt:demix:batch} and \eqref{eq:rt:cov:batch}.
+%Therefore, if we know the rotation angle $\rotSpat$ and its time frame $\rotFra$, we can get the same result as the previous subsection by performing the transformations \eqref{eq:rt:demix:batch} and \eqref{eq:rt:cov:batch}.
 
 % 以上の結果の近似として，オンラインAuxIVAにおいては次の式を用いて，CMA回転時刻においてパラメータを変換する：
-For OIVA, we perform the following transformation at the rotation time $\rotFra$ as an approximation of the results above:
+Although $\cov _{\src,\ft}$ and $\Demix _{\ft}$ are estimated online in OIVA,
+we use these variable transformations written in \eqref{eq:demix:refpos} and \eqref{eq:cov:refpos:batch} as a pre-processing of their update to compensate of the CMA rotation such as:
+%For OIVA, we perform the following transformation at the rotation time $\rotFra$ as an approximation of the results above:
 \begin{align}
-  \Demix _{\freq,\rotFra - 1} &\gets \refpos{\Demix} _{\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat), \label{eq:sfiiva:demix} \\
-  \cov _{\src,\freq,\rotFra - 1} &\gets \rotMat (\rotSpat) \refpos{\cov} _{\src,\freq,\rotFra - 1} \rotMat ^{\hermite} (\rotSpat). \label{eq:sfiiva:cov}
+  \refpos{\Demix} _{\ft[-1]} &\gets \Demix _{\ft[-1]} \rotMat ^{\hermite} (\Delta \rotSpat _{\tframe}), \label{eq:sfiiva:demix} \\
+  \refpos{\cov} _{\src,\ft[-1]} &\gets \rotMat (\Delta\rotSpat _{\tframe}) \cov _{\src,\ft[-1]} \rotMat ^{\hermite} (\Delta\rotSpat _{\tframe}), \label{eq:sfiiva:cov}
 \end{align}
+where $\Delta\rotSpat _{\tframe} = \rotSpat _{\tframe} - \rotSpat _{\tframe - 1}$.
 % この手法は観測信号はマイクが回転した信号を変換せずに扱うことができるため，回転後の位置における音像が推定される．
 % さらに，前節の観測信号に対して音場補間する手法とは異なり，回転後の毎フレームに対して変換が必要なく，回転した時間フレーム時点の１回だけ変換を行えばよい．
-This method can handle the observed signal without transforming the observed signal after the CMA rotation, so the source image at the post-rotated position is estimated.
-Furthermore, unlike the method of SFI for the observation signal in the previous subsection, no transformation is required for every single frame after rotation, and only one transformation at the time of the rotated time frame is needed.
-\todo{%
-}
+The whole algorithm is summarized as \cref{alg:sfiva-m}.
+This method preserves the observation as-is and transforms the intermediate variables as $\Demix _{\ft[-1]}$ and $\cov _{\src,\ft[-1]}$ instead, the source image at the latest CMA position can be estimated, which is an advantage of this algorithm.
+Furthermore, the angle of CMA is supposed to be measured by integrating angular accelerometers, which can introduce bias errors.
+In this case, the method described in the previous subsection continues to have errors in the transformation of the observations to those at the reference position.
+On the other hand, in the method described in this subsection, the error included in the transformation of $\Demix _{\ft}$ and $\cov _{\src,\ft}$ should disappear with online updates.
+This is another advantage of this approach. We will show this in an experiment to be described later.
 
-\todo{%
-  \paragraph{TODO}
-  \begin{itemize}
-    \item 回転角度は時間インデクスを含めて一般的に$\rotSpat _{\tframe}$で表し，4.2の時不変の話を出さずに書きたい
-    \begin{itemize}
-      \item[$\Rightarrow$] \eqref{eq:rt:cov:batch}の変換をどう正当化するか？
-      \item[$\Rightarrow$] SFIIVA-Mの利点として当初主張していた「回転した瞬間だけ計算すればよい」が言えなくなる，むしろ計算量が大きくなってしまう…
-      \item[$\Rightarrow$] 現状の実験結果は回転1回なので，5章で結局，回転角度はある時刻$\rotFra$で一回だけ回転という話に戻す必要がある
-    \end{itemize}
-  \item 角度の測定誤差があるときの利点
-    \begin{itemize}
-      \item SFIIVA-Oは誤差が蓄積する
-      \item SFIIVA-Mはオンライン更新で忘れていくので，推定角度が間違っていても収束するはず
-        \begin{itemize}
-          \item 大きなメリットといえる (by 若林先生)，わかりやすく主張しておきたい
-        \end{itemize}
-    \end{itemize}
-\end{itemize}
-}
+%This method can handle the observed signal without transforming the observed signal after the CMA rotation, so the source image at the post-rotated position is estimated.
+%Furthermore, unlike the method of SFI for the observation signal in the previous subsection, no transformation is required for every single frame after rotation, and only one transformation at the time of the rotated time frame is needed.
+%\todo{%
+%  \paragraph{TODO}
+%  \begin{itemize}
+%    \item 回転角度は時間インデクスを含めて一般的に$\rotSpat _{\tframe}$で表し，4.2の時不変の話を出さずに書きたい
+%    \begin{itemize}
+%      \item[$\Rightarrow$] \eqref{eq:rt:cov:batch}の変換をどう正当化するか？
+%      \item[$\Rightarrow$] SFIIVA-Mの利点として当初主張していた「回転した瞬間だけ計算すればよい」が言えなくなる，むしろ計算量が大きくなってしまう…
+%      \item[$\Rightarrow$] 現状の実験結果は回転1回なので，5章で結局，回転角度はある時刻$\rotFra$で一回だけ回転という話に戻す必要がある
+%    \end{itemize}
+%  \item 角度の測定誤差があるときの利点
+%    \begin{itemize}
+%      \item SFIIVA-Oは誤差が蓄積する
+%      \item SFIIVA-Mはオンライン更新で忘れていくので，推定角度が間違っていても収束するはず
+%        \begin{itemize}
+%          \item 大きなメリットといえる (by 若林先生)，わかりやすく主張しておきたい
+%        \end{itemize}
+%    \end{itemize}
+%\end{itemize}
+%}
 
 \begin{algorithm}{SFI-based Online AuxIVA with Transformation of Pre-update Demixing and Weighted Covariance Matrices (\SFIIVAm)}{sfiva-m}
   \textbf{Input:} ${\{\Obs _{\ft}\}} _{\ft}$, ${\{\Demix _{\freq,0}\}} _{\freq}$, ${\{\cov _{\src,\freq,0}\}} _{\src,\freq}$, $\forget$, ${\{\rotSpat _{\tframe}\}} _{\tframe}$ \\
@@ -607,12 +632,12 @@ Furthermore, unlike the method of SFI for the observation signal in the previous
       for $\freq = 1, \dots, \Freq$ \\+
         {$\Demix _{\freq,\tframe}$} $\gets$ $\Demix _{\freq,\tframe - 1} \rotMat ^{\hermite} (\varDelta\rotSpat _{\tframe})$ \ct{\eqref{eq:sfiiva:demix}} \\
         for $\src = 1,\, \dots,\, \Src$ \\+
-          {$\cov _{\src,\ft[-1]}$} $\gets$ $\rotMat (\varDelta\rotSpat _{\tframe}) \cov _{\src,\ft[-1]} \rotMat ^{\hermite} (\varDelta \rotSpat _{\tframe})$ \ct{\eqref{eq:sfiiva:cov}}\\--
+          {$\refpos{\cov} _{\src,\ft[-1]}$} $\gets$ $\rotMat (\varDelta\rotSpat _{\tframe}) \cov _{\src,\ft[-1]} \rotMat ^{\hermite} (\varDelta \rotSpat _{\tframe})$ \ct{\eqref{eq:sfiiva:cov}} \\--
       for $\itr = 1,\, \dots,\, \Itr$ \\+
         for $\src = 1,\, \dots,\, \Src$ \\+
           {$\var _{\src,\tframe}$} $\gets$ $\sqrt{\sum _{\freq = 1} ^{\Freq} \abs{\demix _{\src,\ft} ^{\hermite} \Obs _{\ft}} ^2}$ \ct{\eqref{eq:var}} \\
           for $\freq = 1, \dots, \Freq$ \\+
-            {$\cov _{\src,\ft}    $} $\gets$ $\forget \cov _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \ct{\eqref{eq:cov}} \\
+            {$\cov _{\src,\ft}    $} $\gets$ $\forget \refpos{\cov} _{\src,\ft[-1]} + (1 - \forget) \weight(\var _{\src,\tframe}) \Obs _{\ft} \Obs _{\ft} ^{\hermite}$ \\
             {$\demix _{\src,\ft}$} $\gets$ $\left(\Demix _{\ft} \cov _{\src,\ft}\right) ^{-1} \eye _{\src}$ \ct{\eqref{eq:ip:proj}} \\
             {$\demix _{\src,\ft}$} $\gets$ $\frac{\demix _{\src,\ft}}{\sqrt{\demix _{\src,\ft} ^{\hermite} \cov _{\src,\ft} \demix _{\src,\ft}}}$ \ct{\eqref{eq:ip:norm}} \\---
 
@@ -623,12 +648,12 @@ Furthermore, unlike the method of SFI for the observation signal in the previous
 \end{algorithm}
 
 \section{Experimental Validation}\label{sec:experiment}
-Although OIVA can track slow microphone movements, its convergence performance highly depends on the forgetting factor.
-Furthermore, ICA-based BSS methods do not change the results even if the observed signals are ``remixed.''
-For example, the same output is obtained by inputting the 2-channel observed signals $x_1$ and $x_2$ as $x_1 + x_2$ and $x_1 - x_2$.
-Since the transformation of the observed signals by the SFI can also be interpreted as a kind of ``remixing,''
-the separation performance is expected to remain the same regardless of whether or not the SFI is performed before or after the CMA rotation.
-However, it has been reported that SFI improves the separation performance \cite{Nakashima:2022:ASJ:A}.
+% Although OIVA can track slow microphone movements, its convergence performance highly depends on the forgetting factor.
+% Furthermore, ICA-based BSS methods do not change the results even if the observed signals are ``remixed.''
+% For example, the same output is obtained by inputting the 2-channel observed signals $x_1$ and $x_2$ as $x_1 + x_2$ and $x_1 - x_2$.
+% Since the transformation of the observed signals by the SFI can also be interpreted as a kind of ``remixing,''
+% the separation performance is expected to remain the same regardless of whether or not the SFI is performed before or after the CMA rotation.
+% However, it has been reported that SFI improves the separation performance \cite{Nakashima:2022:ASJ:A}.
 In this section, we experimentally confirm how much SFI contributes to BSS and discuss the difference in the location of the source image due to the SFI.
 Henceforth, we assume that CMA was instantaneously rotated at an angle $\rotSpat$ at time frame $\rotFra$.
 
