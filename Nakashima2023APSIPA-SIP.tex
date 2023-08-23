@@ -706,7 +706,7 @@ The reference signal for the SI-SDR was the source image recorded with a rotated
 The initial values for demixing and weighted covariance matrices were
 $\Demix _{\freq,0} = \Eye\; (\forall \freq)$, $\cov _{\src,\freq,0} = 10^{-3} \times \Eye\; (\forall \src, \freq)$, respectively, where $\Eye$ is the $\Src$-dimensional identity matrix.
 We set the number of iterations in each time frame in \cref{alg:iva} $\Itr$ to 5.
-We ran experiments with varying forgetting factors $\forget = 0.98, 0.99$, which were chosen so that the approximate number of frames $\frac{1}{1 - \forget} = 50, 100$.
+We ran experiments with varying forgetting factors $\forget = 0.9, 0.95, 0.98, 0.99$, which were chosen so that the approximate number of frames $\frac{1}{1 - \forget} = 10, 20, 50, 100$.
 To increase numerous stability for the implementation of OIVA,
 we applied the following ad-hoc normalization $\cov _{\src,\ft} \gets \cov _{\src,\ft} + 10 ^{-3} \times \Eye$ after updates by \eqref{eq:cov}.
 We compared the following four methods:
@@ -732,6 +732,13 @@ This result may be because \SFIIVAo{} estimates the source image at the referenc
 \begin{figure}[t]
   \centering
   \begin{minipage}[t]{.45\textwidth}
+    \centering\includegraphics{figures/plots/online/line_900.pdf}\subcaption{$\forget = 0.9  $}\label{fig:plot:line:900}
+  \end{minipage}
+  \begin{minipage}[t]{.45\textwidth}
+    \centering\includegraphics{figures/plots/online/line_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:line:950}
+  \end{minipage}
+
+  \begin{minipage}[t]{.45\textwidth}
     \centering\includegraphics{figures/plots/online/line_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:line:980}
   \end{minipage}
   \begin{minipage}[t]{.45\textwidth}
@@ -743,6 +750,13 @@ This result may be because \SFIIVAo{} estimates the source image at the referenc
 
 \begin{figure}[t]
   \centering
+  \begin{minipage}[t]{.45\textwidth}
+    \centering\includegraphics{figures/plots/online/box_900.pdf}\subcaption{$\forget = 0.9  $}\label{fig:plot:box:900}
+  \end{minipage}
+  \begin{minipage}[t]{.45\textwidth}
+    \centering\includegraphics{figures/plots/online/box_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:box:950}
+  \end{minipage}
+
   \begin{minipage}[t]{.45\textwidth}
     \centering\includegraphics{figures/plots/online/box_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:box:980}
   \end{minipage}
