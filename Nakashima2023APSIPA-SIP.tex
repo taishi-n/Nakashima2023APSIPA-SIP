@@ -51,12 +51,12 @@
    kwfont=\sffamily\bfseries,
    font=\kwfont,
    prfont=\textsf,
-   hsep=.5em,
+   hsep=0em,
    indent-mark,
    indent-mark-color=gray,
    indent-mark-shift=.5em,
-   indent-length=1.5em,
-   line-height=1.2,
+   indent-length=2.0em,
+   line-height=1.4,
    ct-left=\hfill\texttt{//}~,
    ct-right=,
    % label=\textcircled{\ttfamily\scriptsize\arabic*},
@@ -373,10 +373,10 @@ Next, we formulate a sound field interpolation problem with the model above.
 We define the $\Mic$-points spatial discrete Fourier transform (DFT) of $\sfcma _{\mic}$ and its inverse transform as
 \begin{align}
   \dft _{\Src} [\sfcma _{\mic}] &= \sum _{\mic \in \SRC} \sfcma _{\mic} \twid ^{-\mic\src} \coloneqq \Sfcma _{\src},\\
-  \dft _{\Src} ^{-1} [\Sfcma _{\src}] &= \frac{1}{\Mic} \sum _{\src \in \SRC} \Sfcma _{\src} \twid ^{\mic\src}, \\
-  \twid &= \exp \left(j\frac{2\pi}{\Mic}\right),
+  \dft _{\Src} ^{-1} [\Sfcma _{\src}] &= \frac{1}{\Mic} \sum _{\src \in \SRC} \Sfcma _{\src} \twid ^{\mic\src},%\\
+  % \twid &= \exp \left(j\frac{2\pi}{\Mic}\right),
 \end{align}
-where $j$ is the imaginary unit,
+where $\twid \coloneqq \exp (j \frac{2\pi}{\Mic})$ is a twidle factor of $\Mic$-point DFT, $j$ is the imaginary unit,
 and $\SRC$ is a index set defined as%{\small\todo{（和の範囲を次のようにとる理由…？）}}
 \begin{align}
   \SRC &=
@@ -482,16 +482,16 @@ The demixing matrices $\Demix _{\ft}$ are estimated by using these weighted cova
 Assuming that CMA rotates only once at a specific time frame $\tframe$, we analyze how the proposed method, as given in \cref{eq:cov:rot}, differs from the original formula in \cref{eq:cov}.
 In \cref{eq:cov}, the value of $\cov _{\src,\ft}$ is updated online.
 However, since the angles of CMA differ between time frames $\tframe - 1$ and $\tframe$, the blending of $\cov _{\src,\ft[-1]}$, which holds information before the rotation, and $\Obs _{\ft}$, which holds information after the rotation, leads to an inaccurate estimation of the demixing matrix $\Demix _{\ft}$.
-If CMA does not rotate further after time frame $\tframe$, 
-the observation information before the rotation is gradually diminished, and 
-$\cov _{\src,\ft}$ and $\Demix _{\ft}$ are expected to slowly converge to their values 
+If CMA does not rotate further after time frame $\tframe$,
+the observation information before the rotation is gradually diminished, and
+$\cov _{\src,\ft}$ and $\Demix _{\ft}$ are expected to slowly converge to their values
 associated with the post-rotation position of CMA.
 However, this convergence is expected to take time.
 On the contrary, in \cref{eq:cov:rot}, all observed signals are translated into observation at the reference position.
 Thus, even if CMA rotates at time frame $\tframe$, there is no substantial discrepancy between $\cov _{\src,\ft[-1]}$ and $\refpos{\Obs} _{\ft}$, and the influence of rotation on the estimation of the demixing matrix $\Demix _{\ft}$ is expected to be much reduced.
 
 Note that  the separated signals obtained by this approach are the source images at the reference microphone of CMA with the reference angle, regardless of the CMA rotation.
-%As a result, the source image at the rotated position cannot be obtained, 
+%As a result, the source image at the rotated position cannot be obtained,
 It causes problems in some practical applications.
 %BSS in augmented reality space using a head-mounted display needs to be processed so that the sound can be heard from the position of the source image after rotation.
 For example, in hearing aid applications or virtual/augmented reality (VR/AR) applications with a head-mounted display, it is desired to present a separated signal with the source localization sensation.
@@ -703,6 +703,12 @@ The reference signal for the SI-SDR was the source image recorded with a rotated
   \label{fig:layout:exp}
 \end{figure}
 
+The initial values for demixing and weighted covariance matrices were
+$\Demix _{\freq,0} = \Eye\; (\forall \freq)$, $\cov _{\src,\freq,0} = 10^{-3} \times \Eye\; (\forall \src, \freq)$, respectively, where $\Eye$ is the $\Src$-dimensional identity matrix.
+We set the number of iterations in each time frame in \cref{alg:iva} $\Itr$ to 5.
+We ran experiments with varying forgetting factors $\forget = 0.98, 0.99$, which were chosen so that the approximate number of frames $\frac{1}{1 - \forget} = 50, 100$.
+To increase numerous stability for the implementation of OIVA,
+we applied the following ad-hoc normalization $\cov _{\src,\ft} \gets \cov _{\src,\ft} + 10 ^{-3} \times \Eye$ after updates by \eqref{eq:cov}.
 We compared the following four methods:
 \begin{description}
   \item[\NaiveIVA] OIVA described in \cref{subsec:oiva} as a baseline.
@@ -713,31 +719,18 @@ We compared the following four methods:
   \item[\SFIIVAm] Apply parameter transformation for weighted covariance and demixing matrices after CMA rotation.  (See \Cref{alg:sfiva-m}.)
     % \\ $\rot{\Demix} _{\ft} \gets \Demix _{\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$,\; $\rot{\cov} _{\src,\ft} \gets \rotMat (\rotSpat _{\tframe}) \cov _{\src,\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$
 \end{description}
-The initial values for demixing and weighted covariance matrices were
-$\Demix _{\freq,0} = \Eye\; (\forall \freq)$, $\cov _{\src,\freq,0} = 10^{-3}\times\Eye\; (\forall \src, \freq)$, respectively.
-We set the number of iterations in each time frame in \cref{alg:iva} $\Itr$ to 5.
-We ran experiments with varying forgetting factors $\forget = 0.9, 0.95, 0.98, 0.99$, which were chosen so that the approximate number of frames $\frac{1}{1 - \forget} = 10, 20, 50, 100$.
-To increase numerous stability for the implementation of OIVA,
-we applied the following ad-hoc normalization $\cov _{\src,\ft} \gets \cov _{\src,\ft} + 10 ^{-3} \Eye$ after updates by \eqref{eq:cov}.
 
 \subsection{Source Separation Performance}
 
 \Cref{fig:plot:line} shows the SI-SDRi every \SI{1}{\second} averaged over samples and channels.
-\Cref{fig:plot:box} and \cref{tab:sdr} show the SI-SDRi averaged over samples and channels before and after CMA rotation.
-Overall, \NaiveIVA{} and \ResetIVA{} showed a performance drop after the CMA rotation and improved again with time.
+\Cref{fig:plot:box} shows the SI-SDRi averaged over samples and channels immediately after and after a sufficient time has elapsed of CMA rotation.
+Overall, \NaiveIVA{} and \ResetIVA{} showed a performance drop immediately after the CMA rotation and improved again with time.
 \ResetIVA{} has the lowest performance before CMA rotation among all forgetting factors, which worsens as the forgetting factor approaches 1.
-In contrast, the proposed \SFIIVAm{} and \SFIIVAo{} methods performed better performance after the CMA rotation than the others.
+In contrast, the proposed \SFIIVAm{} and \SFIIVAo{} methods performed better performance immediately after the CMA rotation than the others.
 Comparing \SFIIVAm{} and \SFIIVAo{}, \SFIIVAm{} performed slightly better.
 This result may be because \SFIIVAo{} estimates the source image at the reference microphone, while the reference signal for SI-SDR evaluation was the source image at the reference position.
 \begin{figure}[t]
-  \begin{minipage}[t]{.45\textwidth}
-    \centering\includegraphics{figures/plots/online/line_900.pdf}\subcaption{$\forget = 0.90 $}\label{fig:plot:line:900}
-  \end{minipage}
-  \begin{minipage}[t]{.45\textwidth}
-    \centering\includegraphics{figures/plots/online/line_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:line:950}
-  \end{minipage}
-  \vspace{.5em}
-
+  \centering
   \begin{minipage}[t]{.45\textwidth}
     \centering\includegraphics{figures/plots/online/line_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:line:980}
   \end{minipage}
@@ -747,22 +740,16 @@ This result may be because \SFIIVAo{} estimates the source image at the referenc
   \caption{SI-SDR improvements (SI-SDRi) every \SI{1}{\second}}%
   \label{fig:plot:line}
 \end{figure}
-\begin{figure}[t]
-  \begin{minipage}[t]{.45\textwidth}
-    \centering\includegraphics{figures/plots/online/box_900.pdf}\subcaption{$\forget = 0.90 $}\label{fig:plot:box:900}
-  \end{minipage}
-  \begin{minipage}[t]{.45\textwidth}
-    \centering\includegraphics{figures/plots/online/box_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:box:950}
-  \end{minipage}
-  \vspace{.5em}
 
+\begin{figure}[t]
+  \centering
   \begin{minipage}[t]{.45\textwidth}
     \centering\includegraphics{figures/plots/online/box_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:box:980}
   \end{minipage}
   \begin{minipage}[t]{.45\textwidth}
     \centering\includegraphics{figures/plots/online/box_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:box:990}
   \end{minipage}
-  \caption{Box plot of SI-SDR improvements (SI-SDRi) before and after CMA rotation.}%
+  \caption{Box plot of SI-SDR improvements (SI-SDRi) immediately after and after a sufficient time has elapsed of CMA rotation.}%
   \label{fig:plot:box}
 \end{figure}
 
@@ -772,15 +759,15 @@ To check the robustness against errors in measuring the angle of CMA rotation, w
 As discussed in \cref{subsec:proposed:sfiivam}, we expected errors to accumulate when there is an error in the measured angle since \SFIIVAo{} transforms the observed signal every frame.
 In contrast, \SFIIVAm{} performs the transformation only at the CMA rotation, so the effect of the measuring error should decrease with time.
 
-\Cref{tab:sdr} shows the averaged over samples and channels before and after CMA rotation with a measuring error.
+\Cref{tab:sdr} shows the averaged over samples and channels immediately after and after a sufficient time has elapsed of CMA rotation with a measuring error.
 The forgetting factor $\forget$ was fixed to $0.98$ in this experiment.
 As expected, the SI-SDRi of both methods dropped by about \SI{8}{\decibel} at \SI{30}{\second} immediately after the CMA rotation, when the measured angle was \SI{60}{\degree} which is different from the true angle of \SI{40}{\degree}.
 On the other hand, comparing the performance at \SI{59}{\second}, sufficiently after the CMA rotation, the performance of \SFIIVAm{} was about \SI{5}{\decibel} higher than that of \SFIIVAo{}.
 \begin{table}[t]
   \caption{%
-    Average SI-SDRi in decibels before and after CMA rotation with measuring error.
-    True angle was \SI{40}{\degree}.
+    Average SI-SDRi (dB) immediately after and after a sufficient time has elapsed of CMA rotation.
     The length of simulated speech signals is \SI{60}{\second} long, and CMA was instantaneously rotated at \SI{30}{\second}.
+    True accurate measurement of CMA rotation was \SI{40}{\degree} and inaccurate measurement was \SI{60}{\degree}.
     Forgetting factor $\forget = 0.98$.
   }%
   \label{tab:sdr}
@@ -794,7 +781,7 @@ On the other hand, comparing the performance at \SI{59}{\second}, sufficiently a
   \footnotesize
   \begin{minipage}[t]{.45\linewidth}
     \centering
-    \subcaption{Measured angle of \SI{40}{\degree}, which is equal to the ground truth.}%
+    \subcaption{Accurate measurement.}%
     \label{tab:sdr:98}
     \begin{tabular}{lSS}
       \toprule
@@ -809,7 +796,7 @@ On the other hand, comparing the performance at \SI{59}{\second}, sufficiently a
   \hspace{.05\linewidth}
   \begin{minipage}[t]{.45\linewidth}
     \centering
-    \subcaption{Measured angle of \SI{60}{\degree}, which is differ from the true angle of \SI{40}{\degree}.}%
+    \subcaption{Inaccurate measurement.}%
     \label{tab:sdr:98}
     \begin{tabular}{lSS}
       \toprule
