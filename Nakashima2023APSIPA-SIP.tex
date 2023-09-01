@@ -468,7 +468,7 @@ Note that $\rotSpat _{\tframe}$ must be known using another sensor, such as an a
 % 本節では，CMAの回転に頑健なonline BSSを提案するために，BSSと文献1で提案されたSFIを組み合わせることを考える．
 % 通常のOnline AuxIVAでは回転前後で分離行列を推定し直す必要がある．
 % 前述したように，CMAの回転角度と回転時刻が得られていれば，SFIによってCMAの回転をキャンセルできため，分離行列を推定し直すことなく音源分離できる．
-In the beamforming, that is robust against the self-rotation proposed in \cite{Wakabayashi:2023:ASLP},
+In the beamforming that is robust against the self-rotation proposed in \cite{Wakabayashi:2023:ASLP},
 the signals observed by the CMA with angle $\theta_t$ are transformed frame by frame to what would have been observed at the reference position,
 namely, at the angle $\theta=0$, using SFI, and then the beamforming is applied to the transformed signals.
 
@@ -496,9 +496,10 @@ However, this convergence is expected to take time.
 In contrast, in \cref{eq:cov:rot}, all observed signals are translated into the observation at the reference position.
 Thus, even if the CMA rotates at the time frame $\tframe$, there is no substantial discrepancy between $\cov _{\src,\ft[-1]}$ and $\refpos{\Obs} _{\ft}$, and the effect of the rotation on the estimation of the demixing matrix $\Demix _{\ft}$ is expected to be markedly reduced.
 
-Note that  the separated signals obtained by this approach are the source images at the reference microphone of the CMA with the reference angle, regardless of the CMA rotation.
+Note that the separated signals obtained by this approach are the source images at the reference microphone of the CMA with the reference angle.
+Since the position of the reference microphone is fixed in the space regardless of the CMA rotation,
 %As a result, the source image at the rotated position cannot be obtained,
-This causes problems in some practical applications.
+this causes problems in some practical applications.
 %BSS in augmented reality space using a head-mounted display needs to be processed so that the sound can be heard from the position of the source image after rotation.
 For example, in hearing aid applications or virtual/augmented reality (VR/AR) applications with a head-mounted display, it is desired to present a separated signal with the source localization sensation.
 For this purpose, we should estimate the source images on the reference microphone of the CMA rotated together with the head.
@@ -541,7 +542,7 @@ For this purpose, we should estimate the source images on the reference micropho
 % まず，簡単のために，時不変な環境におけるパラメータ変換を議論する．
 % 角度$\rotSpat$回転したCMAで録音された観測信号が，次の関係を厳密に満たしていると仮定する：
 
-In this subsection, we propose another online BSS that is robust against CMA rotation and outputs the source image at the latest microphone position.
+In this subsection, we propose another online BSS that is robust against CMA rotation and outputs the source image at the latest reference microphone position frame by frame.
 As discussed in the previous section, the mismatch between $\cov _{\src,\ft[-1]}$ and $\Obs _{\ft}$ causes a problem.
 In the previous approach, we transform $\Obs _{\ft}$ to what it should be at the reference position of the CMA.
 In this subsection, we consider another approach: transforming $\cov _{\src,\ft[-1]}$ to what it should be at the latest position of the CMA.
@@ -722,9 +723,11 @@ We compared the following four methods:
   \item[\NaiveIVA] OIVA described in \cref{subsec:oiva} as a baseline.
   \item[\ResetIVA] Re-initialize the weighted covariance and demixing matrices when the CMA was rotated:
       $\Demix _{\freq,\rotFra - 1} \gets \Eye, \; \cov _{\src,\freq,\rotFra - 1} \gets \varepsilon \Eye.$
-  \item[\SFIIVAo] Apply SFI to signals observed by CMA rotation and transformed frame by frame. (See \Cref{alg:sfiva-o}.)
+  \item[\SFIIVAo] Apply SFI to the latest observation and estimate the source image at the fixed position. (See \Cref{alg:sfiva-o}.)
+  %Apply SFI to signals observed by CMA rotation and transformed frame by frame. (See \Cref{alg:sfiva-o}.)
     % \\ $\Obs _{\ft} = \rotMat ^{\hermite} (\rotSpat _{\tframe}) \rot{\Obs} _{\ft}$
-  \item[\SFIIVAm] Apply parameter transformation to the weighted covariance and demixing matrices after CMA rotation.  (See \Cref{alg:sfiva-m}.)
+  \item[\SFIIVAm] Apply SFI to the weighted covariance and demixing matrices as parameter transformation and estimate the source image at the position rotated with CMA (see \Cref{alg:sfiva-m}).
+  %Apply parameter transformation to the weighted covariance and demixing matrices after CMA rotation.  (See \Cref{alg:sfiva-m}.)
     % \\ $\rot{\Demix} _{\ft} \gets \Demix _{\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$,\; $\rot{\cov} _{\src,\ft} \gets \rotMat (\rotSpat _{\tframe}) \cov _{\src,\ft} \rotMat ^{\hermite} (\rotSpat _{\tframe})$
 \end{description}
 
@@ -779,7 +782,7 @@ whereas the reference signal for SI-SDR evaluation was the source image at the r
 \subsection{Robustness against Estimation Error}
 
 To examine the robustness against errors in measuring the angle of CMA rotation, we compared results when the measured angles used for \SFIIVAo{} and \SFIIVAm{} differed from the true angle.
-As discussed in \cref{subsec:proposed:sfiivam}, we expected errors to accumulate when there is an error in the measured angle since \SFIIVAo{} transforms the observed signal every frame.
+As discussed in \cref{subsec:proposed:sfiivam}, we expected errors to remain when there is an error in the measured angle since \SFIIVAo{} transforms the observed signal every frame.
 In contrast, \SFIIVAm{} performs the transformation only at the time of CMA rotation, so the effect of the measuring error should decrease with time.
 
 \Cref{tab:sdr} shows the SI-SDRi (dB) averaged over samples and channels immediately after CMA rotation and after a sufficient time has elapsed with measurement errors.
