@@ -122,7 +122,7 @@ Furthermore, competitions have been organized, and datasets have been developed 
 Clarity Challenge \cite{Akeroyd:2023:ICASSP} aims to improve speech intelligibility in hearing aids and includes data on the listeners' head movements.
 SPEAR Challenge \cite{Guiraud:2022:IWAENC} is a speech enhancement challenge for head-worn hearing devices, and extensive datasets called EasyCom \cite{Donley:2021:arxiv} have been distributed, which include speaker and head movement data.
 
-In realation to BSS, many methods have been proposed on the basis of a block batch \cite{Koldovsky:2019:ICASSP,Koldovsky:2021:SP,Jansky:2022:ASMP} or online processing \cite{Kim:2010:CASI,Taniguchi:2014:HSCMA} to account for environmental changes.
+In relation to BSS, many methods have been proposed on the basis of a block batch \cite{Koldovsky:2019:ICASSP,Koldovsky:2021:SP,Jansky:2022:ASMP} or online processing \cite{Kim:2010:CASI,Taniguchi:2014:HSCMA} to account for environmental changes.
 In particular, online AuxIVA (OIVA) shows high separation performance in real-time scenarios \cite{Taniguchi:2014:HSCMA}.
 It has also been actively researched recently for applications in hearing aids \cite{Sunohara:2017:ICASSP}, joint optimization with dereverberation \cite{Ueda:2021:ICASSP}, and computationally efficient optimization \cite{Nakashima:2023:ICASSP}.
 OIVA estimates demixing matrices in a frame-by-frame manner and can track smooth environmental changes in ATS, such as slow movements of sources.
@@ -174,7 +174,14 @@ Under this definition, $\str _{\mic,\src,\ft} \; (\mic = 2, \dots, \Mic,\; \fora
 Note that many BSS methods require a time-invariant mixing system $\steer _{\src,\freq}\; (\forall \src)$,
 whereas, in this paper, steering vectors are time-variant $\steer _{\src,\ft}\; (\forall \src)$ to account for CMA rotation.
 We aim to estimate source images at the reference microphone even when the CMA is rotated.
-In the following, we assume that the rotation angle $\theta_t$ at each frame is known using another sensor.
+In the following, we assume that the rotation angle $\theta_t$ at each frame is known using another sensor, such as an angular acceleration sensor.
+\Cref{fig:system} shows the system diagram of our proposed approach.
+\begin{figure}[t]
+  \centering
+  \includegraphics{figures/diagrams/system.pdf}%
+  \caption{System diagram of blind source separation combining with sound field interpolation.}%
+  \label{fig:system}
+\end{figure}
 
 Next, we consider an online BSS problem analyzed using the model defined above.
 We henceforth assume that the number of microphones of the CMA is equal to that of sources: $\Mic = \Src$.
@@ -406,7 +413,7 @@ By using the expression above, we assume that the observed signal with CMA rotat
 \begin{equation}
   \refpos{\Obs} _{\ft} = \rotMat ^{-1} (\rotSpat _{\tframe}) \Obs _{\ft}.
 \end{equation}
-Note that $\rotSpat _{\tframe}$ must be known using another sensor, such as an angular acceleration sensor, or estimated from the acoustic observation itself \cite{Lian:2021:APSIPA}.
+As mentioned in the previous section, note that $\rotSpat _{\tframe}$ must be known using another sensor, such as an angular acceleration sensor, or estimated from the acoustic observation itself \cite{Lian:2021:APSIPA}.
 
 \section{Proposed Method}\label{sec:proposed}
 
@@ -577,25 +584,23 @@ The separation performance was evaluated by the scale-invariant signal-to-distor
 The reference signal for the SI-SDR was the source image recorded with a rotated CMA.
 \begin{figure}[t]
   \centering
-  \begin{minipage}[t]{.32\linewidth}
+  \begin{minipage}[t]{.45\linewidth}
     \centering
     \includegraphics[width=\columnwidth]{figures/room_layout_range.pdf}
-    \subcaption{Sources are randomly placed in the orange-shaded area.}%
+    \subcaption{Five sources are randomly placed in each orange-shaded area.}%
     \label{fig:layout:range}
   \end{minipage}
-  \begin{minipage}[t]{.32\linewidth}
+  \hspace{.05\linewidth}
+  \begin{minipage}[t]{.45\linewidth}
     \centering
-    \includegraphics[width=\columnwidth]{figures/room_layout_000.pdf}
-    \subcaption{Example before rotation.}%
-    \label{fig:layout:ref}
+    \includegraphics[width=\columnwidth]{figures/room_layout_one.pdf}
+    \subcaption{Example of sources and microphones placement.}%
+    \label{fig:layout:one}
   \end{minipage}
-  \begin{minipage}[t]{.32\linewidth}
-    \centering
-    \includegraphics[width=\columnwidth]{figures/room_layout_040.pdf}
-    \subcaption{Example after rotation.}%
-    \label{fig:layout:rot}
-  \end{minipage}
-  \caption{Room layout.}%
+  \caption{%
+    Room layout. The center of CMA is placed at $(\SI{3.0}{\metre}, \SI{4.0}{\metre})$ in the room. CMA was rotated \SI{40}{\degree} counter-clockwise at \SI{30}{\second}.
+    In the zoomed plot of (b), red dots represent the microphones at the position before rotation, green dots represent the position after rotation, and the cross lines in the middle represent the center of CMA.
+  }%
   \label{fig:layout:exp}
 \end{figure}
 
@@ -603,7 +608,7 @@ The initial values for demixing and weighted covariance matrices were
 $\Demix _{\freq,0} = \Eye\; (\forall \freq)$ and $\cov _{\src,\freq,0} = 10^{-3} \times \Eye\; (\forall \src, \freq)$, respectively, where $\Eye$ is the $\Src$-dimensional identity matrix.
 We set the number of iterations in each time frame in \cref{alg:iva} $\Itr$ to 5.
 We ran experiments using various forgetting factors $\forget = 0.9, 0.95, 0.98, \text{and} 0.99$,
-which were chosen so that the approximate number of frames $\frac{1}{1 - \forget} = 10, 20, 50, \text{and} 100$, respectively.
+which were chosen so that the approximate number of frames $\frac{1}{1 - \forget} =$ 10, 20, 50, and 100, respectively.
 To increase numerous stability for the implementation of OIVA,
 we applied the following ad-hoc normalization $\cov _{\src,\ft} \gets \cov _{\src,\ft} + 10 ^{-3} \times \Eye$ after updates using \eqref{eq:cov}.
 We compared the following four methods:
@@ -618,6 +623,9 @@ We compared the following four methods:
 \subsection{Source Separation Performance}
 
 \Cref{fig:plot:line} shows the SI-SDRi every \SI{1}{\second} averaged over samples and channels.
+As shown in \cref{fig:plot:line}, the result of forgetting factor $\forget$ of 0.9 showed faster tracking to the CMA rotation than the other results.
+This is because the closer the forgetting factor $\forget$ to 0, the smaller the contribution of past signals.
+However, the final performance was lower with no significant difference between the four methods and saturated after a sufficient time.
 \Cref{fig:plot:box} shows the SI-SDRi averaged over samples and channels immediately after CMA rotation and after a sufficient time has elapsed.
 Overall, \NaiveIVA{} and \ResetIVA{} showed a performance drop immediately after CMA rotation and improved again with time.
 \ResetIVA{} has the lowest performance before CMA rotation among all forgetting factors, which worsens as the forgetting factor approaches 1.
@@ -659,7 +667,10 @@ whereas the reference signal for SI-SDR evaluation was the source image at the r
   \begin{minipage}[t]{.45\textwidth}
     \centering\includegraphics{figures/plots/online/box_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:box:990}
   \end{minipage}
-  \caption{Box plots of SI-SDR improvements (SI-SDRi) immediately after CMA rotation and after a sufficient time has elapsed.}%
+  \caption{%
+    Box-and-whisker plots of SI-SDR improvements (SI-SDRi) immediately after CMA rotation and after a sufficient time has elapsed, corresponding \SI{30}{\second} and \SI{59}{\second} in \cref{fig:plot:line}.
+    The whiskers show the minima and maxima of each distribution, except for points determined to be outliers.
+  }%
   \label{fig:plot:box}
 \end{figure}
 
@@ -723,10 +734,10 @@ On the other hand, by comparing the performance at \SI{59}{\second}, which is su
 
 \subsection{Difference in Beam Pattern}
 
-In this subsection, we selected one example to focus on the difference between the two proposed methods \SFIIVAo{} and \SFIIVAo{}.
+In this subsection, we selected one example to focus on the difference between the two proposed methods \SFIIVAo{} and \SFIIVAm{}.
 \Cref{fig:plot:beam} shows the beam patterns of the demixing matrices calculated by each method.
 \Cref{fig:plot:bp:ref} is the result calculated before the rotation.
-\Cref{fig:plot:bp:sfiivao,fig:plot:bp:sfiivam} are the results with the demixing matrices calculated using \SFIIVAm{} and \SFIIVAo{}, respectively, after the rotation.
+\Cref{fig:plot:bp:sfiivao,fig:plot:bp:sfiivam} are the results with the demixing matrices calculated using \SFIIVAo{} and \SFIIVAm{}, respectively, after the rotation.
 Dark regions in each plot represent nulls in a certain direction.
 In the case of BSS, the desired result is that the direction of the estimated source is toward the brighter regions, and that of the others is toward the darker region.
 As shown in \cref{fig:plot:beam,fig:plot:bp:ref}, the results were similar to each other, and only the results in \cref{fig:plot:bp:sfiivam} were different from the each other.
