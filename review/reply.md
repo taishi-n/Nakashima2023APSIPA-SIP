@@ -26,28 +26,39 @@ The notations and citations used in this letter are the same as in the revised m
 >    Therefore, it is essential to demonstrate the performance of the proposed algorithms under various noise conditions.
 >    Alternatively, please consider validating the proposed algorithms through real experiments.
 
-- **要相談**
-  - 実環境実験は時間的に難しい…
-  - ノイズありシミュレーションを行ったとしても分離性能が全体的に下がるだけになりそう…
-- 反論案:
-  - 論文中のモデルは音源分離の文脈で広く用いられている標準的ものである
-  - ノイズを付加したシミュレーション実験および実環境実験は今後検討する
+**追加実験準備中**
+Thank you for your constructive comments.
+As pointed out, the authors acknowledge that it is important to show the results of experiments in noisy environments from a practical point of view.
+Additional experiments were performed under the following conditions:
+
+- Observation noise in the microphone array.
+- Background diffuse noise.
+  For detailed experimental conditions, results, and discussions, please see the new Subsection 5.5 in the revised edition.
+  As for experiments under real environments, due to time constraints, we decided to leave it for future work and have added to the conclusions of the revised manuscript.
 
 > 2. Figure 6 is difficult to view, particularly when printed in greyscale.
 >    Another figure that supports your conclusion in a clearer manner may be beneficial.
 
-- **要相談**
-  - 図が独特なのでもっともな指摘…
-  - 現状の全周波数を同径方向にプロットしたものではなく，ビームフォーマの論文でよく見かける，1000Hz, 2000Hz, 4000Hz...などの指向特性を追加する？
+Thank you for your suggestion.
+As shown below, we also made a modified example plot of a beam pattern with only a few frequencies, which is widely used in the context of beamforming, but we think it is rather difficult to view.
+![ref](./fig/freq-limit/ref.png)
+![rot-sfiiva-m](./fig/freq-limit/rot-sfiiva-m.png)
+![rot-sfiiva-o](./fig/freq-limit/rot-sfiiva-o.png)
+However, as you pointed out, authors agree that the color map makes it difficult to see.
+Therefore, we kept the original plotting style, but changed the color map, and made some modifications such as the position of the color bar and the size of each plot.
+![plasma-ref](./fig/ref.png)
+![plasma-rot-sfiiva-o](./fig/rot_sfiiva-o.png)
+![plasma-rot-sfiiva-m](./fig/rot_sfiiva-m.png)
 
 > 3. The current simulation setup adopts the same number of sources and microphones.
 >    It presents a determined case in math.
 >    How about other combinations of $K$ and $M$ to demonstrate the under-determined and over-determined cases?
 
-- **要相談**
-  - 答えるのが難しい…
-  - Overdetermined の実験はやったことがあるが，同じ音源が違うチャネルに分けて分離されるなど評価がかなり難しくなる
-  - Underdetermined の実験はやったことはないが，IVA ベースの音源分離なのでそもそも分離されなくなりそう
+The purpose of this paper is to make BSS robust against self-rotation of microphone array.
+As discussed in the famous independent component analysis or its extensions, the determined condition is the most basic and widely used in the context of BSS.
+For over-determined or under-determined conditions, many methods have attributed them to the determined condition by imposing additional prior information or complex models.
+Therefore, we believe that it is reasonable to start with the most basic determined condition.
+However, we would like to work on the extension to the over-determined condition in the future, so we have added it to the conclusion as one of the future work to be addressed.
 
 > Furthermore, typos are noted in this paper.
 > For instance, in the third paragraph of the introduction, it should be "relation" instead of "realation."
@@ -68,24 +79,29 @@ We have added a new figure (Figure 1 in the revised manuscript).
 > On Page 4, after mentioning that the rotation angle is assumed to be measured by a sensor it might be good to also mention an example (e.g. an angular acceleration sensor as mentioned later at the end of Section 3).
 
 Thank you for pointing out an unclear point.
-We have added an example of the sentence at the end of the first paragraph in Section 2.
+We have added an example of the sentence at the end of the first paragraph in Section 2 (Page 4 in the revised manuscript).
 
 > In Figure 3, (b) and (c) appear to be identical.
 > Please clarify if this is intended.
 
-The figure was not the same, but rather two separate drawings to show the rotation of the microphones.
-We acknowledge that the two figures are confusing as pointed out.
-Figure 3 (b) in the revised manuscript has been combined into one figure.
+The two figures (Figure 3 (b) and (c) in the first manuscript) showed the placement before and after the circular microphone array is rotated and are not identical.
+As pointed out, however, we acknowledge that the two figures are confusing.
+We have removed the two figures and added a new figure (Figure 4 (b) in the revised manuscript) to show the rotation more clearly.
 
 > Please also clarify what the numbers refer to next to the square outlining the CMA i.e. 3.025, 3.000 and 2.975 in the vertical direction and the 3 numbers in the horizontal direction.
 
-The numbers in the figure are used to represent the coordinates of the center of the microphone array in metre.
-An explanation for that has been added to the caption of Figure 3 in the revised manuscript.
+The numbers in the figure represent the coordinates of the center of the circular microphone array in meters.
+However, because we felt that this would complicate the figure and hinder understanding, we removed the numbers from the figure.
+Instead, we added their explanation in the caption of Figure 4(b).
 
 > From results in Figures 4 and 5 it appears that the performance when using a forgetting factor of 0.9 are quite similar for each method.
 
 Thank you for your helpful comment.
-We have added an explanation for that in Section 5.2.
+In online AuxIVA, setting the forgetting factor $\alpha$ to smaller value is equivalent to reducing the contribution of past data.
+This results in faster convergence and tracking of the microphone array rotation but tends to limit the separation performance.
+The result with a forgetting factor $\alpha$ of 0.9 clearly demonstrates that tendency.
+We believe that each method performs similarly in this case because the separation performance of all methods is immediately saturated.
+We have added an explanation for that in Section 5.2 (Page 15 in the revised manuscript).
 
 > Please clarify this and also if the error bars, which appear overlapping, represent confidence intervals or some other quantity.
 
@@ -100,5 +116,8 @@ We have carefully corrected that.
 > In Figure 6 (c), it appears that results for Channel 4 might not be as good a other channels in that while there is a brighter region around 176 degrees other regions also appear relatively bright (e.g. between 248 and 320 degrees).
 > Please consider commenting on why this might be the case.
 
-- **考え中**
-  - 今回は音声信号のため 8000Hz 付近の高い周波数成分がなく，どこに null を向けてもよくなるため…？
+Thank you for your insightful comment.
+Online AuxIVA is equivalent to adaptively estimating the nulls that suppresses interference sources in each frequency.
+In this experiment, speech signal was used as the source signal, so the frequency components around 8000 Hz were not included.
+We believe that the direction of the non-interference source was incorrectly estimated only in the frequency band that did not include speech as a result.
+These explanations have been added to the experimental results.
