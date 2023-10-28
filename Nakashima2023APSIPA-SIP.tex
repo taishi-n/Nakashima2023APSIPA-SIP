@@ -175,13 +175,6 @@ Note that many BSS methods require a time-invariant mixing system $\steer _{\src
 whereas, in this paper, steering vectors are time-variant $\steer _{\src,\ft}\; (\forall \src)$ to account for CMA rotation.
 We aim to estimate source images at the reference microphone even when the CMA is rotated.
 In the following, we assume that the rotation angle $\theta_t$ at each frame is known using another sensor, such as an angular acceleration sensor.
-\Cref{fig:system} shows the system diagram of our proposed approach.
-\begin{figure}[t]
-  \centering
-  \includegraphics{figures/diagrams/system.pdf}%
-  \caption{System diagram of blind source separation combining with sound field interpolation.}%
-  \label{fig:system}
-\end{figure}
 
 Next, we consider an online BSS problem analyzed using the model defined above.
 We henceforth assume that the number of microphones of the CMA is equal to that of sources: $\Mic = \Src$.
@@ -274,7 +267,7 @@ we apply the following backprojection \cite{Murata:2001:NC} for postprocessing:
 \end{align}
 where $\diag(\cdot)$ is an operator for constructing a diagonal matrix with each of its elements equals the corresponding element of the given vector.
 \Cref{alg:iva} summarizes the OIVA algorithm.
-The online updates of $\cov _{\src,\ft}$ \eqref{eq:cov} enable OIVA to track the slow movement of sound sources or microphones progressively..
+The online updates of $\cov _{\src,\ft}$ \eqref{eq:cov} enable OIVA to track the slow movement of sound sources or microphones progressively.
 Nevertheless, it cannot promptly adapt to swift changes, which can happen in head rotation when wearing CMA on the head.
 In this research, we aim to solve this problem.
 
@@ -437,7 +430,13 @@ and the online update of the weighted covariance matrix $\cov _{\src,\ft}$ is pe
   \label{eq:cov:rot}
 \end{align}
 The demixing matrices $\Demix _{\ft}$ are estimated by using these weighted covariance matrices $\cov _{\src,\ft}$ similarly to OIVA.
-\Cref{alg:sfiva-o} summarizes OIVA using this approach.
+\Cref{alg:sfiva-o} summarizes OIVA using this approach, and \cref{fig:sfiiva-m} shows the system diagram.
+\begin{figure}[t]
+  \centering
+  \includegraphics{figures/diagrams/sfiiva-o.pdf}%
+  \caption{System diagram of SFI-based online AuxIVA using transformation of latest observation.}
+  \label{fig:sfiiva-o}
+\end{figure}
 
 Assuming that a CMA rotates only once at a specific time frame $\tframe$, we analyze how the proposed method, as given in \cref{eq:cov:rot}, differs from the original formula in \cref{eq:cov}.
 In \cref{eq:cov}, the value of $\cov _{\src,\ft}$ is updated online.
@@ -522,7 +521,13 @@ we use these variable transformations written in \eqref{eq:demix:refpos} and \eq
   \refpos{\cov} _{\src,\ft[-1]} &\gets \rotMat (\Delta\rotSpat _{\tframe}) \cov _{\src,\ft[-1]} \rotMat ^{\hermite} (\Delta\rotSpat _{\tframe}), \label{eq:sfiiva:cov}
 \end{align}
 where $\Delta\rotSpat _{\tframe} = \rotSpat _{\tframe} - \rotSpat _{\tframe - 1}$.
-The entire algorithm is summarized as \cref{alg:sfiva-m}.
+The entire algorithm is summarized as \cref{alg:sfiva-m}, and \cref{fig:sfiiva-m} shows the system diagram of our approach.
+\begin{figure}[t]
+  \centering
+  \includegraphics{figures/diagrams/sfiiva-m.pdf}%
+  \caption{System diagram of SFI-based online AuxIVA with transformation of pre-update demixing and weighted covariance matrices.}%
+  \label{fig:sfiiva-m}
+\end{figure}
 This method preserves the observation as is and transforms the intermediate variables as $\Demix _{\ft[-1]}$ and $\cov _{\src,\ft[-1]}$ instead;
 thus, the source image at the latest CMA position can be estimated, which is an advantage of this algorithm.
 Furthermore, the angle of the CMA is supposed to be measured by integrating angular accelerometers, which can introduce bias errors.
@@ -598,7 +603,7 @@ The reference signal for the SI-SDR was the source image recorded with a rotated
     \label{fig:layout:one}
   \end{minipage}
   \caption{%
-    Room layout. The center of CMA is placed at $(\SI{3.0}{\metre}, \SI{4.0}{\metre})$ in the room. CMA was rotated \SI{40}{\degree} counter-clockwise at \SI{30}{\second}.
+    Room layout. The center of CMA is placed at $(\SI{4.0}{\metre}, \SI{3.0}{\metre})$ in the room with the radius of \SI{2}{\centi\metre}. CMA was rotated \SI{40}{\degree} counter-clockwise at \SI{30}{\second}.
     In the zoomed plot of (b), red dots represent the microphones at the position before rotation, green dots represent the position after rotation, and the cross lines in the middle represent the center of CMA.
   }%
   \label{fig:layout:exp}
@@ -747,20 +752,20 @@ The result in \cref{fig:plot:bp:sfiivam} shows the expected direction after CMA 
 \begin{figure}[t]
   \centering
   \begin{minipage}[t]{\linewidth}
-    \centering\includegraphics{figures/plots/beam-pattern/sfiiva-cov_ref.pdf}\subcaption{Before rotation.}\label{fig:plot:bp:ref}
+    \centering\includegraphics{figures/plots/beam-pattern/ref.pdf}\subcaption{Before rotation.}\label{fig:plot:bp:ref}
   \end{minipage}
   \begin{minipage}[t]{\linewidth}
-    \centering\includegraphics{figures/plots/beam-pattern/sfiiva-obs_rot.pdf}\subcaption{\SFIIVAo{} after rotation.}\label{fig:plot:bp:sfiivao}
+    \centering\includegraphics{figures/plots/beam-pattern/rot_sfiiva-o.pdf}\subcaption{\SFIIVAo{} after rotation.}\label{fig:plot:bp:sfiivao}
   \end{minipage}
   \begin{minipage}[t]{\linewidth}
-    \centering\includegraphics{figures/plots/beam-pattern/sfiiva-cov_rot.pdf}\subcaption{\SFIIVAm{} after rotation.}\label{fig:plot:bp:sfiivam}
+    \centering\includegraphics{figures/plots/beam-pattern/rot_sfiiva-m.pdf}\subcaption{\SFIIVAm{} after rotation.}\label{fig:plot:bp:sfiivam}
   \end{minipage}
   \caption{%
     Beam patterns of demixing matrices.
     The five plots are the beam patterns of the frequency-wise demixing matrices calculated by each method.
     The radial direction of each plot represents the frequency, and the tangential direction represents the angle from the center of the CMA.
     The light and dark colors represent the gain in decibels.
-    The five white lines in each plot represent the true direction of the source signal.
+    The five triangles in each plot indicate the true direction of the source, with green representing the target source and red the interfering source.
   }%
   \label{fig:plot:beam}
 \end{figure}
