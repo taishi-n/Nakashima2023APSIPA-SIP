@@ -35,15 +35,15 @@ The notations and citations used in this letter are the same as in the revised m
 >    Therefore, it is essential to demonstrate the performance of the proposed algorithms under various noise conditions.
 >    Alternatively, please consider validating the proposed algorithms through real experiments.
 
-**追加実験準備中**
 Thank you for your constructive comments.
-As pointed out, the authors acknowledge that it is important to show the results of experiments in noisy environments from a practical point of view.
+As pointed out, we acknowledge that it is important to show the results of experiments in noisy environments from a practical point of view.
 Additional experiments were performed under the following conditions:
 
-- Observation noise in the microphone array.
-- Background diffuse noise.
-  For detailed experimental conditions, results, and discussions, please see the new Subsection 5.5 in the revised edition.
-  As for experiments under real environments, due to time constraints, we decided to leave it for future work and have added to the conclusions of the revised manuscript.
+1. Experiments with extra interference noise.
+2. Experiments with speech babble noise.
+
+For detailed experimental conditions, results, and discussions, please see the new Subsection 5.5 in the revised edition.
+As for experiments under real environments, due to time constraints, we decided to leave it for future work and have added to the conclusions of the revised manuscript.
 
 > 2. Figure 6 is difficult to view, particularly when printed in greyscale.
 >    Another figure that supports your conclusion in a clearer manner may be beneficial.
@@ -66,17 +66,17 @@ Therefore, we kept the original plotting style, but changed the color map, and m
 The purpose of this paper is to make BSS robust against self-rotation of microphone array.
 As discussed in the famous independent component analysis or its extensions, the determined condition is the most basic and widely used in the context of BSS.
 For over-determined or under-determined conditions, many methods have attributed them to the determined condition by imposing additional prior information or complex models.
-Switching, virtual, OverIVA, を引用しながら結論に追記する
 Therefore, we believe that it is reasonable to start with the most basic determined condition.
-However, we would like to work on the extension to the over-determined condition in the future, so we have added it to the conclusion as one of the future work to be addressed.
+However, it is a very useful point to consider those conditions in the future.
+An explanation has been added to the conclusion with examples of BSS methods under over-determined or under-determined conditions.
 
 > Furthermore, typos are noted in this paper.
 > For instance, in the third paragraph of the introduction, it should be "relation" instead of "realation."
 > Please review the paper carefully for such errors when revising.
 
 Thank you for your suggestion.
-投稿前に英文校閲したことを追記，アクセプトされたら再度校閲予定
 We have carefully corrected that typo and other minor errors.
+We also plan to have it professionally proofread by a native English speaker if the paper is accepted.
 
 <div style="page-break-after:always"></div>
 
