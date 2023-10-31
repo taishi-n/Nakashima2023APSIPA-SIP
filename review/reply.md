@@ -19,6 +19,15 @@ We will provide a point-by-point reply that explains reviewers' comments.
 For the reviewers' convenience, we have marked modified parts as red.
 The notations and citations used in this letter are the same as in the revised manuscript.
 
+## General Comment
+
+- Clearly に伝えるために提案法の名前変えました
+  - `SFIIVA-O` -> `SFIIVA-Obs`
+  - `SFIIVA-M` -> `SFIIVA-Par`
+- それに合わせて図中の凡例変えました
+
+<div style="page-break-after:always"></div>
+
 ## Responses to Reviewer 1
 
 > 1. The basic signal model in (1) does not consider any background noise, and neither does the simulation.
@@ -57,6 +66,7 @@ Therefore, we kept the original plotting style, but changed the color map, and m
 The purpose of this paper is to make BSS robust against self-rotation of microphone array.
 As discussed in the famous independent component analysis or its extensions, the determined condition is the most basic and widely used in the context of BSS.
 For over-determined or under-determined conditions, many methods have attributed them to the determined condition by imposing additional prior information or complex models.
+Switching, virtual, OverIVA, を引用しながら結論に追記する
 Therefore, we believe that it is reasonable to start with the most basic determined condition.
 However, we would like to work on the extension to the over-determined condition in the future, so we have added it to the conclusion as one of the future work to be addressed.
 
@@ -65,6 +75,7 @@ However, we would like to work on the extension to the over-determined condition
 > Please review the paper carefully for such errors when revising.
 
 Thank you for your suggestion.
+投稿前に英文校閲したことを追記，アクセプトされたら再度校閲予定
 We have carefully corrected that typo and other minor errors.
 
 <div style="page-break-after:always"></div>
@@ -74,7 +85,8 @@ We have carefully corrected that typo and other minor errors.
 > It might be good to include a simple system diagram illustrating the key components of the proposed approach (e.g. similar to Figure 1 in [22]).
 
 Thank you for your recommendation.
-We have added a new figure (Figure 1 in the revised manuscript).
+We have added a new figure (Figure X in the revised manuscript).
+And we have renamed our proposed methods for readability.
 
 > On Page 4, after mentioning that the rotation angle is assumed to be measured by a sensor it might be good to also mention an example (e.g. an angular acceleration sensor as mentioned later at the end of Section 3).
 
