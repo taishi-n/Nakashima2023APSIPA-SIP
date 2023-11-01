@@ -19,13 +19,6 @@ We will provide a point-by-point reply that explains reviewers' comments.
 For the reviewers' convenience, we have marked modified parts as red.
 The notations and citations used in this letter are the same as in the revised manuscript.
 
-## General Comment
-
-- Clearly に伝えるために提案法の名前変えました
-  - `SFIIVA-O` -> `SFIIVA-Obs`
-  - `SFIIVA-M` -> `SFIIVA-Par`
-- それに合わせて図中の凡例変えました
-
 <div style="page-break-after:always"></div>
 
 ## Responses to Reviewer 1
@@ -50,14 +43,33 @@ As for experiments under real environments, due to time constraints, we decided 
 
 Thank you for your suggestion.
 As shown below, we also made a modified example plot of a beam pattern with only a few frequencies, which is widely used in the context of beamforming, but we think it is rather difficult to view.
-![ref](./fig/freq-limit/ref.png)
-![rot-sfiiva-m](./fig/freq-limit/rot-sfiiva-m.png)
-![rot-sfiiva-o](./fig/freq-limit/rot-sfiiva-o.png)
+
+<figure>
+  <img src="./fig/freq-limit/ref.png" style="width:60%;display:block;margin:auto">
+  <figcaption style="text-align:center">(a) Before rotation.</figcaption>
+  <br>
+  <img src="./fig/freq-limit/rot-sfiiva-o.png" style="width:60%;display:block;margin:auto">
+  <figcaption style="text-align:center">(b) SFIIVA-O after rotation.</figcaption>
+  <br>
+  <img src="./fig/freq-limit/rot-sfiiva-m.png" style="width:60%;display:block;margin:auto">
+  <figcaption style="text-align:center">(c) SFIIVA-M after rotation.</figcaption>
+  <br>
+  <figcaption style="text-align:center">Fig. 1: Beam patterns of demixing matrices <strong>in 5 frequencies</strong>.</figcaption>
+</figure>
 However, as you pointed out, authors agree that the color map makes it difficult to see.
 Therefore, we kept the original plotting style, but changed the color map, and made some modifications such as the position of the color bar and the size of each plot.
-![plasma-ref](./fig/ref.png)
-![plasma-rot-sfiiva-o](./fig/rot_sfiiva-o.png)
-![plasma-rot-sfiiva-m](./fig/rot_sfiiva-m.png)
+<figure>
+  <img src="./fig/ref.png" style="width:60%;display:block;margin:auto">
+  <figcaption style="text-align:center">(a) Before rotation.</figcaption>
+  <br>
+  <img src="./fig/rot_sfiiva-o.png" style="width:60%;display:block;margin:auto">
+  <figcaption style="text-align:center">(b) SFIIVA-O after rotation.</figcaption>
+  <br>
+  <img src="./fig/rot_sfiiva-m.png" style="width:60%;display:block;margin:auto">
+  <figcaption style="text-align:center">(c) SFIIVA-M after rotation.</figcaption>
+  <br>
+  <figcaption style="text-align:center">Fig. 2: Beam patterns of demixing matrices <strong>with new color and layout</strong>.</figcaption>
+</figure>
 
 > 3. The current simulation setup adopts the same number of sources and microphones.
 >    It presents a determined case in math.
