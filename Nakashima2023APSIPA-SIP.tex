@@ -410,6 +410,18 @@ As mentioned in the previous section, note that $\rotSpat _{\tframe}$ must be kn
 
 \section{Proposed Method}\label{sec:proposed}
 
+% We propose two types of algorithms; sound field interpolation based online AuxIVA.
+% \Cref{fig:system} shows the system architecture of our proposed methods.
+% \begin{figure}[h]
+%   \begin{minipage}[t]{\linewidth}
+%     \centering\includegraphics{figures/diagrams/sfiiva-o.pdf}\subcaption{SFIIVA-Obs}\label{fig:sfiiva-o}
+%   \end{minipage}
+%   \begin{minipage}[t]{\linewidth}
+%     \centering\includegraphics{figures/diagrams/sfiiva-m.pdf}\subcaption{SFIIVA-Par}\label{fig:sfiiva-m}
+%   \end{minipage}
+%   \caption{System diagram of proposed algorithms.}
+%   \label{fig:system}
+% \end{figure}
 
 % TODO: illustration for difference between SFIIVA-O and SFIIVA-M
 \subsection{SFI-based Online AuxIVA with Transformation of Latest Observation}
@@ -431,12 +443,6 @@ and the online update of the weighted covariance matrix $\cov _{\src,\ft}$ is pe
 \end{align}
 The demixing matrices $\Demix _{\ft}$ are estimated by using these weighted covariance matrices $\cov _{\src,\ft}$ similarly to OIVA.
 \Cref{alg:sfiva-o} summarizes OIVA using this approach, and \cref{fig:sfiiva-m} shows the system diagram.
-\begin{figure}[t]
-  \centering
-  \includegraphics{figures/diagrams/sfiiva-o.pdf}%
-  \caption{System diagram of SFI-based online AuxIVA using transformation of latest observation.}
-  \label{fig:sfiiva-o}
-\end{figure}
 
 Assuming that a CMA rotates only once at a specific time frame $\tframe$, we analyze how the proposed method, as given in \cref{eq:cov:rot}, differs from the original formula in \cref{eq:cov}.
 In \cref{eq:cov}, the value of $\cov _{\src,\ft}$ is updated online.
@@ -521,19 +527,13 @@ we use these variable transformations written in \eqref{eq:demix:refpos} and \eq
   \refpos{\cov} _{\src,\ft[-1]} &\gets \rotMat (\Delta\rotSpat _{\tframe}) \cov _{\src,\ft[-1]} \rotMat ^{\hermite} (\Delta\rotSpat _{\tframe}), \label{eq:sfiiva:cov}
 \end{align}
 where $\Delta\rotSpat _{\tframe} = \rotSpat _{\tframe} - \rotSpat _{\tframe - 1}$.
-The entire algorithm is summarized as \cref{alg:sfiva-m}, and \cref{fig:sfiiva-m} shows the system diagram of our approach.
-\begin{figure}[t]
-  \centering
-  \includegraphics{figures/diagrams/sfiiva-m.pdf}%
-  \caption{System diagram of SFI-based online AuxIVA with transformation of pre-update demixing and weighted covariance matrices.}%
-  \label{fig:sfiiva-m}
-\end{figure}
 This method preserves the observation as is and transforms the intermediate variables as $\Demix _{\ft[-1]}$ and $\cov _{\src,\ft[-1]}$ instead;
 thus, the source image at the latest CMA position can be estimated, which is an advantage of this algorithm.
 Furthermore, the angle of the CMA is supposed to be measured by integrating angular accelerometers, which can introduce bias errors.
 In this case, the method described in the previous subsection continues to have errors in the transformation of the observations to those at the reference position.
 On the other hand, in the method described in this subsection, the error included in the transformation of $\Demix _{\ft}$ and $\cov _{\src,\ft}$ should disappear with online updates.
 This is another advantage of this approach. We will show this in an experiment to be described later.
+The entire algorithm is summarized as \cref{alg:sfiva-m}, and \cref{fig:sfiiva-m} shows the system diagram of our approach.
 
 \begin{algorithm}{SFI-based Online AuxIVA with Transformation of Pre-update Demixing and Weighted Covariance Matrices (\SFIIVAm)}{sfiva-m}
   \textbf{Input:} ${\{\Obs _{\ft}\}} _{\ft}$, ${\{\Demix _{\freq,0}\}} _{\freq}$, ${\{\cov _{\src,\freq,0}\}} _{\src,\freq}$, $\forget$, ${\{\rotSpat _{\tframe}\}} _{\tframe}$ \\
@@ -559,6 +559,19 @@ This is another advantage of this approach. We will show this in an experiment t
         {$\Est _{\ft}$} $\gets$ $\proj{\Demix }_{\ft} \Obs _{\ft}$ \ct{\eqref{eq:pb:y}}
   \end{pseudo}
 \end{algorithm}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics{figures/diagrams/sfiiva-o.pdf}
+  \caption{System diagram of proposed \SFIIVAo{}}%
+  \label{fig:sfiiva-o}
+\end{figure}
+\begin{figure}[t]
+  \centering
+  \includegraphics{figures/diagrams/sfiiva-m.pdf}
+  \caption{System diagram of proposed \SFIIVAm{}}%
+  \label{fig:sfiiva-m}
+\end{figure}
 
 \section{Experimental Validation}\label{sec:experiment}
 % Although OIVA can track slow microphone movements, its convergence performance highly depends on the forgetting factor.
