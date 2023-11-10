@@ -11,13 +11,15 @@ Dear Associate Editor and Reviewers,
 
 Thank you very much for your constructive suggestions and valuable comments on our paper entitled "Self-Rotation-Robust Online-Independent Vector Analysis with Sound Field Interpolation on Circular Microphone Array" `(SIP-2023-0063)`.
 We have carefully revised the manuscript according to the comments.
-Comments from reviewers are quoted with gray box like:
+Comments from reviewers are quoted with gray boxes like:
 
-> This is an example for quotations of comments from reviewers.
+> This is an example of quotations of comments from reviewers.
 
-We will provide a point-by-point reply that explains reviewers' comments.
-For the reviewers' convenience, we have marked modified parts as red.
+We will provide a point-by-point reply that explains the reviewers' comments.
 The notations and citations used in this letter are the same as in the revised manuscript.
+
+For the convenience of the reviewers, we have also included the difference between the corrected manuscript and the original manuscript.
+In the differences, the added parts are indicated in blue, and the deleted parts in red.
 
 <div style="page-break-after:always"></div>
 
@@ -30,19 +32,20 @@ The notations and citations used in this letter are the same as in the revised m
 
 Thank you for your constructive comments.
 As pointed out, we acknowledge that it is important to show the results of experiments in noisy environments from a practical point of view.
-Additional experiments were performed under the following conditions:
+Additional experiments were performed under the following three conditions:
 
-1. Experiments with extra interference noise.
-2. Experiments with speech babble noise.
+1. One extra interference
+2. Speech babble noise
+3. Observation noise
 
-For detailed experimental conditions, results, and discussions, please see the new Subsection 5.5 in the revised edition.
+For detailed experimental conditions, results, and discussions, please see **Subsection 5.2** in the revised edition.
 As for experiments under real environments, due to time constraints, we decided to leave it for future work and have added to the conclusions of the revised manuscript.
 
 > 2. Figure 6 is difficult to view, particularly when printed in greyscale.
 >    Another figure that supports your conclusion in a clearer manner may be beneficial.
 
 Thank you for your suggestion.
-As shown below, we also made a modified example plot of a beam pattern with only a few frequencies, which is widely used in the context of beamforming, but we think it is rather difficult to view.
+As shown below, we also made a modified example plot of a beam pattern with only a few frequencies, which is widely used in beamforming, but is rather difficult to view.
 
 <figure>
   <img src="./fig/freq-limit/ref.png" style="width:60%;display:block;margin:auto">
@@ -54,10 +57,12 @@ As shown below, we also made a modified example plot of a beam pattern with only
   <img src="./fig/freq-limit/rot-sfiiva-m.png" style="width:60%;display:block;margin:auto">
   <figcaption style="text-align:center">(c) SFIIVA-M after rotation.</figcaption>
   <br>
-  <figcaption style="text-align:center">Fig. 1: Beam patterns of demixing matrices <strong>in 5 frequencies</strong>.</figcaption>
+  <figcaption style="text-align:center">Fig. 1: Beam patterns of demixing matrices <strong>in 5 frequencies</strong> (125, 250, 500, 1000, 2000 Hz).</figcaption>
 </figure>
-However, as you pointed out, authors agree that the color map makes it difficult to see.
-Therefore, we kept the original plotting style, but changed the color map, and made some modifications such as the position of the color bar and the size of each plot.
+
+However, as you pointed out, we agree that the color map makes it difficult to see.
+Therefore, we kept the original plotting style but changed the color map and made some modifications, such as the color bar's position and the plot's size.
+
 <figure>
   <img src="./fig/ref.png" style="width:60%;display:block;margin:auto">
   <figcaption style="text-align:center">(a) Before rotation.</figcaption>
@@ -75,11 +80,11 @@ Therefore, we kept the original plotting style, but changed the color map, and m
 >    It presents a determined case in math.
 >    How about other combinations of $K$ and $M$ to demonstrate the under-determined and over-determined cases?
 
-The purpose of this paper is to make BSS robust against self-rotation of microphone array.
-As discussed in the famous independent component analysis or its extensions, the determined condition is the most basic and widely used in the context of BSS.
+The purpose of this paper is to make BSS robust against the self-rotation of the microphone array.
+As discussed in the famous independent component analysis or its extensions, the determined condition is the most basic and widely used in BSS.
 For over-determined or under-determined conditions, many methods have attributed them to the determined condition by imposing additional prior information or complex models.
-Therefore, we believe that it is reasonable to start with the most basic determined condition.
-However, it is a very useful point to consider those conditions in the future.
+Therefore, we believe starting with the most basic determined condition is reasonable.
+However, it is a very beneficial point to consider those conditions in the future.
 An explanation has been added to the conclusion with examples of BSS methods under over-determined or under-determined conditions.
 
 > Furthermore, typos are noted in this paper.
@@ -97,8 +102,7 @@ We also plan to have it professionally proofread by a native English speaker if 
 > It might be good to include a simple system diagram illustrating the key components of the proposed approach (e.g. similar to Figure 1 in [22]).
 
 Thank you for your recommendation.
-We have added a new figure (Figure X in the revised manuscript).
-And we have renamed our proposed methods for readability.
+We have added a new figure (Figures 3 and 4 in the revised manuscript).
 
 > On Page 4, after mentioning that the rotation angle is assumed to be measured by a sensor it might be good to also mention an example (e.g. an angular acceleration sensor as mentioned later at the end of Section 3).
 
@@ -121,15 +125,15 @@ Instead, we added their explanation in the caption of Figure 4(b).
 > From results in Figures 4 and 5 it appears that the performance when using a forgetting factor of 0.9 are quite similar for each method.
 
 Thank you for your helpful comment.
-In online AuxIVA, setting the forgetting factor $\alpha$ to smaller value is equivalent to reducing the contribution of past data.
+In online AuxIVA, setting the forgetting factor $\alpha$ to a smaller value is equivalent to reducing the contribution of past data.
 This results in faster convergence and tracking of the microphone array rotation but tends to limit the separation performance.
-The result with a forgetting factor $\alpha$ of 0.9 clearly demonstrates that tendency.
+The result with a forgetting factor $\alpha$ of 0.9 demonstrates that tendency.
 We believe that each method performs similarly in this case because the separation performance of all methods is immediately saturated.
 We have added an explanation for that in Section 5.2 (Page 15 in the revised manuscript).
 
 > Please clarify this and also if the error bars, which appear overlapping, represent confidence intervals or some other quantity.
 
-The bars represent the maximum and minimum values excluding outliers since Figure 5 is a well-known box-and-whisker diagram.
+The bars represent the maximum and minimum values, excluding outliers since Figure 5 is a well-known box-and-whisker diagram.
 We have added an explanation for that to the figure caption in the revised manuscript.
 
 > In the first sentence of Section 5.4, it should perhaps say “SFIIVA-O and SFIIVA-M” rather than “SFIIVA-O and SFIIVA-O”.
@@ -141,7 +145,7 @@ We have carefully corrected that.
 > Please consider commenting on why this might be the case.
 
 Thank you for your insightful comment.
-Online AuxIVA is equivalent to adaptively estimating the nulls that suppresses interference sources in each frequency.
-In this experiment, speech signal was used as the source signal, so the frequency components around 8000 Hz were not included.
-We believe that the direction of the non-interference source was incorrectly estimated only in the frequency band that did not include speech as a result.
+Online AuxIVA is equivalent to adaptively estimating the nulls that suppress interference sources in each frequency.
+In this experiment, speech signals were used as the source signal, so the frequency components around 8000 Hz were not included.
+We believe that the direction of the non-interference source was incorrectly estimated only in the frequency band that did not include speech.
 These explanations have been added to the experimental results.
