@@ -41,13 +41,13 @@ As for experiments under real environments, due to time constraints, we decided 
 >    Another figure that supports your conclusion in a clearer manner may be beneficial.
 
 Thank you for your suggestion.
-We also made a modified example plot of a beam pattern with only a few frequencies, which is widely used in beamforming, but is rather difficult to view.
+We considered adding another figure, but it was not easy.
 However, as you pointed out, we agree that the color map makes it difficult to see.
-Therefore, we kept the original plotting style but made some modifications:
+Therefore, instead, we made the following modifications to improve the clarity of the figures.
 
 - Moved the color bar to the bottom
-- Deleted numbers indicating the direction of the source signals
-- Added a green triangle to indicate the direction of the target signal and small red triangles to indicate the direction of the interference signals
+- Deleted the numbers indicating the source directions
+- Added a green triangle and small red triangles to indicate the directions of the target source and the interference sources, respectively. We think the difference in the size of triangles improves the clarity in greyscale.
 
 <figure>
   <img src="./fig/ref.png" style="width:60%;display:block;margin:auto">
