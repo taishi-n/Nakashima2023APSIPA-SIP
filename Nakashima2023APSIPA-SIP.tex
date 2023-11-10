@@ -716,7 +716,7 @@ where
 $\sigma _{k} ^{2}$ is the variance of the $k$-th source signal at the reference microphone,
 and $\sigma _{\mathrm{n}} ^{2}$ is the variance of noise signals.
 After convolving room impulse responses, the variances of $k$-th source signal were scaled to $\sigma _{k} ^{2} = 1$ at the reference microphone.
-Then, the variance of interfering signals was scaled so that $\text{SNR} = \SI{20}{\decibel}$.
+Then, the variance of interferce signals was scaled so that $\text{SNR} = \SI{20}{\decibel}$.
 In this experiment, we set the forgetting number $\forget$ to 0.98.
 Other conditions are the same as in the noiseless case.
 \begin{figure}[t]
@@ -826,11 +826,13 @@ In this subsection, we selected one example to focus on the difference between t
 \Cref{fig:plot:bp:ref} is the result calculated before the rotation.
 \Cref{fig:plot:bp:sfiivao,fig:plot:bp:sfiivam} are the results with the demixing matrices calculated using \SFIIVAo{} and \SFIIVAm{}, respectively, after the rotation.
 Dark regions in each plot represent nulls in a certain direction.
-In the case of BSS, the desired result is that the direction of the estimated source is toward the brighter regions, and that of the others is toward the darker region.
+In the case of online AuxIVA, the desired result is that the direction of the estimated source is toward the brighter regions, and that of the others is toward the darker region.
 As shown in \cref{fig:plot:beam,fig:plot:bp:ref}, the results were similar to each other, and only the results in \cref{fig:plot:bp:sfiivam} were different from the each other.
 The dark regions in \cref{fig:plot:bp:ref,fig:plot:bp:sfiivao} were nearly in the desired directions since \SFIIVAo{} approximately canceled the rotation of the CMA and thus updated the demixing matrices in the same direction even after the rotation.
 For \SFIIVAm{}, the bright areas should be in the direction viewed from the position after the rotation, \emph{i.e.}, \SI{40}{\degree} less anti-clockwise than the previous result in this case.
-The result in \cref{fig:plot:bp:sfiivam} shows the expected direction after CMA rotation.
+The nulls may not be precisely formed in some frequency bands where the source signal is inherently weak because it does not affect the separated signal very much.
+Looking at the high-frequency bands of each beam pattern, there are several cases where bright regions are visible outside of the target signal, such as Est. 4 in \cref{fig:plot:bp:sfiivam}.
+We suppose this result might happen since the 4th estimated signal in high-frequency bands was accidentally weak.
 \begin{figure}[t]
   \centering
   \begin{minipage}[t]{\linewidth}
@@ -847,7 +849,7 @@ The result in \cref{fig:plot:bp:sfiivam} shows the expected direction after CMA 
     The five plots are the beam patterns of the frequency-wise demixing matrices calculated by each method.
     The radial direction of each plot represents the frequency, and the tangential direction represents the angle from the center of the CMA.
     The light and dark colors represent the gain in decibels.
-    The five triangles in each plot indicate the true direction of the source, with green representing the target source and red the interfering source.
+    The five triangles in each plot indicate the true direction of the source, with green representing the target source and red the interference source.
   }%
   \label{fig:plot:beam}
 \end{figure}

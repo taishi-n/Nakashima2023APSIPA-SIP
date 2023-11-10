@@ -42,7 +42,6 @@ As for experiments under real environments, due to time constraints, we decided 
 
 Thank you for your suggestion.
 We considered adding another figure, but it was not easy.
-However, as you pointed out, we agree that the color map makes it difficult to see.
 Therefore, instead, we made the following modifications to improve the clarity of the figures.
 
 - Moved the color bar to the bottom
@@ -66,12 +65,10 @@ Therefore, instead, we made the following modifications to improve the clarity o
 >    It presents a determined case in math.
 >    How about other combinations of $K$ and $M$ to demonstrate the under-determined and over-determined cases?
 
+We recognize that the reviewer's question is natural.
+However, historically, BSS research had started with a scenario of the determined case, later progressing to underdetermined or overdetermined cases.
 The purpose of this paper is to make BSS robust against the self-rotation of the microphone array.
-As discussed in the famous independent component analysis or its extensions, the determined condition is the most basic and widely used in BSS.
-For over-determined or under-determined conditions, many methods have attributed them to the determined condition by imposing additional prior information or complex models.
-Therefore, we believe starting with the most basic determined condition is reasonable.
-However, it is a very beneficial point to consider those conditions in the future.
-An explanation has been added to the conclusion with examples of BSS methods under over-determined or under-determined conditions.
+To maintain a clear focus on this purpose, we would like to keep the determined case in this paper, and we will investigate other conditions in future work.
 
 > Furthermore, typos are noted in this paper.
 > For instance, in the third paragraph of the introduction, it should be "relation" instead of "realation."
@@ -98,23 +95,24 @@ We have added an example of the sentence at the end of the first paragraph in Se
 > In Figure 3, (b) and (c) appear to be identical.
 > Please clarify if this is intended.
 
-The two figures (Figure 3 (b) and (c) in the first manuscript) showed the placement before and after the circular microphone array is rotated and are not identical.
-As pointed out, however, we acknowledge that the two figures are confusing.
-We have removed the two figures and added a new figure (Figure 4 (b) in the revised manuscript) to show the rotation more clearly.
+The two figures (Figure 3 (b) and (c) in the first manuscript) showed the placement before and after the rotation of the circular microphone array.
+Therefore, the microphone positions in the figures are different.
+However, we agree these figures are similar and confusing.
+Then, we merged the two figures into a new figure (Figure 4 (b) in the revised manuscript) to show the rotation more clearly.
 
 > Please also clarify what the numbers refer to next to the square outlining the CMA i.e. 3.025, 3.000 and 2.975 in the vertical direction and the 3 numbers in the horizontal direction.
 
-The numbers in the figure represent the coordinates of the center of the circular microphone array in meters.
-However, because we felt that this would complicate the figure and hinder understanding, we removed the numbers from the figure.
-Instead, we added their explanation in the caption of Figure 4(b).
+Those numbers in the figure represent the tick labels around the center of the circular microphone array in meters.
+However, we agreed that this would complicate the figure and hinder understanding.
+Then, we removed the numbers from the figure and added their explanation in the caption of Figure 4(b).
 
 > From results in Figures 4 and 5 it appears that the performance when using a forgetting factor of 0.9 are quite similar for each method.
 
 Thank you for your helpful comment.
-In online AuxIVA, setting the forgetting factor $\alpha$ to a smaller value results in faster convergence and tracking of the microphone array rotation but tends to limit the separation performance.
-Because a smaller $\alpha$ reduces the contribution of past data.
-We believe that each method performs similarly in this case because the separation performance of all methods is immediately saturated.
-We have added an explanation for that in Section 5.2 (Page 15 in the revised manuscript).
+In online AuxIVA, setting the forgetting factor $\alpha$ to a smaller value results in faster convergence of the demixing matrices and quicker adaptation to the rotation of the microphone array.
+However, the influence of older data diminishes more rapidly, and the equivalent length of data being processed is shortened, which can degrade the separation performance.
+We believe each method performs similarly because the separation performance of all methods becomes immediately saturated in this case.
+We have added an explanation for this in Section 5.2 (Page 15 of the revised manuscript).
 
 > Please clarify this and also if the error bars, which appear overlapping, represent confidence intervals or some other quantity.
 
@@ -130,7 +128,6 @@ We have carefully corrected that.
 > Please consider commenting on why this might be the case.
 
 Thank you for your insightful comment.
-Online AuxIVA is equivalent to adaptively estimating the nulls that suppress interference sources in each frequency.
-In this experiment, speech signals were used as the source signal, so the frequency components around 8000 Hz were not included.
-We believe that the direction of the non-interference source was incorrectly estimated only in the frequency band that did not include speech.
-These explanations have been added to the experimental results.
+Online AuxIVA adaptively steers nulls to suppress interference sources at each frequency.
+However, the nulls may not be precisely formed in some frequency bands where the source signal is inherently weak because it does not affect the separated signal very much.
+We suppose the beam pattern for Est. 4 with insufficient nulls in Fig. 12(c) might happen since the 4th separated signal in high-frequency bands was accidentally weak.
