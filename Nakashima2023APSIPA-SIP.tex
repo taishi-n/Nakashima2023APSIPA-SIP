@@ -626,7 +626,9 @@ We compared the following four methods:
 \end{description}
 
 \subsection{Source Separation Performance}
+\subsubsection{Noiseless Environments}
 
+As an initial experiment to verify the efficacy of the proposed methods, we first investigated source separation performance under a noise-less environment.
 \Cref{fig:plot:line} shows the SI-SDRi every \SI{1}{\second} averaged over samples and channels.
 As shown in \cref{fig:plot:line}, the result of forgetting factor $\forget$ of 0.9 showed faster tracking to the CMA rotation than the other results.
 This is because the closer the forgetting factor $\forget$ to 0, the smaller the contribution of past signals.
@@ -641,42 +643,109 @@ whereas the reference signal for SI-SDR evaluation was the source image at the r
 \begin{figure}[t]
   \centering
   \begin{minipage}[t]{.45\textwidth}
-    \centering\includegraphics{figures/plots/online/line_900.pdf}\subcaption{$\forget = 0.9  $}\label{fig:plot:line:900}
+    \centering\includegraphics{figures/plots/clean/line_900.pdf}\subcaption{$\forget = 0.9  $}\label{fig:plot:line:900}
   \end{minipage}
+  \hspace{.05\textwidth}
   \begin{minipage}[t]{.45\textwidth}
-    \centering\includegraphics{figures/plots/online/line_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:line:950}
+    \centering\includegraphics{figures/plots/clean/line_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:line:950}
   \end{minipage}
 
   \begin{minipage}[t]{.45\textwidth}
-    \centering\includegraphics{figures/plots/online/line_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:line:980}
+    \centering\includegraphics{figures/plots/clean/line_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:line:980}
   \end{minipage}
+  \hspace{.05\textwidth}
   \begin{minipage}[t]{.45\textwidth}
-    \centering\includegraphics{figures/plots/online/line_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:line:990}
+    \centering\includegraphics{figures/plots/clean/line_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:line:990}
   \end{minipage}
-  \caption{SI-SDR improvements (SI-SDRi) every \SI{1}{\second}}%
+  \caption{SI-SDR improvements (SI-SDRi) every \SI{1}{\second} under noiseless environments.}%
   \label{fig:plot:line}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}
   \centering
   \begin{minipage}[t]{.45\textwidth}
-    \centering\includegraphics{figures/plots/online/box_900.pdf}\subcaption{$\forget = 0.9  $}\label{fig:plot:box:900}
+    \centering\includegraphics{figures/plots/clean/box_900.pdf}\subcaption{$\forget = 0.9  $}\label{fig:plot:box:900}
   \end{minipage}
+  \hspace{.05\textwidth}
   \begin{minipage}[t]{.45\textwidth}
-    \centering\includegraphics{figures/plots/online/box_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:box:950}
+    \centering\includegraphics{figures/plots/clean/box_950.pdf}\subcaption{$\forget = 0.95 $}\label{fig:plot:box:950}
   \end{minipage}
 
   \begin{minipage}[t]{.45\textwidth}
-    \centering\includegraphics{figures/plots/online/box_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:box:980}
+    \centering\includegraphics{figures/plots/clean/box_980.pdf}\subcaption{$\forget = 0.98 $}\label{fig:plot:box:980}
   \end{minipage}
+  \hspace{.05\textwidth}
   \begin{minipage}[t]{.45\textwidth}
-    \centering\includegraphics{figures/plots/online/box_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:box:990}
+    \centering\includegraphics{figures/plots/clean/box_990.pdf}\subcaption{$\forget = 0.99 $}\label{fig:plot:box:990}
   \end{minipage}
   \caption{%
     Box-and-whisker plots of SI-SDR improvements (SI-SDRi) immediately after CMA rotation and after a sufficient time has elapsed, corresponding \SI{30}{\second} and \SI{59}{\second} in \cref{fig:plot:line}.
     The whiskers show the minima and maxima of each distribution, except for points determined to be outliers.
   }%
   \label{fig:plot:box}
+\end{figure}
+
+\subsubsection{Noisy Environments}
+
+For a more realistic simulation, we experimented with the following two types of noisy environments:
+\begin{description}
+  \item[\texttt{babble}] Diffuse babble noise consisting of 50 speech signals. Interference signals were selected from the speech signals of the JVS dataset, 50 of which were from speakers different from those used for the source signals.
+  \item[\texttt{white}] Single interference source consisting of white noise.
+\end{description}
+\Cref{fig:layout:noise} shows examples of the layout of the sources and microphones in noisy environments.
+
+The signal-to-noise ratio (SNR) is defined as
+\begin{equation}
+  % \text{SIR} = 10 \log _{10} \frac{\sum _{t} s _{t} ^{2}}{Q \sum _{t} n _{t} ^{2}},
+  \text{SNR} = 10 \log _{10} \frac{\sum _{k=1} ^{K} \sigma _{k} ^{2}}{\sigma _{\mathrm{n}} ^{2}},
+\end{equation}
+where
+$\sigma _{k} ^{2}$ is the variance of the $k$-th source signal at the reference microphone,
+and $\sigma _{\mathrm{n}} ^{2}$ is the variance of noise signals.
+After convolving room impulse responses, the variances of $k$-th source signal were scaled to $\sigma _{k} ^{2} = 1$ at the reference microphone.
+Then, the variance of interfering signals was scaled so that $\text{SNR} = \SI{20}{\decibel}$.
+In this experiment, we set the forgetting number $\forget$ to 0.98.
+Other conditions are the same as in the noiseless case.
+\begin{figure}[t]
+  \centering
+  \begin{minipage}[t]{.45\linewidth}
+    \centering
+    \includegraphics[width=.9\columnwidth]{figures/room_layout_noise-multi.pdf}
+    \subcaption{\texttt{babble}}%
+    \label{fig:layout:noise:multi}
+  \end{minipage}
+  \hspace{.05\linewidth}
+  \begin{minipage}[t]{.45\linewidth}
+    \centering
+    \includegraphics[width=.9\columnwidth]{figures/room_layout_noise-single.pdf}
+    \subcaption{\texttt{white}}%
+    \label{fig:layout:noise:single}
+  \end{minipage}
+  \caption{%
+    Examples of room layout of noisy environments.
+    The center of CMA is placed at $(\SI{4.0}{\metre}, \SI{3.0}{\metre})$ in the room with the radius of \SI{2}{\centi\metre}.
+    CMA was rotated \SI{40}{\degree} counter-clockwise at \SI{30}{\second}.
+    % In the zoomed plot of (b), red dots represent the microphones at the position before rotation, green dots represent the position after rotation, and the cross lines in the middle represent the center of CMA.
+  }%
+  \label{fig:layout:noise}
+\end{figure}
+
+\Cref{fig:plot:line:noise} shows the SI-SDRi every \SI{1}{\second} averaged over samples and channels under noisy environments.
+As shown in the figure, performance between methods was consistent with the noiseless case.
+Overall, the final separation performance is lower than that of the noiseless case (\cref{fig:plot:line:980}).
+For \texttt{babble} and \texttt{white}, the separation performance of \texttt{white} was about \SI{10}{\decibel} lower than that of \texttt{babble}.
+This is because \texttt{white} contains many components in the high frequency range that are not included in \texttt{babble} and have a negative impact on the separation performance.
+\begin{figure}[t]
+  \centering
+  \begin{minipage}[t]{.45\textwidth}
+    \centering\includegraphics{figures/plots/babble-norm/line_980.pdf}\subcaption{\texttt{babble}}\label{fig:plot:line:980:babble}
+  \end{minipage}
+  \hspace{.05\textwidth}
+  \begin{minipage}[t]{.45\textwidth}
+    \centering\includegraphics{figures/plots/white-norm/line_980.pdf}\subcaption{\texttt{white}}\label{fig:plot:line:980:white}
+  \end{minipage}
+  \caption{SI-SDR improvements (SI-SDRi) every \SI{1}{\second} with various noise.}%
+  \label{fig:plot:line:noise}
 \end{figure}
 
 \subsection{Robustness against Estimation Error}
