@@ -700,13 +700,13 @@ whereas the reference signal for SI-SDR evaluation was the source image at the r
 
 \subsubsection{Noisy Environments}
 
-For a more realistic simulation, we experimented with the following two types of noisy environments:
+For a realistic simulation, we conducted experiments under the following two types of noisy environments:
 \begin{description}
-  \item[\texttt{babble}] Diffuse babble noise consisting of 50 speech signals. Interference signals were selected from the speech signals of the JVS dataset, 50 of which were from speakers different from those used for the source signals.
+  \item[\texttt{babble}] Diffuse babble noise consisting of 50 speech signals.
   \item[\texttt{white}] Single interference source consisting of white noise.
 \end{description}
 \Cref{fig:layout:noise} shows examples of the layout of the sources and microphones in noisy environments.
-
+Interference signals in \texttt{babble} were selected from the speech signals of the JVS dataset that were different from those used for the source signals.
 The signal-to-noise ratio (SNR) is defined as
 \begin{equation}
   % \text{SIR} = 10 \log _{10} \frac{\sum _{t} s _{t} ^{2}}{Q \sum _{t} n _{t} ^{2}},
