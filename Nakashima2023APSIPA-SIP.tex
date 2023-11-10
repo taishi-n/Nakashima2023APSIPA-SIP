@@ -644,8 +644,10 @@ We compared the following four methods:
 As an initial experiment to verify the efficacy of the proposed methods, we first investigated source separation performance under a noise-less environment.
 \Cref{fig:plot:line} shows the SI-SDRi every \SI{1}{\second} averaged over samples and channels.
 As shown in \cref{fig:plot:line}, the result of forgetting factor $\forget$ of 0.9 showed faster tracking to the CMA rotation than the other results.
-This is because the closer the forgetting factor $\forget$ to 0, the smaller the contribution of past signals.
-However, the final performance was lower with no significant difference between the four methods and saturated after a sufficient time.
+In online AuxIVA, setting the forgetting factor $\forget$ to a smaller value results in faster convergence of the demixing matrices and quicker adaptation to the CMA rotation.
+However, the influence of older data diminishes more rapidly, and the equivalent length od data being processed is shortened, which can degrade the separation performance.
+Therefore, in this case, we believe that the final performance immediately saturated and thus showed lower performance with no significant difference between the four methods
+
 \Cref{fig:plot:box} shows the SI-SDRi averaged over samples and channels immediately after CMA rotation and after a sufficient time has elapsed.
 Overall, \NaiveIVA{} and \ResetIVA{} showed a performance drop immediately after CMA rotation and improved again with time.
 \ResetIVA{} has the lowest performance before CMA rotation among all forgetting factors, which worsens as the forgetting factor approaches 1.
@@ -712,11 +714,8 @@ The signal-to-noise ratio (SNR) is defined as
   % \text{SIR} = 10 \log _{10} \frac{\sum _{t} s _{t} ^{2}}{Q \sum _{t} n _{t} ^{2}},
   \text{SNR} = 10 \log _{10} \frac{\sum _{k=1} ^{K} \sigma _{k} ^{2}}{\sigma _{\mathrm{n}} ^{2}},
 \end{equation}
-where
-$\sigma _{k} ^{2}$ is the variance of the $k$-th source signal at the reference microphone,
-and $\sigma _{\mathrm{n}} ^{2}$ is the variance of noise signals.
-After convolving room impulse responses, the variances of $k$-th source signal were scaled to $\sigma _{k} ^{2} = 1$ at the reference microphone.
-Then, the variance of interferce signals was scaled so that $\text{SNR} = \SI{20}{\decibel}$.
+where $\sigma _{k} ^{2}$ and $\sigma _\mathrm{n} ^{2}$ are the variance of the $k$-th source signal and noise signals at the reference microphone, respectively
+After convolving room impulse responses, the variance of interferce signals was scaled so that $\text{SNR} = \SI{20}{\decibel}$.
 In this experiment, we set the forgetting number $\forget$ to 0.98.
 Other conditions are the same as in the noiseless case.
 \begin{figure}[t]
@@ -747,7 +746,7 @@ Other conditions are the same as in the noiseless case.
 As shown in the figure, performance between methods was consistent with the noiseless case.
 Overall, the final separation performance is lower than that of the noiseless case (\cref{fig:plot:line:980}).
 For \texttt{babble} and \texttt{white}, the separation performance of \texttt{white} was about \SI{10}{\decibel} lower than that of \texttt{babble}.
-This is because \texttt{white} contains many components in the high frequency range that are not included in \texttt{babble} and have a negative impact on the separation performance.
+This is because \texttt{white} has a flat spectrum, and it can be quite larger than that of speech in the high-frequency range that is not included in \texttt{babble} and has a negative impact on the separation performance.
 \begin{figure}[t]
   \centering
   \begin{minipage}[t]{.45\textwidth}
