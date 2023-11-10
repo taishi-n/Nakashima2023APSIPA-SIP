@@ -11,9 +11,6 @@ Dear Associate Editor and Reviewers,
 
 Thank you very much for your constructive suggestions and valuable comments on our paper entitled "Self-Rotation-Robust Online-Independent Vector Analysis with Sound Field Interpolation on Circular Microphone Array" `(SIP-2023-0063)`.
 We have carefully revised the manuscript according to the comments.
-Comments from reviewers are quoted with gray boxes like:
-
-> This is an example of quotations of comments from reviewers.
 
 We will provide a point-by-point reply that explains the reviewers' comments.
 The notations and citations used in this letter are the same as in the revised manuscript.
@@ -32,11 +29,10 @@ In the differences, the added parts are indicated in blue, and the deleted parts
 
 Thank you for your constructive comments.
 As pointed out, we acknowledge that it is important to show the results of experiments in noisy environments from a practical point of view.
-Additional experiments were performed under the following three conditions:
+Additional experiments were performed under the following two conditions:
 
 1. One extra interference
 2. Speech babble noise
-3. Observation noise
 
 For detailed experimental conditions, results, and discussions, please see **Subsection 5.2** in the revised edition.
 As for experiments under real environments, due to time constraints, we decided to leave it for future work and have added to the conclusions of the revised manuscript.
@@ -45,23 +41,13 @@ As for experiments under real environments, due to time constraints, we decided 
 >    Another figure that supports your conclusion in a clearer manner may be beneficial.
 
 Thank you for your suggestion.
-As shown below, we also made a modified example plot of a beam pattern with only a few frequencies, which is widely used in beamforming, but is rather difficult to view.
-
-<figure>
-  <img src="./fig/freq-limit/ref.png" style="width:60%;display:block;margin:auto">
-  <figcaption style="text-align:center">(a) Before rotation.</figcaption>
-  <br>
-  <img src="./fig/freq-limit/rot-sfiiva-o.png" style="width:60%;display:block;margin:auto">
-  <figcaption style="text-align:center">(b) SFIIVA-O after rotation.</figcaption>
-  <br>
-  <img src="./fig/freq-limit/rot-sfiiva-m.png" style="width:60%;display:block;margin:auto">
-  <figcaption style="text-align:center">(c) SFIIVA-M after rotation.</figcaption>
-  <br>
-  <figcaption style="text-align:center">Fig. 1: Beam patterns of demixing matrices <strong>in 5 frequencies</strong> (125, 250, 500, 1000, 2000 Hz).</figcaption>
-</figure>
-
+We also made a modified example plot of a beam pattern with only a few frequencies, which is widely used in beamforming, but is rather difficult to view.
 However, as you pointed out, we agree that the color map makes it difficult to see.
-Therefore, we kept the original plotting style but changed the color map and made some modifications, such as the color bar's position and the plot's size.
+Therefore, we kept the original plotting style but made some modifications:
+
+- Moved the color bar to the bottom
+- Deleted numbers indicating the direction of the source signals
+- Added a green triangle to indicate the direction of the target signal and small red triangles to indicate the direction of the interference signals
 
 <figure>
   <img src="./fig/ref.png" style="width:60%;display:block;margin:auto">
@@ -73,7 +59,7 @@ Therefore, we kept the original plotting style but changed the color map and mad
   <img src="./fig/rot_sfiiva-m.png" style="width:60%;display:block;margin:auto">
   <figcaption style="text-align:center">(c) SFIIVA-M after rotation.</figcaption>
   <br>
-  <figcaption style="text-align:center">Fig. 2: Beam patterns of demixing matrices <strong>with new color and layout</strong>.</figcaption>
+  <figcaption style="text-align:center">Fig 12: Beam patterns of demixing matrices. The five plots are the beam patterns of the frequency-wise demixing matrices calculated by each method. The radial direction of each plot represents the frequency, and the tangential direction represents the angle from the center of the CMA. The light and dark colors represent the gain in decibels. The five triangles in each plot indicate the true direction of the source, with green representing the target source and red the interfering source.</figcaption>
 </figure>
 
 > 3. The current simulation setup adopts the same number of sources and microphones.
@@ -125,9 +111,8 @@ Instead, we added their explanation in the caption of Figure 4(b).
 > From results in Figures 4 and 5 it appears that the performance when using a forgetting factor of 0.9 are quite similar for each method.
 
 Thank you for your helpful comment.
-In online AuxIVA, setting the forgetting factor $\alpha$ to a smaller value is equivalent to reducing the contribution of past data.
-This results in faster convergence and tracking of the microphone array rotation but tends to limit the separation performance.
-The result with a forgetting factor $\alpha$ of 0.9 demonstrates that tendency.
+In online AuxIVA, setting the forgetting factor $\alpha$ to a smaller value results in faster convergence and tracking of the microphone array rotation but tends to limit the separation performance.
+Because a smaller $\alpha$ reduces the contribution of past data.
 We believe that each method performs similarly in this case because the separation performance of all methods is immediately saturated.
 We have added an explanation for that in Section 5.2 (Page 15 in the revised manuscript).
 
