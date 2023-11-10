@@ -634,7 +634,7 @@ We compared the following four methods:
   \item[\NaiveIVA] OIVA described in \cref{subsec:oiva} as a baseline.
   \item[\ResetIVA] Re-initialize the weighted covariance and demixing matrices when the CMA was rotated:
       $\Demix _{\freq,\rotFra - 1} \gets \Eye, \; \cov _{\src,\freq,\rotFra - 1} \gets \varepsilon \Eye.$
-  \item[\SFIIVAo] Apply SFI to the latest observation and estimate the source image at the fixed position. (See \Cref{alg:sfiva-o}.)
+  \item[\SFIIVAo] Apply SFI to the latest observation and estimate the source image at the fixed position (see \Cref{alg:sfiva-o}).
   \item[\SFIIVAm] Apply SFI to the weighted covariance and demixing matrices as parameter transformation and estimate the source image at the position rotated with CMA (see \Cref{alg:sfiva-m}).
 \end{description}
 
