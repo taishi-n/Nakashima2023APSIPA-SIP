@@ -145,7 +145,7 @@ The rest of this paper is organized as follows.
 We formulate our problem in \cref{sec:problem}.
 In \cref{sec:conventional}, we describe online BSS and SFI, and how to combine them.
 In \cref{sec:proposed}, we propose a new online BSS that utilizes the information before and after the rotation of a CMA.
-We conduct some experiments to show the efficacy of SFI for online BSS in \cref{sec:experiment}.
+We conducted some experiments to show the efficacy of SFI for online BSS in \cref{sec:experiment}.
 In \cref{sec:conclusion}, we conclude this paper.
 
 \section{Problem Formulation}\label{sec:problem}
@@ -217,7 +217,7 @@ ${\{\Obs _{\ft}\}}_{\ft}$ denotes the set of $\Obs _{\ft}$ for all $\freq$ and $
 
 \section{Conventional Methods}\label{sec:conventional}
 
-\subsection{Batch AuxIVA}
+\subsection{Batch Auxiliary-Function-Based Independent Vector Analysis}\label{subsec:iva}
 As the basis of our work, we first summarize the \emph{batch} AuxIVA \cite{Ono:2011:WASPAA}.
 In AuxIVA, we estimate \emph{time-invariant} demixing matrices ${\{\Demix _{\freq}\}} _{\freq}$ using all the time frames $\tframe = 1, \dots, \Tframe$ by minimizing the following objective function:
 \begin{align}
@@ -226,12 +226,12 @@ In AuxIVA, we estimate \emph{time-invariant} demixing matrices ${\{\Demix _{\fre
   \var _{\src,\tframe} &= \textstyle\sqrt{\sum _{\freq=1} ^{\Freq} \lvert \demix ^{\hermite} _{\src,\freq} \Obs ^{\nohermite}_{\ft} \rvert ^2} \label{eq:var:batch},
 \end{align}
 where
-$\weight\colon \R _{>0} \to \R _{>0}$ is defined as $\weight(\var) = \cont ' (\var) / 2 \var$, with $\cont '(\var)$ being the first derivative of $\cont (\var)$ for $\var$
+$\weight\colon \R _{>0} \to \R _{>0}$ is defined as $\weight(\var) = \cont ' (\var)/(2 \var)$, with $\cont '(\var)$ being the first derivative of $\cont (\var)$ for $\var$
 and $\cont(\var)$ is the contrast function derived from the probability density function of source signals.
-In this paper, we assume that $\weight (\var) = \Freq/{\var ^2}$, which represents the time-varying Gaussian distribution \cite{Ono:2012:APSIPA}.
+In this paper, we assume that $\weight (\var) = \Freq/\var ^2$, which represents the time-varying Gaussian distribution \cite{Ono:2012:APSIPA}.
 $\cov _{\src,\freq}$ is the \emph{weighted covariance matrix} of the observed signals.
 One popular method of minimizing the objective function \eqref{eq:obj:batch} with respect to $\Demix _{\freq}$ includes \emph{iterative projection (IP)} \cite{Ono:2011:WASPAA}.
-IP cyclically updates each row vector of the demixing matrix (\emph{demixing vector}) $\demix _{\src,\ft} ^{\hermite}\; (\src = 1, \dots, \Src)$ using the following update rule:
+IP cyclically updates each row vector of the demixing matrix (\emph{demixing vector}) $\demix _{\src,\freq} ^{\hermite}\; (\src = 1, \dots, \Src)$ using the following update rule:
 \begin{align}
   \demix _{\src,\freq} &\gets (\Demix _{\freq} \cov _{\src,\freq}) ^{-1} \eye _{\src} \label{eq:ip:proj}, \\
   \demix _{\src,\freq} &\gets \tfrac{{\demix _{\src,\freq}}}{{\sqrt{\demix _{\src,\freq} ^{\hermite} \cov _{\src,\freq} \demix _{\src,\freq}}}} \label{eq:ip:norm},
@@ -267,12 +267,12 @@ we apply the following backprojection \cite{Murata:2001:NC} for postprocessing:
 \end{align}
 where $\diag(\cdot)$ is an operator for constructing a diagonal matrix with each of its elements equals the corresponding element of the given vector.
 \Cref{alg:iva} summarizes the OIVA algorithm.
-The online updates of $\cov _{\src,\ft}$ \eqref{eq:cov} enable OIVA to track the slow movement of sound sources or microphones progressively.
-Nevertheless, it cannot promptly adapt to swift changes, which can happen in head rotation when wearing CMA on the head.
+The online updates of $\cov _{\src,\ft}$ \eqref{eq:cov} enable OIVA to track the slow movement of source signals or microphones progressively.
+Nevertheless, it cannot promptly adapt to rapid changes, which can happen in head rotation when wearing CMA on the head.
 In this research, we aim to solve this problem.
 
 \begin{algorithm}{Online AuxIVA (OIVA)}{iva}
-  \textbf{Input:} ${\{\Obs _{\ft}\}} _{\ft}$, $ {\{\Demix _{\freq,0}\}} _{\freq}$, $ {\{\cov _{\src,\freq,0}\}} _{\src,\freq}$, $ \forget$\\
+  \textbf{Input:} ${\{\Obs _{\ft}\}} _{\ft}$, $ {\{\Demix _{\freq,0}\}} _{\freq}$, $ {\{\cov _{\src,\freq,0}\}} _{\src,\freq}$, $ \forget$, $\Itr$\\
   \textbf{Output:} ${\{\Est _{\ft}\}} _{\ft}$
   \begin{pseudo}
     for $\tframe = 1, \dots, \Tframe$ \\+
@@ -295,7 +295,7 @@ In this research, we aim to solve this problem.
 
 \subsection{Sound Field Interpolation on Circular Microphone Array}
 In this subsection, we briefly review the sound field interpolation method on a CMA, initially proposed in \cite{Wakabayashi:2021:ICASSP,Wakabayashi:2023:ASLP}.
-Let $\sfcma (\rotCoor)$ be a continuous sound pressure on the circumference of a circle at a spatial angle $\rotCoor \in \interval[open right,soft open fences]{0}{2\pi}$, as shown in \cref{fig:sfi}.
+Let $\sfcma (\rotCoor)$ be a continuous sound pressure on the circumference of a circle at a spatial angle $\rotCoor \; ({0} \leq \rotCoor < {2\pi})$, as shown in \cref{fig:sfi}.
 Then, we observe a sound field with $\Mic$ microphones distributed on the circle at even intervals.
 The $\mic$th observed signal is denoted as
 \begin{equation}
@@ -303,7 +303,7 @@ The $\mic$th observed signal is denoted as
   \label{eq:sfi:model}
 \end{equation}
 In other words, we regard the observations of the sound field with a CMA as the discretizations of that along an angle on the circumference $\rotCoor$.
-We assume that this spatial sampling by the CMA satisfies Shanon's sampling theorem, \emph{i.e.}, $\sfcma (\rotCoor)$ contains no frequency components higher than half of the sampling frequency on the circumference of the circle.
+We assume that this spatial sampling by the CMA satisfies Shannon's sampling theorem, \emph{i.e.}, $\sfcma (\rotCoor)$ contains no frequency components higher than half of the sampling frequency on the circumference of the circle.
 If the CMA is rotated by a spatial angle $\rotSpat \in \R$, we can regard its observation as the $\rotSmpl$-sample shift of $\sfcma _{\mic}$ where $\rotSmpl = \frac{\Mic}{2\pi} \rotSpat$;
 \begin{equation}
   \sfcma \left(\frac{2\pi}{\Mic} \mic + \rotSpat \right)%
@@ -330,7 +330,7 @@ We define the $\Mic$-point spatial discrete Fourier transform (DFT) of $\sfcma _
   \dft _{\Src} [\sfcma _{\mic}] &= \sum _{\mic \in \SRC} \sfcma _{\mic} \twid ^{-\mic\src} \coloneqq \Sfcma _{\src},\\
   \dft _{\Src} ^{-1} [\Sfcma _{\src}] &= \frac{1}{\Mic} \sum _{\src \in \SRC} \Sfcma _{\src} \twid ^{\mic\src},%\\
 \end{align}
-where $\twid \coloneqq \exp (j \frac{2\pi}{\Mic})$ is a twidle factor of the $\Mic$-point DFT, $j$ is the imaginary unit, and $\SRC$ is an index set defined as
+where $\twid \coloneqq \exp (j \frac{2\pi}{\Mic})$ is a twiddle factor of the $\Mic$-point DFT, $j$ is the imaginary unit, and $\SRC$ is an index set defined as
 \begin{align}
   \SRC &=
   \begin{cases}
@@ -370,7 +370,7 @@ The coefficient $\rotmat _{\mic,\dum}(\rotSmpl)$ is calculated as
       \displaystyle \frac{\sinc{(\rotIdx)}}{\sinc{\left(\rotIdx / \Mic\right)}} & (\text{$\Mic$ is odd}),
     \end{cases}\label{eq:rot:sinc}
 \end{align}
-where $\rotIdx =\rotSmpl + \mic - \dum; (\mic, \dum = 0, \dots, \Mic - 1)$ \cite{Wakabayashi:2023:ASLP}.
+where $\rotIdx =\rotSmpl + \mic - \dum\; (\mic, \dum = 0, \dots, \Mic - 1)$ \cite{Wakabayashi:2023:ASLP}.
 \eqref{eq:rot:sinc} is an alternative expression for (3) in \cite{Wakabayashi:2023:ASLP}.
 See Section II of \cite{Wakabayashi:2023:ASLP} for the detailed derivation.
 
@@ -424,7 +424,7 @@ As mentioned in the previous section, note that $\rotSpat _{\tframe}$ must be kn
 % \end{figure}
 
 % TODO: illustration for difference between SFIIVA-O and SFIIVA-M
-\subsection{SFI-based Online AuxIVA with Transformation of Latest Observation}
+\subsection{SFI-based OIVA with Transformation of Latest Observation}
 
 In the beamforming that is robust against the self-rotation proposed in \cite{Wakabayashi:2023:ASLP},
 the signals observed by the CMA with angle $\theta_t$ are transformed frame by frame to what would have been observed at the reference position,
@@ -442,14 +442,14 @@ and the online update of the weighted covariance matrix $\cov _{\src,\ft}$ is pe
   \label{eq:cov:rot}
 \end{align}
 The demixing matrices $\Demix _{\ft}$ are estimated by using these weighted covariance matrices $\cov _{\src,\ft}$ similarly to OIVA.
-\Cref{alg:sfiva-o} summarizes OIVA using this approach, and \cref{fig:sfiiva-m} shows the system diagram.
+\Cref{alg:sfiva-o} summarizes OIVA using this approach, and \cref{fig:sfiiva-o} shows the system diagram.
 
 Assuming that a CMA rotates only once at a specific time frame $\tframe$, we analyze how the proposed method, as given in \cref{eq:cov:rot}, differs from the original formula in \cref{eq:cov}.
 In \cref{eq:cov}, the value of $\cov _{\src,\ft}$ is updated online.
 However, since the angle of the CMA differs between the time frames $\tframe - 1$ and $\tframe$, the blending of $\cov _{\src,\ft[-1]}$, which holds information before the rotation, and $\Obs _{\ft}$, which holds information after the rotation, leads to an inaccurate estimation of the demixing matrix $\Demix _{\ft}$.
 If the CMA does not rotate further after the time frame $\tframe$,
 the observation information before the rotation is gradually diminished, and
-$\cov _{\src,\ft}$ and $\Demix _{\ft}$ are expected to slowly converge to their values associated with the postrotation position of CMA.
+$\cov _{\src,\ft}$ and $\Demix _{\ft}$ are expected to slowly converge to their values associated with the post-rotation position of CMA.
 However, this convergence is expected to take time.
 In contrast, in \cref{eq:cov:rot}, all observed signals are translated into the observation at the reference position.
 Thus, even if the CMA rotates at the time frame $\tframe$, there is no substantial discrepancy between $\cov _{\src,\ft[-1]}$ and $\refpos{\Obs} _{\ft}$, and the effect of the rotation on the estimation of the demixing matrix $\Demix _{\ft}$ is expected to be markedly reduced.
@@ -459,8 +459,8 @@ Since the position of the reference microphone is fixed in the space regardless 
 For example, in hearing aid applications or virtual/augmented reality (VR/AR) applications with a head-mounted display, it is desired to present a separated signal with the source localization sensation.
 For this purpose, we should estimate the source images on the reference microphone of the CMA rotated together with the head.
 
-\begin{algorithm}{SFI-based Online AuxIVA using Transformation of Latest Observation (\SFIIVAo)}{sfiva-o}
-  \textbf{Input:} ${\{\Obs _{\ft}\}} _{\ft}$, ${\{\Demix _{\freq,0}\}} _{\freq}$, ${\{\cov _{\src,\freq,0}\}} _{\src,\freq}$, $\forget$, ${\{\rotSpat _{\tframe}\}} _{\tframe}$ \\
+\begin{algorithm}{SFI-based OIVA using Transformation of Latest Observation (\SFIIVAo)}{sfiva-o}
+  \textbf{Input:} ${\{\Obs _{\ft}\}} _{\ft}$, ${\{\Demix _{\freq,0}\}} _{\freq}$, ${\{\cov _{\src,\freq,0}\}} _{\src,\freq}$, $\forget$, $\Itr$, ${\{\rotSpat _{\tframe}\}} _{\tframe}$ \\
   \textbf{Output:} ${\{\Est _{\ft}\}} _{\ft}$
   \begin{pseudo}
     for $\tframe = 1,\, \dots,\, \Tframe$ \\+
@@ -481,7 +481,7 @@ For this purpose, we should estimate the source images on the reference micropho
   \end{pseudo}
 \end{algorithm}
 
-\subsection{SFI-based Online AuxIVA with Transformation of Pre-update Demixing and Weighted Covariance Matrices}\label{subsec:proposed:sfiivam}
+\subsection{SFI-based OIVA with Transformation of Pre-update Demixing and Weighted Covariance Matrices}\label{subsec:proposed:sfiivam}
 
 In this subsection, we propose another online BSS that is robust against CMA rotation and outputs the source image at the latest reference microphone position frame by frame.
 As discussed in the previous section, the mismatch between $\cov _{\src,\ft[-1]}$ and $\Obs _{\ft}$ causes a problem.
@@ -535,11 +535,10 @@ On the other hand, in the method described in this subsection, the error include
 This is another advantage of this approach. We will show this in an experiment to be described later.
 The entire algorithm is summarized as \cref{alg:sfiva-m}, and \cref{fig:sfiiva-m} shows the system diagram of our approach.
 
-\begin{algorithm}{SFI-based Online AuxIVA with Transformation of Pre-update Demixing and Weighted Covariance Matrices (\SFIIVAm)}{sfiva-m}
-  \textbf{Input:} ${\{\Obs _{\ft}\}} _{\ft}$, ${\{\Demix _{\freq,0}\}} _{\freq}$, ${\{\cov _{\src,\freq,0}\}} _{\src,\freq}$, $\forget$, ${\{\rotSpat _{\tframe}\}} _{\tframe}$ \\
+\begin{algorithm}{SFI-based OIVA with Transformation of Pre-update Demixing and Weighted Covariance Matrices (\SFIIVAm)}{sfiva-m}
+  \textbf{Input:} ${\{\Obs _{\ft}\}} _{\ft}$, ${\{\Demix _{\freq,0}\}} _{\freq}$, ${\{\cov _{\src,\freq,0}\}} _{\src,\freq}$, $\forget$, $\Itr$, ${\{\rotSpat _{\tframe}\}} _{\tframe}$ \\
   \textbf{Output:} ${\{\Est _{\ft}\}} _{\ft}$
   \begin{pseudo}
-
     for $\tframe = 1,\, \dots,\, \Tframe$ \\+
       $\varDelta \rotSpat _{\tframe} \gets \rotSpat _{\tframe} - \rotSpat _{\tframe - 1}$ \\
       for $\freq = 1, \dots, \Freq$ \\+
@@ -593,7 +592,7 @@ The length was \SI{60}{\second}, and the sampling frequency was resampled from \
 The reverberation time was approximately \SI{100}{\milli\second}.
 A CMA with $\Src = 5$ channels and a radius of \SI{2}{\centi\metre} was placed at the center of the room.
 Each source was randomly placed at least \SI{1}{\metre} from the center of the CMA and within an angle ranging from $\frac{360}{\Src} \src$ to $\frac{360\si{\degree}}{\Src} (\src - 1) + \frac{180\si{\degree}}{\Src}\; (\src = 1, \dots, \Src)$.
-\Cref{fig:layout:exp} illustrates the range of sources' placements and their examples.
+\Cref{fig:layout:exp} illustrates the range of sources' placements and its example.
 To simulate the instant rotation of the CMA, the source images were generated when the CMA was rotated \SI{40}{\degree} counter-clockwise from the horizontal axis and was joined together at 0--30 \si{\second} and 30--60 \si{\second} intervals.
 Note that the rotation angle and time are given in an oracle manner.
 STFT was performed on the observed signals with a frame length of 4096 points, a shift length of 2048 points, and a Hamming window.
@@ -625,7 +624,7 @@ The reference signal for the SI-SDR was the source image recorded with a rotated
 The initial values for demixing and weighted covariance matrices were
 $\Demix _{\freq,0} = \Eye\; (\forall \freq)$ and $\cov _{\src,\freq,0} = 10^{-3} \times \Eye\; (\forall \src, \freq)$, respectively, where $\Eye$ is the $\Src$-dimensional identity matrix.
 We set the number of iterations in each time frame in \cref{alg:iva} $\Itr$ to 5.
-We ran experiments using various forgetting factors $\forget = 0.9, 0.95, 0.98, \text{and} 0.99$,
+We ran experiments using various forgetting factors $\forget = $ 0.9, 0.95, 0.98 and 0.99,
 which were chosen so that the approximate number of frames $\frac{1}{1 - \forget} =$ 10, 20, 50, and 100, respectively.
 To increase numerous stability for the implementation of OIVA,
 we applied the following ad-hoc normalization $\cov _{\src,\ft} \gets \cov _{\src,\ft} + 10 ^{-3} \times \Eye$ after updates using \eqref{eq:cov}.
@@ -634,23 +633,23 @@ We compared the following four methods:
   \item[\NaiveIVA] OIVA described in \cref{subsec:oiva} as a baseline.
   \item[\ResetIVA] Re-initialize the weighted covariance and demixing matrices when the CMA was rotated:
       $\Demix _{\freq,\rotFra - 1} \gets \Eye, \; \cov _{\src,\freq,\rotFra - 1} \gets \varepsilon \Eye.$
-  \item[\SFIIVAo] Apply SFI to the latest observation and estimate the source image at the fixed position (see \Cref{alg:sfiva-o}).
-  \item[\SFIIVAm] Apply SFI to the weighted covariance and demixing matrices as parameter transformation and estimate the source image at the position rotated with CMA (see \Cref{alg:sfiva-m}).
+  \item[\SFIIVAo] Apply SFI to the latest observation and estimate the source image at the fixed position (\Cref{alg:sfiva-o}).
+  \item[\SFIIVAm] Apply SFI to the weighted covariance and demixing matrices as parameter transformation and estimate the source image at the position rotated with CMA (\Cref{alg:sfiva-m}).
 \end{description}
 
 \subsection{Source Separation Performance}
 \subsubsection{Noiseless Environments}
 
-As an initial experiment to verify the efficacy of the proposed methods, we first investigated source separation performance under a noise-less environment.
+As an initial experiment to verify the efficacy of the proposed methods, we first investigated source separation performance under a noiseless environment.
 \Cref{fig:plot:line} shows the SI-SDRi every \SI{1}{\second} averaged over samples and channels.
 As shown in \cref{fig:plot:line}, the result of forgetting factor $\forget$ of 0.9 showed faster tracking to the CMA rotation than the other results.
-In online AuxIVA, setting the forgetting factor $\forget$ to a smaller value results in faster convergence of the demixing matrices and quicker adaptation to the CMA rotation.
-However, the influence of older data diminishes more rapidly, and the equivalent length od data being processed is shortened, which can degrade the separation performance.
-Therefore, in this case, we believe that the final performance immediately saturated and thus showed lower performance with no significant difference between the four methods
+In OIVA, setting the forgetting factor $\forget$ to a smaller value results in faster convergence of the demixing matrices and quicker adaptation to the CMA rotation.
+However, the influence of older data diminishes more rapidly, and the approximate number of frames $\frac{1}{1 - \forget}$ is shortened, which can degrade the separation performance.
+Therefore, in this case, we believe that the final performance immediately saturated and thus showed lower performance with no significant difference between the four methods.
 
 \Cref{fig:plot:box} shows the SI-SDRi averaged over samples and channels immediately after CMA rotation and after a sufficient time has elapsed.
 Overall, \NaiveIVA{} and \ResetIVA{} showed a performance drop immediately after CMA rotation and improved again with time.
-\ResetIVA{} has the lowest performance before CMA rotation among all forgetting factors, which worsens as the forgetting factor approaches 1.
+\ResetIVA{} has the lowest performance before CMA rotation among all forgetting factors, which worsens as the forgetting factor $\forget$ approaches 1.
 In contrast, the proposed \SFIIVAm{} and \SFIIVAo{} methods performed better immediately after the CMA rotation than the others.
 Between \SFIIVAm{} and \SFIIVAo{}, \SFIIVAm{} performed slightly better,
 which may be due to the fact that \SFIIVAo{} estimates the source image at the reference microphone,
@@ -708,14 +707,14 @@ For a realistic simulation, we conducted experiments under the following two typ
   \item[\texttt{white}] Single interference source consisting of white noise.
 \end{description}
 \Cref{fig:layout:noise} shows examples of the layout of the sources and microphones in noisy environments.
-Interference signals in \texttt{babble} were selected from the speech signals of the JVS dataset that were different from those used for the source signals.
+Noise signals in \texttt{babble} were selected from the speech signals of the JVS dataset that were different from those used for the source signals.
 The signal-to-noise ratio (SNR) is defined as
 \begin{equation}
   % \text{SIR} = 10 \log _{10} \frac{\sum _{t} s _{t} ^{2}}{Q \sum _{t} n _{t} ^{2}},
   \text{SNR} = 10 \log _{10} \frac{\sum _{k=1} ^{K} \sigma _{k} ^{2}}{\sigma _{\mathrm{n}} ^{2}},
 \end{equation}
-where $\sigma _{k} ^{2}$ and $\sigma _\mathrm{n} ^{2}$ are the variance of the $k$-th source signal and noise signals at the reference microphone, respectively
-After convolving room impulse responses, the variance of interferce signals was scaled so that $\text{SNR} = \SI{20}{\decibel}$.
+where $\sigma _{k} ^{2}$ and $\sigma _\mathrm{n} ^{2}$ are the variance of the $k$th source signal and noise signals at the reference microphone, respectively.
+After convolving room impulse responses, the variance of noise signals was scaled so that $\text{SNR} = \SI{20}{\decibel}$.
 In this experiment, we set the forgetting number $\forget$ to 0.98.
 Other conditions are the same as in the noiseless case.
 \begin{figure}[t]
@@ -745,7 +744,7 @@ Other conditions are the same as in the noiseless case.
 \Cref{fig:plot:line:noise} shows the SI-SDRi every \SI{1}{\second} averaged over samples and channels under noisy environments.
 As shown in the figure, performance between methods was consistent with the noiseless case.
 Overall, the final separation performance is lower than that of the noiseless case (\cref{fig:plot:line:980}).
-For \texttt{babble} and \texttt{white}, the separation performance of \texttt{white} was about \SI{10}{\decibel} lower than that of \texttt{babble}.
+The separation performance of \texttt{white} was about \SI{10}{\decibel} lower than that of \texttt{babble}.
 This is because \texttt{white} has a flat spectrum, and it can be quite larger than that of speech in the high-frequency range that is not included in \texttt{babble} and has a negative impact on the separation performance.
 \begin{figure}[t]
   \centering
@@ -756,7 +755,7 @@ This is because \texttt{white} has a flat spectrum, and it can be quite larger t
   \begin{minipage}[t]{.45\textwidth}
     \centering\includegraphics{figures/plots/white-norm/line_980.pdf}\subcaption{\texttt{white}}\label{fig:plot:line:980:white}
   \end{minipage}
-  \caption{SI-SDR improvements (SI-SDRi) every \SI{1}{\second} with various noise.}%
+  \caption{SI-SDR improvements (SI-SDRi) every \SI{1}{\second} with two kinds of noise.}%
   \label{fig:plot:line:noise}
 \end{figure}
 
@@ -776,7 +775,7 @@ On the other hand, by comparing the performance at \SI{59}{\second}, which is su
     Average SI-SDRi (dB) immediately after CMA rotation and after a sufficient time has elapsed.
     The length of simulated speech signals is \SI{60}{\second}, and the CMA was instantaneously rotated at \SI{30}{\second}.
     The true accurate measurement of CMA rotation was at \SI{40}{\degree} and the inaccurate measurement was at \SI{60}{\degree}.
-    Forgetting factor $\forget = 0.98$.
+    Forgetting factor $\forget$ was set to 0.98.
   }%
   \label{tab:sdr}
   \centering
@@ -790,7 +789,7 @@ On the other hand, by comparing the performance at \SI{59}{\second}, which is su
   \begin{minipage}[t]{.45\linewidth}
     \centering
     \subcaption{Accurate measurement.}%
-    \label{tab:sdr:98}
+    \label{tab:sdr:deg40}
     \begin{tabular}{lSS}
       \toprule
         Method   & \multicolumn{2}{c}{Time (s)} \\ \cmidrule{2-3}
@@ -805,7 +804,7 @@ On the other hand, by comparing the performance at \SI{59}{\second}, which is su
   \begin{minipage}[t]{.45\linewidth}
     \centering
     \subcaption{Inaccurate measurement.}%
-    \label{tab:sdr:98}
+    \label{tab:sdr:deg60}
     \begin{tabular}{lSS}
       \toprule
         Method   & \multicolumn{2}{c}{Time (s)} \\ \cmidrule{2-3}
@@ -825,7 +824,7 @@ In this subsection, we selected one example to focus on the difference between t
 \Cref{fig:plot:bp:ref} is the result calculated before the rotation.
 \Cref{fig:plot:bp:sfiivao,fig:plot:bp:sfiivam} are the results with the demixing matrices calculated using \SFIIVAo{} and \SFIIVAm{}, respectively, after the rotation.
 Dark regions in each plot represent nulls in a certain direction.
-In the case of online AuxIVA, the desired result is that the direction of the estimated source is toward the brighter regions, and that of the others is toward the darker region.
+In the case of OIVA, the desired result is that the direction of the estimated source is toward the brighter regions, and that of the others is toward the darker region.
 As shown in \cref{fig:plot:beam,fig:plot:bp:ref}, the results were similar to each other, and only the results in \cref{fig:plot:bp:sfiivam} were different from the each other.
 The dark regions in \cref{fig:plot:bp:ref,fig:plot:bp:sfiivao} were nearly in the desired directions since \SFIIVAo{} approximately canceled the rotation of the CMA and thus updated the demixing matrices in the same direction even after the rotation.
 For \SFIIVAm{}, the bright areas should be in the direction viewed from the position after the rotation, \emph{i.e.}, \SI{40}{\degree} less anti-clockwise than the previous result in this case.
