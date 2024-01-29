@@ -112,7 +112,7 @@
 
 \section{Introduction}\label{sec:intro}
 Blind source separation (BSS) \cite{Makino:2018:ASS} is a technique to extract source signals from their observed mixture.
-Popular approaches for BSS include independent vector analysis (IVA) \cite{Kim:2006:ASLP,Hiroe:2006:ICA}, auxiliary-function-based IVA (AuxIVA) \cite{Ono:2011:WASPAA}, and their extensions \cite{Kitamura:2016:ASLP,Nugraha:2020:SPL,Brendel:2020:SP}.
+Popular approaches for BSS include independent vector analysis (IVA) \cite{Kim:2006:ASL,Hiroe:2006:ICA}, auxiliary-function-based IVA (AuxIVA) \cite{Ono:2011:WASPAA}, and their extensions \cite{Kitamura:2016:ASLP,Nugraha:2020:SPL,Brendel:2020:SP}.
 These methods assume a time-invariant acoustic transfer system (ATS).
 However, in practical applications, considering time variations of the ATS, such as microphone movements, is necessary.
 
@@ -591,7 +591,7 @@ In this experiment, the utterances included in \texttt{parallel100} were randoml
 The length was \SI{60}{\second}, and the sampling frequency was resampled from \SI{24}{\kilo\hertz} to \SI{16}{\kilo\hertz}.
 The reverberation time was approximately \SI{100}{\milli\second}.
 A CMA with $\Src = 5$ channels and a radius of \SI{2}{\centi\metre} was placed at the center of the room.
-Each source was randomly placed at least \SI{1}{\metre} from the center of the CMA and within an angle ranging from $\frac{360}{\Src} \src$ to $\frac{360\si{\degree}}{\Src} (\src - 1) + \frac{180\si{\degree}}{\Src}\; (\src = 1, \dots, \Src)$.
+Each source was randomly placed at least \SI{1}{\metre} from the center of the CMA and within an angle ranging from $\frac{360\si{\degree}}{\Src} \src$ to $\frac{360\si{\degree}}{\Src} (\src - 1) + \frac{180\si{\degree}}{\Src}\; (\src = 1, \dots, \Src)$.
 \Cref{fig:layout:exp} illustrates the range of sources' placements and its example.
 To simulate the instant rotation of the CMA, the source images were generated when the CMA was rotated \SI{40}{\degree} counter-clockwise from the horizontal axis and was joined together at 0--30 \si{\second} and 30--60 \si{\second} intervals.
 Note that the rotation angle and time are given in an oracle manner.
@@ -624,7 +624,7 @@ The reference signal for the SI-SDR was the source image recorded with a rotated
 The initial values for demixing and weighted covariance matrices were
 $\Demix _{\freq,0} = \Eye\; (\forall \freq)$ and $\cov _{\src,\freq,0} = 10^{-3} \times \Eye\; (\forall \src, \freq)$, respectively, where $\Eye$ is the $\Src$-dimensional identity matrix.
 We set the number of iterations in each time frame in \cref{alg:iva} $\Itr$ to 5.
-We ran experiments using various forgetting factors $\forget = $ 0.9, 0.95, 0.98 and 0.99,
+We ran experiments using various forgetting factors $\forget = $ 0.9, 0.95, 0.98, and 0.99,
 which were chosen so that the approximate number of frames $\frac{1}{1 - \forget} =$ 10, 20, 50, and 100, respectively.
 To increase numerous stability for the implementation of OIVA,
 we applied the following ad-hoc normalization $\cov _{\src,\ft} \gets \cov _{\src,\ft} + 10 ^{-3} \times \Eye$ after updates using \eqref{eq:cov}.
